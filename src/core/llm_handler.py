@@ -1,18 +1,15 @@
 """
-Natural Language Processing for Teacher Training
+Pedagogical Language Processing Module
 
-This module provides intelligent language processing capabilities for the
-teacher training simulation system. It handles the generation of realistic
-student responses and evaluation of teaching strategies.
+This module handles all natural language processing tasks related to teaching scenarios,
+including response analysis, scenario creation, and student reaction generation.
+It provides a structured interface to the underlying LLM while maintaining
+educational context and pedagogical principles.
 
-Key Features:
-1. Teaching Response Analysis - Evaluates pedagogical approaches
-2. Student Response Generation - Creates age-appropriate reactions
-3. Contextual Understanding - Considers teaching scenario context
-4. Fallback Mechanisms - Ensures system reliability
-
-The system uses local LLM deployment for privacy and consistent performance
-while maintaining high-quality educational interactions.
+Example:
+    processor = PedagogicalLanguageProcessor()
+    analysis = processor.analyze_teaching_response("Let's use blocks to count", context)
+    reaction = processor.generate_student_reaction(context, effectiveness=0.8)
 """
 
 import requests
@@ -21,31 +18,141 @@ import time
 import os
 import signal
 import subprocess
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
+from ..utils.llm_interface import LLMInterface
+from ..utils.prompt_templates import PromptTemplates
+
+@dataclass
+class TeachingContext:
+    """
+    Data class for maintaining teaching context.
+    
+    Attributes:
+        subject: The subject being taught
+        grade_level: The grade level of the student
+        learning_objectives: List of learning objectives
+        student_characteristics: Dictionary of student traits and needs
+        previous_interactions: List of recent interactions
+    """
+    subject: str
+    grade_level: str
+    learning_objectives: List[str]
+    student_characteristics: Dict[str, Any]
+    previous_interactions: Optional[List[Dict[str, str]]] = None
 
 class PedagogicalLanguageProcessor:
     """
-    Manages natural language processing for teacher training simulations.
+    Processes natural language in educational contexts using LLMs.
     
-    This class provides:
-    - Analysis of teaching strategies and responses
-    - Generation of realistic student reactions
-    - Evaluation of pedagogical effectiveness
-    - Context-aware interaction handling
-    
-    The processor maintains educational context while generating
-    responses that reflect real classroom dynamics.
+    This class handles all language-related tasks in the teaching simulation:
+    - Analyzing teacher responses for effectiveness
+    - Generating appropriate student reactions
+    - Creating realistic teaching scenarios
+    - Providing pedagogically sound feedback
     
     Attributes:
-        model (str): Name of the language model being used
-        base_url (str): Endpoint for LLM API communication
-        system_prompt (str): Core instruction set for teaching evaluation
+        llm (LLMInterface): Interface to the language model
+        templates (PromptTemplates): Collection of educational prompt templates
     """
     
-    def __init__(self, model_name="mistral"):
-        self.model = model_name
-        self.base_url = "http://localhost:11434/api"
-        self.system_prompt = """You are an expert teacher evaluator, analyzing teaching responses 
-        in a training simulation. Provide detailed, constructive feedback."""
+    def __init__(self):
+        """Initialize the processor with LLM interface and prompt templates."""
+        self.llm = LLMInterface()
+        self.templates = PromptTemplates()
+        
+    def analyze_teaching_response(
+        self, 
+        teacher_input: str, 
+        context: TeachingContext
+    ) -> Dict[str, Any]:
+        """
+        Analyze the effectiveness of a teacher's response.
+        
+        Args:
+            teacher_input: The teacher's response or action
+            context: Current teaching context including student info
+            
+        Returns:
+            Dictionary containing analysis results:
+            - effectiveness_score: Float between 0 and 1
+            - identified_strengths: List of effective elements
+            - improvement_areas: List of areas for improvement
+            - suggested_strategies: Alternative approaches
+            
+        Example:
+            analysis = processor.analyze_teaching_response(
+                "Let's break this problem into smaller steps",
+                current_context
+            )
+        """
+        prompt = self.templates.get("analysis")
+        return self.llm.generate(
+            prompt=prompt,
+            context=context,
+            input=teacher_input
+        )
+        
+    def generate_student_reaction(
+        self, 
+        context: TeachingContext, 
+        effectiveness: float
+    ) -> str:
+        """
+        Generate an age-appropriate student reaction.
+        
+        Args:
+            context: Current teaching context
+            effectiveness: Float between 0 and 1 indicating teaching effectiveness
+            
+        Returns:
+            A string containing the simulated student's reaction
+            
+        Example:
+            reaction = processor.generate_student_reaction(
+                context,
+                effectiveness=0.85
+            )
+        """
+        prompt = self.templates.get("student_reaction")
+        return self.llm.generate(
+            prompt=prompt,
+            context=context,
+            effectiveness=effectiveness
+        )
+        
+    def create_scenario(
+        self, 
+        parameters: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Create a teaching scenario based on given parameters.
+        
+        Args:
+            parameters: Dictionary containing scenario parameters:
+                - subject: Subject area
+                - difficulty: Difficulty level
+                - student_profile: Student characteristics
+                
+        Returns:
+            Dictionary containing the complete scenario:
+            - context: Teaching context
+            - student_background: Relevant student information
+            - learning_objectives: Specific goals
+            - potential_challenges: Anticipated difficulties
+            
+        Example:
+            scenario = processor.create_scenario({
+                "subject": "mathematics",
+                "difficulty": "intermediate",
+                "student_profile": {...}
+            })
+        """
+        prompt = self.templates.get("scenario_creation")
+        return self.llm.generate(
+            prompt=prompt,
+            parameters=parameters
+        )
 
     def ensure_server_running(self):
         """Ensure Ollama server is running."""

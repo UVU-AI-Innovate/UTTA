@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ollama pull mistral
 
 # Start the application
-python terminal_app.py</pre>
+python src/interfaces/terminal_app.py</pre>
                 </div>
 
                 <div class="note">
@@ -46,20 +46,123 @@ python terminal_app.py</pre>
                 </div>
             </div>
 
+            <div id="application-flow" class="section">
+                <h2>Application Flow</h2>
+
+                <div class="subsection">
+                    <h3>1. Initialization Phase</h3>
+                    <div class="example">
+                        <h4>System Startup</h4>
+                        <ul>
+                            <li>Load configuration settings from config.yaml</li>
+                            <li>Initialize the LLM interface and ensure model availability</li>
+                            <li>Load the knowledge base with teaching strategies and resources</li>
+                            <li>Set up the teacher profile and simulation parameters</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>2. Teacher Profile Setup</h3>
+                    <div class="example">
+                        <h4>Profile Configuration</h4>
+                        <ul>
+                            <li>Collect teacher information (experience level, grade preferences)</li>
+                            <li>Set preferred subjects and teaching style</li>
+                            <li>Identify areas for professional development</li>
+                            <li>Store profile for personalized scenarios</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>3. Training Session Flow</h3>
+                    <div class="flow-diagram">
+                        <div class="component">
+                            <h4>1. Scenario Generation</h4>
+                            <ul>
+                                <li>Select subject and difficulty</li>
+                                <li>Generate student profile</li>
+                                <li>Create teaching context</li>
+                            </ul>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="component">
+                            <h4>2. Teacher Interaction</h4>
+                            <ul>
+                                <li>Present scenario</li>
+                                <li>Accept teacher response</li>
+                                <li>Process teaching strategy</li>
+                            </ul>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="component">
+                            <h4>3. Response Analysis</h4>
+                            <ul>
+                                <li>Evaluate effectiveness</li>
+                                <li>Generate feedback</li>
+                                <li>Suggest improvements</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>4. Feedback Generation</h3>
+                    <div class="example">
+                        <h4>Analysis Components</h4>
+                        <ul>
+                            <li><strong>Effectiveness Score:</strong> Numerical evaluation (0-1) of teaching approach</li>
+                            <li><strong>Strengths:</strong> Identification of effective strategies used</li>
+                            <li><strong>Areas for Improvement:</strong> Specific suggestions for enhancement</li>
+                            <li><strong>Alternative Approaches:</strong> Other teaching strategies to consider</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h3>5. Progress Tracking</h3>
+                    <div class="example">
+                        <h4>Session Monitoring</h4>
+                        <ul>
+                            <li>Track response patterns and improvement</li>
+                            <li>Monitor strategy effectiveness</li>
+                            <li>Record successful approaches</li>
+                            <li>Generate progress reports</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <div id="core-components" class="section">
                 <h2>Core Component Implementation</h2>
 
                 <div class="subsection">
                     <h3>Teacher Training Agent</h3>
+                    <div class="note">
+                        <h4>Key Responsibilities</h4>
+                        <ul>
+                            <li>Manages the overall training simulation</li>
+                            <li>Coordinates between components</li>
+                            <li>Maintains session state</li>
+                            <li>Processes teacher interactions</li>
+                        </ul>
+                    </div>
                     <div class="example">
                         <pre>
+# src/core/ai_agent.py
 class TeacherTrainingAgent:
     def __init__(self):
         self.llm = LLMInterface()
         self.knowledge = PedagogicalKnowledgeManager()
         self.processor = PedagogicalLanguageProcessor()
         
-    def generate_scenario(self, subject, difficulty, student_profile):
+    def create_teaching_scenario(
+        self, 
+        subject: str, 
+        difficulty: str, 
+        student_profile: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate a teaching scenario based on parameters."""
         context = {
             "subject": subject,
@@ -68,8 +171,12 @@ class TeacherTrainingAgent:
         }
         return self.processor.create_scenario(context)
         
-    def process_response(self, teacher_input, scenario):
-        """Process teacher's response and generate feedback."""
+    def evaluate_teaching_response(
+        self, 
+        teacher_input: str, 
+        scenario: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Evaluate response and generate feedback."""
         analysis = self.processor.analyze_teaching_response(
             teacher_input=teacher_input,
             context=scenario
@@ -80,8 +187,18 @@ class TeacherTrainingAgent:
 
                 <div class="subsection">
                     <h3>Knowledge Manager</h3>
+                    <div class="note">
+                        <h4>Key Responsibilities</h4>
+                        <ul>
+                            <li>Manages teaching strategies database</li>
+                            <li>Provides contextual knowledge retrieval</li>
+                            <li>Tracks strategy effectiveness</li>
+                            <li>Updates knowledge base with new insights</li>
+                        </ul>
+                    </div>
                     <div class="example">
                         <pre>
+# src/models/knowledge_manager.py
 class PedagogicalKnowledgeManager:
     def __init__(self):
         self.db = Database()
@@ -93,7 +210,7 @@ class PedagogicalKnowledgeManager:
         return self.vector_store.similarity_search(query)
         
     def update_knowledge(self, new_data):
-        """Add new teaching strategies to the knowledge base."""
+        """Add new teaching strategies."""
         vectors = self.vector_store.encode(new_data)
         self.vector_store.add(vectors)</pre>
                     </div>
@@ -101,8 +218,18 @@ class PedagogicalKnowledgeManager:
 
                 <div class="subsection">
                     <h3>Language Processor</h3>
+                    <div class="note">
+                        <h4>Key Responsibilities</h4>
+                        <ul>
+                            <li>Processes natural language interactions</li>
+                            <li>Analyzes teaching effectiveness</li>
+                            <li>Generates student reactions</li>
+                            <li>Provides contextual responses</li>
+                        </ul>
+                    </div>
                     <div class="example">
                         <pre>
+# src/core/llm_handler.py
 class PedagogicalLanguageProcessor:
     def __init__(self):
         self.llm = LLMInterface()

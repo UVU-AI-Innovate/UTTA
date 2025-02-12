@@ -17,7 +17,7 @@ pedagogical context and relationships between different teaching concepts.
 """
 
 import os
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import json
 import pandas as pd
 from sentence_transformers import SentenceTransformer
@@ -32,6 +32,25 @@ import yaml
 import csv
 import chardet
 from knowledge_store import KnowledgeStore
+from dataclasses import dataclass
+
+@dataclass
+class TeachingStrategy:
+    """
+    Data class representing a teaching strategy.
+    
+    Attributes:
+        name: Name or title of the strategy
+        description: Detailed description of how to implement
+        subjects: List of subjects where this strategy is applicable
+        grade_levels: List of appropriate grade levels
+        effectiveness_data: Optional historical effectiveness data
+    """
+    name: str
+    description: str
+    subjects: List[str]
+    grade_levels: List[str]
+    effectiveness_data: Optional[Dict[str, float]] = None
 
 class PedagogicalKnowledgeManager:
     """
@@ -526,4 +545,136 @@ class PedagogicalKnowledgeManager:
         for file_path in self.knowledge_base_dir.glob('*.*'):
             if file_path.name != 'knowledge.db':  # Skip the database file
                 print(f"\nProcessing {file_path.name}...")
-                self.add_to_knowledge_base(str(file_path)) 
+                self.add_to_knowledge_base(str(file_path))
+
+    def get_teaching_strategies(
+        self, 
+        context: Dict[str, Any]
+    ) -> List[TeachingStrategy]:
+        """
+        Retrieve relevant teaching strategies based on context.
+        
+        Args:
+            context: Dictionary containing search criteria:
+                - subject: Subject area
+                - grade_level: Target grade level
+                - student_needs: Specific student requirements
+                - learning_objectives: Desired learning outcomes
+                
+        Returns:
+            List of TeachingStrategy objects matching the criteria
+            
+        Example:
+            strategies = manager.get_teaching_strategies({
+                "subject": "mathematics",
+                "grade_level": "3rd",
+                "student_needs": ["visual_learner", "needs_scaffolding"]
+            })
+        """
+        query = self._build_search_query(context)
+        results = self.search(query)
+        return [self._parse_strategy(result) for result in results]
+        
+    def add_teaching_strategy(
+        self, 
+        strategy: TeachingStrategy
+    ) -> bool:
+        """
+        Add a new teaching strategy to the knowledge base.
+        
+        Args:
+            strategy: TeachingStrategy object containing the new strategy
+            
+        Returns:
+            Boolean indicating success of the operation
+            
+        Example:
+            success = manager.add_teaching_strategy(TeachingStrategy(
+                name="Visual Fraction Learning",
+                description="Use manipulatives to teach fractions...",
+                subjects=["mathematics"],
+                grade_levels=["3rd", "4th"]
+            ))
+        """
+        try:
+            # Convert strategy to vector embedding
+            vector = self.embedding_model.encode([strategy.description])[0]
+            
+            # Store in vector database
+            self.knowledge_store.add_document(
+                content=strategy.description,
+                source="Teaching Strategy",
+                chunk_type="strategy",
+                metadata={
+                    "name": strategy.name,
+                    "description": strategy.description,
+                    "subjects": strategy.subjects,
+                    "grade_levels": strategy.grade_levels,
+                    "effectiveness_data": strategy.effectiveness_data
+                },
+                embedding=vector
+            )
+            
+            return True
+        except Exception as e:
+            print(f"Error adding strategy: {str(e)}")
+            return False
+            
+    def update_effectiveness(
+        self, 
+        strategy_id: str, 
+        effectiveness_data: Dict[str, float]
+    ) -> None:
+        """
+        Update effectiveness metrics for a teaching strategy.
+        
+        Args:
+            strategy_id: Unique identifier for the strategy
+            effectiveness_data: Dictionary containing metrics:
+                - student_engagement: Float between 0 and 1
+                - learning_outcomes: Float between 0 and 1
+                - teacher_feedback: Float between 0 and 1
+                
+        Example:
+            manager.update_effectiveness("strategy_123", {
+                "student_engagement": 0.85,
+                "learning_outcomes": 0.78,
+                "teacher_feedback": 0.92
+            })
+        """
+        # This method is not implemented in the original code block or the new class
+        # It's assumed to exist as it's called in the update_effectiveness method
+        pass
+        
+    def _build_search_query(self, context: Dict[str, Any]) -> str:
+        """
+        Build a search query from context parameters.
+        
+        Args:
+            context: Search context dictionary
+            
+        Returns:
+            Formatted search query string
+        """
+        return json.dumps({
+            "type": "teaching_strategy",
+            "parameters": context
+        })
+        
+    def _parse_strategy(self, result: Dict[str, Any]) -> TeachingStrategy:
+        """
+        Parse search result into TeachingStrategy object.
+        
+        Args:
+            result: Raw search result dictionary
+            
+        Returns:
+            TeachingStrategy object
+        """
+        return TeachingStrategy(
+            name=result["name"],
+            description=result["description"],
+            subjects=result["subjects"],
+            grade_levels=result["grade_levels"],
+            effectiveness_data=result.get("effectiveness_data")
+        ) 

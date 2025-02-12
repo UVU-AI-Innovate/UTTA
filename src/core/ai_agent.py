@@ -1,18 +1,14 @@
 """
-TeacherTrainingSimulator Core Module
+Teacher Training Agent Module
 
-This module implements the core simulation engine for teacher training scenarios.
-It provides a realistic environment for practicing and evaluating teaching strategies
-through simulated student interactions.
+This module implements the core AI agent responsible for simulating and managing
+teacher training scenarios. It coordinates between the LLM interface, knowledge management,
+and pedagogical processing components.
 
-Key Components:
-1. Scenario Generation - Creates realistic teaching scenarios based on grade level
-2. Response Evaluation - Assesses teaching strategies using pedagogical principles
-3. Student Simulation - Generates age-appropriate student reactions
-4. Knowledge Integration - Leverages research-based teaching knowledge
-
-The system uses advanced NLP and a knowledge base of teaching strategies to provide
-meaningful feedback and realistic student responses.
+Example:
+    agent = TeacherTrainingAgent()
+    scenario = agent.create_teaching_scenario("mathematics", "intermediate", student_profile)
+    feedback = agent.evaluate_teaching_response(teacher_input, scenario)
 """
 
 import random
@@ -21,156 +17,118 @@ from llm_handler import LLMHandler
 from knowledge_base import SECOND_GRADE_CHARACTERISTICS, TEACHING_STRATEGIES
 from evaluator import evaluate_teacher_response
 from knowledge_manager import KnowledgeManager
+from typing import Dict, Any
+from .llm_handler import PedagogicalLanguageProcessor
+from ..models.knowledge_manager import PedagogicalKnowledgeManager
+from ..utils.llm_interface import LLMInterface
 
 class TeacherTrainingAgent:
     """
-    Core simulation engine for teacher professional development.
+    Main agent class for managing teacher training simulations.
     
-    This class manages the entire teacher training simulation process, including:
-    - Generation of realistic classroom scenarios
-    - Evaluation of teaching responses using pedagogical principles
-    - Simulation of age-appropriate student behaviors
-    - Integration of evidence-based teaching strategies
-    
-    The agent maintains state about both the simulated student and the teacher
-    in training, allowing for contextual and personalized interactions.
+    This class orchestrates the interaction between different components:
+    - LLM Interface for AI model interactions
+    - Knowledge Manager for accessing teaching strategies
+    - Language Processor for analyzing responses
     
     Attributes:
-        knowledge_manager (KnowledgeManager): Manages pedagogical knowledge and teaching strategies
-        student_profile (dict): Current student's characteristics and learning state
-        teacher_profile (dict): Teacher's experience level and development areas
-        llm (LLMHandler): Handles natural language processing for response generation
-        conversation_memory (dict): Tracks interaction history and learning progress
+        llm (LLMInterface): Interface to the language model
+        knowledge (PedagogicalKnowledgeManager): Manager for teaching knowledge
+        processor (PedagogicalLanguageProcessor): Processor for language analysis
     """
+    
     def __init__(self):
-        """Initialize the chatbot with knowledge base and default settings."""
-        print("\nInitializing Teacher Training Simulator...")
+        """Initialize the TeacherTrainingAgent with required components."""
+        self.llm = LLMInterface()
+        self.knowledge = PedagogicalKnowledgeManager()
+        self.processor = PedagogicalLanguageProcessor()
         
-        # Initialize knowledge manager
-        self.knowledge_manager = KnowledgeManager()
+    def create_teaching_scenario(
+        self, 
+        subject: str, 
+        difficulty: str, 
+        student_profile: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Create a teaching scenario based on given parameters.
         
-        try:
-            print("Loading knowledge base...")
-            # Process all files in knowledge base
-            self.knowledge_manager.process_all_files()
-            print("✓ Knowledge base loaded successfully")
-        except Exception as e:
-            print(f"! Error loading knowledge base: {str(e)}")
-            print("Using fallback basic knowledge...")
-            self.knowledge_base = self._get_fallback_knowledge()
-
-        # Add teacher profile with defaults for quick testing
-        self.teacher_profile = {
-            "name": "Test Teacher",
-            "experience_level": "novice",
-            "grade_level_interest": "lower_elementary",
-            "subject_preferences": ["math", "reading"],
-            "teaching_style": "interactive",
-            "areas_for_growth": ["classroom_management", "student_engagement"]
+        Args:
+            subject: The subject area for the scenario (e.g., "mathematics", "reading")
+            difficulty: The difficulty level (e.g., "beginner", "intermediate", "advanced")
+            student_profile: Dictionary containing student characteristics and learning style
+            
+        Returns:
+            Dictionary containing the generated scenario details including:
+            - context: The teaching context
+            - objectives: Learning objectives
+            - student_background: Relevant student information
+            - suggested_approaches: Initial teaching strategy suggestions
+        
+        Example:
+            scenario = agent.create_teaching_scenario(
+                "mathematics",
+                "intermediate",
+                {"learning_style": "visual", "grade_level": "3rd"}
+            )
+        """
+        context = {
+            "subject": subject,
+            "difficulty": difficulty,
+            "student_profile": student_profile
         }
-
-        # Initialize student personality and state
-        self._initialize_student_state()
+        return self.processor.create_scenario(context)
         
-        print("✓ Initialization complete\n")
-
-        # Enhanced personality traits with more specific attributes
-        self.personality = {
-            "base_traits": {
-                "attention_span": random.uniform(0.4, 0.8),
-                "learning_style": random.choice(["visual", "auditory", "kinesthetic"]),
-                "social_confidence": random.uniform(0.3, 0.8),
-                "favorite_subjects": random.sample(["math", "reading", "art", "science"], 2),
-                "challenges": random.sample([
-                    "reading comprehension",
-                    "number sense",
-                    "staying focused",
-                    "asking for help"
-                ], 2)
-            },
-            "current_state": {
-                "engagement": 0.5,
-                "understanding": 0.5,
-                "mood": 0.5,
-                "energy": 0.8
-            }
-        }
-
-        # Knowledge base of second-grade appropriate responses
-        self.responses = {
-            "disengaged": [
-                "I don't want to do this...",
-                "This is boring.",
-                "Can I draw instead?",
-                "When is recess?",
-                "*looks out the window*"
-            ],
-            "confused": [
-                "I don't get it.",
-                "This is too hard!",
-                "Can you explain it again?",
-                "*stares at worksheet with furrowed brow*"
-            ],
-            "engaged": [
-                "Oh, I think I know!",
-                "Can I try solving it?",
-                "This is like what we did yesterday!",
-                "*raises hand enthusiastically*"
-            ]
-        }
-
-        # More specific scenario types
-        self.scenarios = {
-            "math": {
-                "description": "During math practice with addition problems",
-                "behaviors": [
-                    "looking confused at the worksheet",
-                    "counting fingers under the desk",
-                    "erasing answers repeatedly"
-                ]
-            },
-            "reading": {
-                "description": "During reading time with a new story",
-                "behaviors": [
-                    "struggling with longer words",
-                    "getting distracted by pictures",
-                    "losing place in the text"
-                ]
-            }
-        }
-
-        # Initialize LLM handler
-        self.llm = LLMHandler()
-
-        # Add knowledge-based initialization
-        self.learning_style = random.choice(list(SECOND_GRADE_CHARACTERISTICS["learning_styles"].keys()))
+    def evaluate_teaching_response(
+        self, 
+        teacher_input: str, 
+        scenario: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Evaluate a teacher's response and generate detailed feedback.
         
-        # Get common challenges by combining math and reading challenges
-        math_challenges = SECOND_GRADE_CHARACTERISTICS["cognitive"]["academic_skills"]["math"]["challenging"]
-        reading_challenges = SECOND_GRADE_CHARACTERISTICS["cognitive"]["academic_skills"]["reading"]["challenging"]
-        all_challenges = math_challenges + reading_challenges
+        Args:
+            teacher_input: The teacher's response or action in the scenario
+            scenario: The current teaching scenario context
+            
+        Returns:
+            Dictionary containing the evaluation results including:
+            - effectiveness: Overall effectiveness score
+            - strengths: Identified strong points
+            - areas_for_improvement: Suggested improvements
+            - alternative_approaches: Other teaching strategies to consider
+            
+        Example:
+            feedback = agent.evaluate_teaching_response(
+                "I would use visual aids to demonstrate fraction concepts",
+                current_scenario
+            )
+        """
+        analysis = self.processor.analyze_teaching_response(
+            teacher_input=teacher_input,
+            context=scenario
+        )
+        return self.generate_feedback(analysis)
         
-        self.current_challenges = random.sample(all_challenges, 2)
+    def generate_feedback(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate structured feedback based on teaching response analysis.
         
-        # Update personality with knowledge-based traits
-        self.personality.update({
-            "learning_preferences": SECOND_GRADE_CHARACTERISTICS["learning_styles"][self.learning_style]["preferences"],
-            "typical_expressions": random.sample(
-                SECOND_GRADE_CHARACTERISTICS["social_emotional"]["emotional_expressions"]["frustrated"], 
-                3
-            ),
-            "current_challenges": self.current_challenges
-        })
-
-        # Add conversation memory
-        self.conversation_memory = {
-            "recent_topics": [],
-            "successful_strategies": [],
-            "student_progress": {
-                "understanding": 0.5,
-                "engagement": 0.5,
-                "confidence": 0.5
-            }
+        Args:
+            analysis: Analysis results from the language processor
+            
+        Returns:
+            Structured feedback dictionary with specific recommendations
+            and improvement suggestions
+        """
+        # Get relevant teaching strategies
+        strategies = self.knowledge.get_teaching_strategies(analysis["context"])
+        
+        # Combine analysis with teaching strategies
+        return {
+            "effectiveness": analysis["effectiveness_score"],
+            "strengths": analysis["identified_strengths"],
+            "areas_for_improvement": analysis["improvement_areas"],
+            "alternative_approaches": strategies
         }
 
     def _load_teaching_strategies(self):
