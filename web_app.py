@@ -4,11 +4,12 @@ Provides an interactive interface for teachers to practice and analyze teaching 
 """
 
 import streamlit as st
-from ai_agent import AIAgent
+import os
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import json
+from ai_agent import TeacherTrainingAgent as AIAgent
 
 class WebInterface:
     def __init__(self):

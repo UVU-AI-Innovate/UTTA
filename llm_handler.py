@@ -20,8 +20,8 @@ import signal
 import subprocess
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from ..utils.llm_interface import LLMInterface
-from ..utils.prompt_templates import PromptTemplates
+from llm_interface import LLMInterface
+from prompt_templates import PromptTemplates
 
 @dataclass
 class TeachingContext:

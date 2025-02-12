@@ -3,25 +3,79 @@
 ## 🚀 Setting Up the Environment
 
 ### Installation Steps
+
+#### 1. Clone the Repository
 ```bash
 # Clone the repository
 git clone https://github.com/UVU-AI-Innovate/UTTA.git
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Download the LLM model
-ollama pull mistral
-
-# Start the application
-python src/interfaces/terminal_app.py
+cd UTTA
 ```
 
-### System Requirements
-- Python 3.8 or higher
-- 8GB RAM minimum
-- 10GB free disk space
-- CUDA-capable GPU (optional)
+#### 2. Install Dependencies
+```bash
+# Install required packages
+pip install -r requirements.txt
+```
+
+### Project Structure
+The main application files are organized in the root directory:
+
+```
+UTTA/
+├── web_app.py           # Streamlit web interface
+├── ai_agent.py          # Core AI agent implementation
+├── llm_handler.py       # Language model processing
+├── llm_interface.py     # LLM communication interface
+├── knowledge_base.py    # Teaching strategies and characteristics
+├── evaluator.py         # Response evaluation module
+├── prompt_templates.py  # LLM prompt templates
+├── tests/              # Test suite
+├── docs/               # Documentation
+├── resources/          # Additional resources
+└── requirements.txt    # Project dependencies
+```
+
+### Running the Application
+
+To start the web interface:
+```bash
+streamlit run web_app.py
+```
+
+The application will be available at:
+- Local URL: http://localhost:8501
+- Network URL: Displayed in terminal
+
+### Key Components
+
+1. **Web Interface (`web_app.py`)**
+   - Streamlit-based user interface
+   - Handles user interactions and display
+
+2. **AI Agent (`ai_agent.py`)**
+   - Core simulation logic
+   - Manages teaching scenarios and evaluations
+
+3. **LLM Handler (`llm_handler.py`)**
+   - Processes natural language
+   - Manages LLM interactions
+
+4. **Knowledge Base (`knowledge_base.py`)**
+   - Teaching strategies
+   - Student characteristics
+   - Behavioral scenarios
+
+5. **Evaluator (`evaluator.py`)**
+   - Response evaluation logic
+   - Feedback generation
+
+6. **LLM Interface (`llm_interface.py`)**
+   - LLM communication layer
+   - Response generation
+
+7. **Prompt Templates (`prompt_templates.py`)**
+   - LLM prompt management
+   - Scenario templates
 
 ## 🔄 Application Flow
 

@@ -1,224 +1,73 @@
-# UTTA Development (Phase One - Chatbot)
+# UTTA (Universal Teacher Training Assistant)
 
-📚 **Project Documentation:** [https://uvu-ai-innovate.github.io/UTTA/](https://uvu-ai-innovate.github.io/UTTA/)
+## 🎯 Overview
+UTTA is an AI-powered educational simulation chatbot designed to help train teachers through realistic classroom scenarios. It provides interactive simulations, immediate feedback, and personalized teaching strategies to enhance educational practices.
 
-An AI-powered educational simulation chatbot designed to help teachers develop and refine their teaching strategies through interactive text-based practice with a simulated second-grade student.
+## 🌟 Key Features
+- Interactive teaching scenarios
+- Real-time feedback and evaluation
+- Personalized teaching strategies
+- Behavioral management simulations
+- Student engagement techniques
+- Differentiated learning approaches
 
-## System Overview
+## 📁 Project Structure
+```
+UTTA/
+├── web_app.py           # Streamlit web interface
+├── ai_agent.py          # Core AI agent implementation
+├── llm_handler.py       # Language model processing
+├── llm_interface.py     # LLM communication interface
+├── knowledge_base.py    # Teaching strategies and characteristics
+├── evaluator.py         # Response evaluation module
+├── prompt_templates.py  # LLM prompt templates
+├── tests/              # Test suite
+├── docs/               # Documentation
+├── resources/          # Additional resources
+└── requirements.txt    # Project dependencies
+```
 
+## 🔄 System Architecture
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant T as Teacher
-    participant UI as User Interface
-    participant Engine as AI Engine
-    participant KB as Knowledge Base
-    participant M as Memory
-    
-    %% Styling
-    rect rgb(240, 248, 255)
-        Note over T,M: Setup
-        Note over T,UI: Start app
-        
-        T->>UI: Select subject
-        activate UI
-        
-        UI->>Engine: Initialize
-        activate Engine
-        
-        Note over Engine: Load LLM
-        Engine->>KB: Get scenarios
-        activate KB
-        
-        KB-->>Engine: Send teaching cases
-        deactivate KB
-        
-        Engine-->>UI: Ready
-        deactivate Engine
-        
-        Note over UI: Show options
-        deactivate UI
-    end
-    
-    Note over T,M: Teaching
-    rect rgb(230, 255, 240)
-        Note over T,UI: Write response
-        
-        T->>UI: Submit text
-        activate UI
-        
-        UI->>Engine: Send to LLM
-        activate Engine
-        
-        Note over Engine: Process input
-        Engine->>KB: Match patterns
-        activate KB
-        
-        KB-->>Engine: Return matches
-        deactivate KB
-        
-        Note over Engine: Generate reply
-        Engine-->>UI: Send response
-        deactivate Engine
-        
-        UI-->>T: Show reply
-        
-        UI->>M: Save chat
-        activate M
-        
-        deactivate M
-        deactivate UI
-    end
-    
-    rect rgb(255, 240, 245)
-        Note over T,M: Analysis
-        Note over T,UI: Request review
-        
-        T->>UI: Open stats
-        activate UI
-        
-        UI->>Engine: Get analysis
-        activate Engine
-        
-        Engine->>KB: Get standards
-        activate KB
-        
-        KB-->>Engine: Send criteria
-        deactivate KB
-        
-        Engine->>M: Get history
-        activate M
-        
-        M-->>Engine: Send chats
-        deactivate M
-        
-        Note over Engine: Compare & score
-        Note over Engine: Generate feedback
-        
-        Engine-->>UI: Send results
-        deactivate Engine
-        
-        UI-->>T: Show report
-        deactivate UI
-    end
+    participant User
+    participant WebApp
+    participant AIAgent
+    participant LLMHandler
+    participant KnowledgeBase
+
+    User->>WebApp: Input teaching scenario
+    WebApp->>AIAgent: Process scenario
+    AIAgent->>KnowledgeBase: Retrieve strategies
+    AIAgent->>LLMHandler: Generate response
+    LLMHandler-->>AIAgent: Response
+    AIAgent->>AIAgent: Evaluate response
+    AIAgent-->>WebApp: Feedback & suggestions
+    WebApp-->>User: Display results
 ```
 
-The application works through four main components that interact seamlessly to provide a realistic teaching simulation:
-
-1. **User Interface**: Handles teacher interactions through both terminal and web interfaces
-2. **AI Engine**: Uses LLM to understand teaching responses, simulate student interactions, compare responses with educational best practices, and provide detailed teaching effectiveness scores
-3. **Knowledge Base**: Stores educational content, teaching standards, and response patterns
-4. **Memory**: Maintains chat history, session states, and interaction records
-
-## Application Components
-
-### 1. Core AI Engine
-
-The AI Engine is the core of our application, handling:
-- Natural language processing of teacher inputs
-- Context management for conversations
-- LLM-based response generation
-- Response evaluation and feedback
-
-
-### 2. Knowledge Management System
-
-The Knowledge Management System handles:
-- Storage and retrieval of teaching scenarios
-- Vector-based similarity search
-- Response pattern matching
-- Performance analytics
-
-
-### 3. User Interface System
-
-The User Interface System provides:
-- Interactive chat interface
-- Real-time feedback display
-- Progress tracking and visualization
-- Session management
-
-
-## Component Details
-
-### AI Engine Configuration
-```python
-# Example AI engine configuration
-config = {
-    "model": "llama-2-7b-chat",
-    "context_length": 2048,
-    "temperature": 0.7,
-    "response_cache": True
-}
-```
-
-### Knowledge Base Structure
-```python
-# Example knowledge base entry
-scenario = {
-    "context": "Math Class",
-    "difficulty": "intermediate",
-    "student_state": {
-        "learning_style": "visual",
-        "attention": 0.8,
-        "frustration": 0.3
-    }
-}
-```
-
-### Interface Features
-```python
-# Example interface configuration
-ui_config = {
-    "chat_history": 10,
-    "feedback_delay": 0.5,
-    "auto_suggestions": True,
-    "progress_tracking": True
-}
-```
-
-## Getting Started
-
-### For Teachers
+## 🚀 Getting Started
+1. Clone the repository
 ```bash
-# Terminal interface
-python terminal_app.py
+git clone https://github.com/UVU-AI-Innovate/UTTA.git
+cd UTTA
+```
 
-# Web interface
+2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the application
+```bash
 streamlit run web_app.py
 ```
 
-### For Developers
-```bash
-# Installation
-git clone https://github.com/yourusername/teacher-training-simulator.git
-pip install -r requirements.txt
+## 📚 Documentation
+For detailed implementation guides and documentation, please refer to the [Wiki](UTTA.wiki/).
 
-# Development
-python -m pytest tests/
-python run_dev_server.py
-```
+## 🤝 Contributing
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-## Contributing
-
-### AI Development
-- Model integration and tuning
-- Prompt engineering
-- Response generation
-- Evaluation metrics
-
-### Data Management
-- Scenario development
-- Knowledge base expansion
-- Analytics implementation
-- Pattern recognition
-
-### Web Development
-- Interface improvements
-- Feature implementation
-- Performance optimization
-- User experience enhancement
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

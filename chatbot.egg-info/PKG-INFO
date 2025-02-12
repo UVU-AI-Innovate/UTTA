@@ -1,0 +1,293 @@
+Metadata-Version: 2.1
+Name: chatbot
+Version: 0.1.0
+Summary: An AI-powered chatbot for education
+Home-page: https://github.com/yourusername/chatbot
+Author: Your Name
+Author-email: your.email@example.com
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: streamlit>=1.31.0
+Requires-Dist: ollama>=0.1.27
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: faiss-cpu>=1.7.4
+Requires-Dist: sentence-transformers>=2.2.2
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: requests>=2.31.0
+Requires-Dist: tqdm>=4.66.1
+Requires-Dist: matplotlib>=3.8.0
+Requires-Dist: plotly>=5.18.0
+Requires-Dist: transformers==4.38.2
+Requires-Dist: torch==2.1.2
+Requires-Dist: numpy>=1.23.0
+Requires-Dist: PyPDF2>=3.0.0
+Requires-Dist: python-docx>=0.8.11
+Requires-Dist: markdown>=3.5.1
+Requires-Dist: chardet>=5.2.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: termcolor>=2.3.0
+Requires-Dist: SQLAlchemy==2.0.27
+Requires-Dist: psycopg2-binary==2.9.9
+Requires-Dist: pgvector==0.2.5
+Requires-Dist: tqdm>=4.65.0
+Requires-Dist: black>=23.12.0
+Requires-Dist: pylint>=3.0.3
+Requires-Dist: pytest>=7.4.3
+Requires-Dist: mypy>=1.8.0
+Requires-Dist: flake8>=7.0.0
+Requires-Dist: sphinx>=7.2.6
+Requires-Dist: sphinx-rtd-theme>=2.0.0
+Requires-Dist: openai>=1.3.0
+Requires-Dist: isort==5.13.2
+Requires-Dist: flake8-docstrings==1.7.0
+Requires-Dist: pre-commit==3.6.0
+Requires-Dist: pytest-cov==4.1.0
+Requires-Dist: jsonschema>=4.17.3
+Requires-Dist: openai>=1.3.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: termcolor>=2.3.0
+Requires-Dist: scikit-learn>=1.0.2
+Provides-Extra: dev
+Requires-Dist: black==24.1.1; extra == "dev"
+Requires-Dist: isort==5.13.2; extra == "dev"
+Requires-Dist: flake8==7.0.0; extra == "dev"
+Requires-Dist: flake8-docstrings==1.7.0; extra == "dev"
+Requires-Dist: mypy==1.8.0; extra == "dev"
+Requires-Dist: pre-commit==3.6.0; extra == "dev"
+Requires-Dist: pytest==8.0.0; extra == "dev"
+Requires-Dist: pytest-cov==4.1.0; extra == "dev"
+
+# UTTA Development (Phase One - Chatbot)
+
+📚 **Project Documentation:** [https://uvu-ai-innovate.github.io/UTTA/](https://uvu-ai-innovate.github.io/UTTA/)
+
+An AI-powered educational simulation chatbot designed to help teachers develop and refine their teaching strategies through interactive text-based practice with a simulated second-grade student.
+
+## System Overview
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant T as Teacher
+    participant UI as User Interface
+    participant Engine as AI Engine
+    participant KB as Knowledge Base
+    participant M as Memory
+    
+    %% Styling
+    rect rgb(240, 248, 255)
+        Note over T,M: Setup
+        Note over T,UI: Start app
+        
+        T->>UI: Select subject
+        activate UI
+        
+        UI->>Engine: Initialize
+        activate Engine
+        
+        Note over Engine: Load LLM
+        Engine->>KB: Get scenarios
+        activate KB
+        
+        KB-->>Engine: Send teaching cases
+        deactivate KB
+        
+        Engine-->>UI: Ready
+        deactivate Engine
+        
+        Note over UI: Show options
+        deactivate UI
+    end
+    
+    Note over T,M: Teaching
+    rect rgb(230, 255, 240)
+        Note over T,UI: Write response
+        
+        T->>UI: Submit text
+        activate UI
+        
+        UI->>Engine: Send to LLM
+        activate Engine
+        
+        Note over Engine: Process input
+        Engine->>KB: Match patterns
+        activate KB
+        
+        KB-->>Engine: Return matches
+        deactivate KB
+        
+        Note over Engine: Generate reply
+        Engine-->>UI: Send response
+        deactivate Engine
+        
+        UI-->>T: Show reply
+        
+        UI->>M: Save chat
+        activate M
+        
+        deactivate M
+        deactivate UI
+    end
+    
+    rect rgb(255, 240, 245)
+        Note over T,M: Analysis
+        Note over T,UI: Request review
+        
+        T->>UI: Open stats
+        activate UI
+        
+        UI->>Engine: Get analysis
+        activate Engine
+        
+        Engine->>KB: Get standards
+        activate KB
+        
+        KB-->>Engine: Send criteria
+        deactivate KB
+        
+        Engine->>M: Get history
+        activate M
+        
+        M-->>Engine: Send chats
+        deactivate M
+        
+        Note over Engine: Compare & score
+        Note over Engine: Generate feedback
+        
+        Engine-->>UI: Send results
+        deactivate Engine
+        
+        UI-->>T: Show report
+        deactivate UI
+    end
+```
+
+The application works through four main components that interact seamlessly to provide a realistic teaching simulation:
+
+1. **User Interface**: Handles teacher interactions through both terminal and web interfaces
+2. **AI Engine**: Uses LLM to understand teaching responses, simulate student interactions, compare responses with educational best practices, and provide detailed teaching effectiveness scores
+3. **Knowledge Base**: Stores educational content, teaching standards, and response patterns
+4. **Memory**: Maintains chat history, session states, and interaction records
+
+## Application Components
+
+### 1. Core AI Engine
+
+The AI Engine is the core of our application, handling:
+- Natural language processing of teacher inputs
+- Context management for conversations
+- LLM-based response generation
+- Response evaluation and feedback
+
+
+### 2. Knowledge Management System
+
+The Knowledge Management System handles:
+- Storage and retrieval of teaching scenarios
+- Vector-based similarity search
+- Response pattern matching
+- Performance analytics
+
+
+### 3. User Interface System
+
+The User Interface System provides:
+- Interactive chat interface
+- Real-time feedback display
+- Progress tracking and visualization
+- Session management
+
+
+## Component Details
+
+### AI Engine Configuration
+```python
+# Example AI engine configuration
+config = {
+    "model": "llama-2-7b-chat",
+    "context_length": 2048,
+    "temperature": 0.7,
+    "response_cache": True
+}
+```
+
+### Knowledge Base Structure
+```python
+# Example knowledge base entry
+scenario = {
+    "context": "Math Class",
+    "difficulty": "intermediate",
+    "student_state": {
+        "learning_style": "visual",
+        "attention": 0.8,
+        "frustration": 0.3
+    }
+}
+```
+
+### Interface Features
+```python
+# Example interface configuration
+ui_config = {
+    "chat_history": 10,
+    "feedback_delay": 0.5,
+    "auto_suggestions": True,
+    "progress_tracking": True
+}
+```
+
+## Getting Started
+
+### For Teachers
+```bash
+# Terminal interface
+python terminal_app.py
+
+# Web interface
+streamlit run web_app.py
+```
+
+### For Developers
+```bash
+# Installation
+git clone https://github.com/yourusername/teacher-training-simulator.git
+pip install -r requirements.txt
+
+# Development
+python -m pytest tests/
+python run_dev_server.py
+```
+
+## Contributing
+
+### AI Development
+- Model integration and tuning
+- Prompt engineering
+- Response generation
+- Evaluation metrics
+
+### Data Management
+- Scenario development
+- Knowledge base expansion
+- Analytics implementation
+- Pattern recognition
+
+### Web Development
+- Interface improvements
+- Feature implementation
+- Performance optimization
+- User experience enhancement
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

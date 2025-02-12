@@ -13,14 +13,11 @@ Example:
 
 import random
 import json
-from llm_handler import LLMHandler
+from llm_handler import PedagogicalLanguageProcessor
 from knowledge_base import SECOND_GRADE_CHARACTERISTICS, TEACHING_STRATEGIES
 from evaluator import evaluate_teacher_response
-from knowledge_manager import KnowledgeManager
+from llm_interface import LLMInterface
 from typing import Dict, Any
-from .llm_handler import PedagogicalLanguageProcessor
-from ..models.knowledge_manager import PedagogicalKnowledgeManager
-from ..utils.llm_interface import LLMInterface
 
 class TeacherTrainingAgent:
     """
@@ -28,20 +25,21 @@ class TeacherTrainingAgent:
     
     This class orchestrates the interaction between different components:
     - LLM Interface for AI model interactions
-    - Knowledge Manager for accessing teaching strategies
     - Language Processor for analyzing responses
     
     Attributes:
         llm (LLMInterface): Interface to the language model
-        knowledge (PedagogicalKnowledgeManager): Manager for teaching knowledge
         processor (PedagogicalLanguageProcessor): Processor for language analysis
     """
     
     def __init__(self):
         """Initialize the TeacherTrainingAgent with required components."""
         self.llm = LLMInterface()
-        self.knowledge = PedagogicalKnowledgeManager()
         self.processor = PedagogicalLanguageProcessor()
+        self.learning_style = "visual"  # Default learning style
+        self.current_challenges = ["staying focused", "asking for help"]  # Default challenges
+        self.teacher_profile = {"name": "", "experience_level": "", "grade_level_interest": "", "subject_preferences": [], "teaching_style": "", "areas_for_growth": []}
+        self._initialize_student_state()
         
     def create_teaching_scenario(
         self, 
@@ -121,7 +119,7 @@ class TeacherTrainingAgent:
             and improvement suggestions
         """
         # Get relevant teaching strategies
-        strategies = self.knowledge.get_teaching_strategies(analysis["context"])
+        strategies = TEACHING_STRATEGIES.get(analysis["context"], [])
         
         # Combine analysis with teaching strategies
         return {
@@ -467,52 +465,34 @@ class TeacherTrainingAgent:
         time_of_day = scenario["time_of_day"]
         student_context = scenario["student_context"]
         behavior_type = scenario["behavioral_context"]["type"]
-        behavior_trigger = scenario["behavioral_context"]["trigger"]
         subject = scenario["subject"]
         
-        # Get relevant knowledge from vector store
-        time_query = f"teaching strategies for {time_of_day}"
-        style_query = f"teaching methods for {student_context['learning_style']} learners"
-        behavior_query = f"handling {behavior_type} behavior triggered by {behavior_trigger}"
-        subject_query = f"teaching strategies for {subject}"
-        
-        # Search knowledge base
-        time_strategies = self.knowledge_manager.search(time_query)
-        style_strategies = self.knowledge_manager.search(style_query)
-        behavior_strategies = self.knowledge_manager.search(behavior_query)
-        subject_strategies = self.knowledge_manager.search(subject_query)
-        
         # 1. Time-appropriate strategies (20% of score)
-        if any(strategy['text'].lower() in teacher_response.lower() for strategy in time_strategies):
+        time_strategies = TEACHING_STRATEGIES["engagement"]
+        if any(strategy.lower() in teacher_response.lower() for strategy in time_strategies):
             score += 0.2
-            feedback.append(f"✓ Good use of {time_of_day} appropriate strategy")
+            feedback.append(f"✓ Good use of engaging strategy")
         else:
-            suggestions.append(f"Consider {time_of_day} strategies like: {time_strategies[0]['text'] if time_strategies else 'structured activities'}")
+            suggestions.append(f"Consider engagement strategies like: {time_strategies[0]}")
             explanations.append(f"Different times of day require different approaches")
         
         # 2. Learning style alignment (20% of score)
-        if any(strategy['text'].lower() in teacher_response.lower() for strategy in style_strategies):
+        style_strategies = TEACHING_STRATEGIES["differentiation"]
+        if any(strategy.lower() in teacher_response.lower() for strategy in style_strategies):
             score += 0.2
             feedback.append(f"✓ Good alignment with {student_context['learning_style']} learning style")
         else:
-            suggestions.append(f"Include {student_context['learning_style']} learning approaches")
+            suggestions.append(f"Include differentiated learning approaches")
             explanations.append(f"{student_context['learning_style']} learners benefit from specific strategies")
         
         # 3. Behavioral response (30% of score)
-        if any(strategy['text'].lower() in teacher_response.lower() for strategy in behavior_strategies):
+        behavior_strategies = TEACHING_STRATEGIES["support"]
+        if any(strategy.lower() in teacher_response.lower() for strategy in behavior_strategies):
             score += 0.3
             feedback.append("✓ Good behavioral management approach")
         else:
-            suggestions.append(f"Try strategies for {behavior_type} behavior")
+            suggestions.append(f"Try supportive strategies for {behavior_type} behavior")
             explanations.append(f"Students showing {behavior_type} need specific support")
-        
-        # 4. Subject-specific support (30% of score)
-        if any(strategy['text'].lower() in teacher_response.lower() for strategy in subject_strategies):
-            score += 0.3
-            feedback.append(f"✓ Good {subject}-specific support")
-        else:
-            suggestions.append(f"Include {subject} strategies")
-            explanations.append(f"{subject} concepts need specific teaching approaches")
         
         # Generate student reaction based on score
         if score >= 0.8:

@@ -5,6 +5,71 @@
 ### What are LLMs?
 Large Language Models (LLMs) are advanced AI systems trained on vast amounts of text data. They represent a breakthrough in natural language processing, enabling sophisticated language understanding and generation capabilities.
 
+### Understanding Tokens and Context Windows
+
+#### What are Tokens?
+Tokens are the basic units that LLMs use to process text. They are not exactly words, but rather pieces of words that the model understands. Here's how tokenization works:
+
+- A word might be split into multiple tokens
+- Common words might be single tokens
+- Rare words might be split into several tokens
+- Special characters and spaces are also tokens
+
+Examples:
+```text
+"Hello"          → 1 token
+"understanding"  → 2 tokens (under + standing)
+"chatbot"        → 2 tokens (chat + bot)
+"!" or " "       → 1 token each
+```
+
+#### Context Window and Max Tokens
+
+- **Context Window (e.g., 8192 tokens)**:
+  - The total amount of text (in tokens) the model can consider at once
+  - Includes both input (prompt) and output (response)
+  - Like the model's "working memory"
+  - Example: 8192 tokens ≈ 6000 words or about 20 pages of text
+
+- **Max Tokens (e.g., 2048 tokens)**:
+  - Maximum length of the model's response
+  - Must be less than the context window
+  - Controls how long the generated text can be
+  - Example: 2048 tokens ≈ 1500 words or about 5 pages of text
+
+```mermaid
+graph TD
+    subgraph Context[Context Window: 8192 tokens]
+        Input[Input/Prompt]
+        Output[Max Output: 2048 tokens]
+        Memory[Remaining Context: 6144 tokens]
+    end
+
+    Input --> Output
+    Input --> Memory
+    
+    style Context fill:#e3f2fd,stroke:#1565c0
+    style Input fill:#c8e6c9
+    style Output fill:#ffcdd2
+    style Memory fill:#fff3e0
+```
+
+#### Practical Implications
+1. **Memory Management**
+   - Longer context = More memory usage
+   - Larger context window = Higher GPU/RAM requirements
+   - Need to balance between context size and performance
+
+2. **Cost Considerations**
+   - More tokens = Higher processing cost
+   - Need to optimize prompt length
+   - Balance between detail and efficiency
+
+3. **Performance Impact**
+   - Larger context = Slower processing
+   - Need to chunk long texts
+   - Consider streaming for long responses
+
 ```mermaid
 graph TD
     subgraph LLM[Large Language Model]
