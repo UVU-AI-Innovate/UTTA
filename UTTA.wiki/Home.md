@@ -3,56 +3,35 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-wiki-orange.svg)](https://github.com/UVU-AI-Innovate/UTTA/wiki)
+[![Code Style](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
+[![Testing](https://img.shields.io/badge/testing-pytest-yellow.svg)](https://docs.pytest.org/en/stable/)
 
 Welcome to UTTA! This AI-powered educational simulation system helps teachers develop and refine their teaching strategies through interactive practice with simulated students.
 
 ## 🎯 Key Benefits
 
-<div align="center">
-<table>
-<tr>
-<td align="center">
-    <img src="images/practice.png" width="64" height="64" alt="Practice"><br>
-    <b>Safe Practice</b><br>
-    Practice teaching in a simulated environment
-</td>
-<td align="center">
-    <img src="images/feedback.png" width="64" height="64" alt="Feedback"><br>
-    <b>Instant Feedback</b><br>
-    Receive immediate strategy feedback
-</td>
-<td align="center">
-    <img src="images/experiment.png" width="64" height="64" alt="Experiment"><br>
-    <b>Experimentation</b><br>
-    Try different teaching approaches
-</td>
-<td align="center">
-    <img src="images/progress.png" width="64" height="64" alt="Progress"><br>
-    <b>Track Progress</b><br>
-    Monitor improvement over time
-</td>
-</tr>
-</table>
-</div>
+| 🔒 Safe Practice | 📊 Instant Feedback | 🧪 Experimentation | 📈 Progress Tracking |
+|-----------------|-------------------|-------------------|-------------------|
+| Practice teaching in a simulated environment | Receive immediate strategy feedback | Try different teaching approaches | Monitor improvement over time |
 
 ## 🚀 Key Features
 
-### Local LLM Integration
+### 🤖 Local LLM Integration
 - Privacy-focused AI processing
 - Fast response times
 - Customizable models
 
-### Interactive Simulations
+### 💬 Interactive Simulations
 - Realistic student responses
 - Age-appropriate behaviors
 - Dynamic scenario generation
 
-### Performance Analytics
+### 📊 Performance Analytics
 - Detailed feedback metrics
 - Progress tracking
 - Strategy effectiveness analysis
 
-### Customizable Scenarios
+### ⚙️ Customizable Scenarios
 - Multiple subject areas
 - Various difficulty levels
 - Different student profiles
@@ -61,10 +40,10 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| Python | 3.8+ | 3.10+ |
-| RAM | 8GB | 16GB |
-| Storage | 10GB | 20GB |
-| GPU | Optional | CUDA-capable |
+| Python | [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/) | [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/) |
+| RAM | [![RAM](https://img.shields.io/badge/RAM-8GB-yellow.svg)]() | [![RAM](https://img.shields.io/badge/RAM-16GB-green.svg)]() |
+| Storage | [![Storage](https://img.shields.io/badge/Storage-10GB-yellow.svg)]() | [![Storage](https://img.shields.io/badge/Storage-20GB-green.svg)]() |
+| GPU | [![GPU](https://img.shields.io/badge/GPU-Optional-lightgrey.svg)]() | [![GPU](https://img.shields.io/badge/GPU-CUDA-green.svg)]() |
 
 ## 📚 Documentation Guides
 
@@ -72,6 +51,7 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 <div class="grid-item">
 
 ### [Implementation Guide](Implementation-Guide)
+[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
 - Detailed technical implementation
 - Setup instructions
 - Core components
@@ -80,6 +60,7 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 <div class="grid-item">
 
 ### [Architecture Guide](Architecture-Guide)
+[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
 - System architecture
 - Component interactions
 - Data flow
@@ -88,6 +69,7 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 <div class="grid-item">
 
 ### [LLM Guide](LLM-Guide)
+[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
 - Working with Local LLMs
 - Model configuration
 - Performance tuning
@@ -96,6 +78,7 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 <div class="grid-item">
 
 ### [Chatbot Development](Chatbot-Development)
+[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
 - Building interactions
 - Conversation management
 - Educational features
@@ -118,8 +101,13 @@ UTTA/
 
 ## 🤝 Contributing
 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](Contributing)
+[![Contributors](https://img.shields.io/badge/contributors-welcome-blue.svg)](Contributing)
+
 We welcome contributions! Please see our [Contributing Guidelines](Contributing) for details on how to get started.
 
 ## 📄 License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 This project is licensed under the MIT License - see the [LICENSE](License) file for details. 
