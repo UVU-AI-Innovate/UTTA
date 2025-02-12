@@ -229,4 +229,40 @@ graph TD
 - **Resource Management**
   - Auto-scaling policies
   - Resource monitoring
-  - Performance metrics 
+  - Performance metrics
+
+## 🔍 System Monitoring
+
+### Performance Metrics
+```mermaid
+graph TD
+    subgraph Monitoring[System Monitoring]
+        CPU[CPU Usage]
+        MEM[Memory Usage]
+        NET[Network I/O]
+        DISK[Disk Usage]
+    end
+
+    CPU --> Alert[Alert System]
+    MEM --> Alert
+    NET --> Alert
+    DISK --> Alert
+
+    style Monitoring fill:#e3f2fd,stroke:#1565c0
+```
+
+### Health Checks
+1. **Component Health**
+   - Service availability
+   - Response times
+   - Error rates
+
+2. **Resource Usage**
+   - CPU/Memory utilization
+   - Disk space
+   - Network bandwidth
+
+3. **Model Performance**
+   - Inference latency
+   - Token throughput
+   - Memory efficiency 
