@@ -1,7 +1,7 @@
 # Utah Elementary Teacher Training Assistant (UTTA)
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-wiki-orange.svg)](https://github.com/UVU-AI-Innovate/UTTA/wiki)
 [![Code Style](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/psf/black)
 [![Testing](https://img.shields.io/badge/testing-pytest-yellow.svg)](https://docs.pytest.org/en/stable/)
@@ -10,9 +10,12 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 
 ## 🎯 Key Benefits
 
-| 🔒 Safe Practice | 📊 Instant Feedback | 🧪 Experimentation | 📈 Progress Tracking |
-|-----------------|-------------------|-------------------|-------------------|
-| Practice teaching in a simulated environment | Receive immediate strategy feedback | Try different teaching approaches | Monitor improvement over time |
+| Benefit | Description |
+|---------|-------------|
+| 🔒 Safe Practice | Practice teaching in a risk-free simulated environment |
+| 📊 Instant Feedback | Receive immediate, actionable feedback on teaching strategies |
+| 🧪 Experimentation | Try different approaches without real-world consequences |
+| 📈 Progress Tracking | Monitor and analyze improvement over time |
 
 ## 🚀 Key Features
 
@@ -41,73 +44,54 @@ Welcome to UTTA! This AI-powered educational simulation system helps teachers de
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | Python | [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/) | [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/) |
-| RAM | [![RAM](https://img.shields.io/badge/RAM-8GB-yellow.svg)]() | [![RAM](https://img.shields.io/badge/RAM-16GB-green.svg)]() |
-| Storage | [![Storage](https://img.shields.io/badge/Storage-10GB-yellow.svg)]() | [![Storage](https://img.shields.io/badge/Storage-20GB-green.svg)]() |
-| GPU | [![GPU](https://img.shields.io/badge/GPU-Optional-lightgrey.svg)]() | [![GPU](https://img.shields.io/badge/GPU-CUDA-green.svg)]() |
+| RAM | ![RAM](https://img.shields.io/badge/RAM-8GB-yellow.svg) | ![RAM](https://img.shields.io/badge/RAM-16GB-green.svg) |
+| Storage | ![Storage](https://img.shields.io/badge/Storage-10GB-yellow.svg) | ![Storage](https://img.shields.io/badge/Storage-20GB-green.svg) |
+| GPU | ![GPU](https://img.shields.io/badge/GPU-Optional-lightgrey.svg) | ![GPU](https://img.shields.io/badge/GPU-CUDA-green.svg) |
 
 ## 📚 Documentation Guides
 
-<div class="grid-container">
-<div class="grid-item">
+### Core Documentation
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](Implementation-Guide) [Implementation Guide](Implementation-Guide)
+- Complete setup and installation instructions
+- Core component documentation
+- Configuration guide
 
-### [Implementation Guide](Implementation-Guide)
-[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
-- Detailed technical implementation
-- Setup instructions
-- Core components
-</div>
-
-<div class="grid-item">
-
-### [Architecture Guide](Architecture-Guide)
-[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
-- System architecture
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](Architecture-Guide) [Architecture Guide](Architecture-Guide)
+- System architecture overview
 - Component interactions
-- Data flow
-</div>
+- Data flow diagrams
 
-<div class="grid-item">
-
-### [LLM Guide](LLM-Guide)
-[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
-- Working with Local LLMs
+### Advanced Topics
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](LLM-Guide) [LLM Guide](LLM-Guide)
+- Local LLM integration
 - Model configuration
-- Performance tuning
-</div>
+- Performance optimization
 
-<div class="grid-item">
-
-### [Chatbot Development](Chatbot-Development)
-[![Status](https://img.shields.io/badge/status-complete-green.svg)]()
-- Building interactions
-- Conversation management
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](Chatbot-Development) [Chatbot Development](Chatbot-Development)
+- Interaction design
+- Conversation flow
 - Educational features
-</div>
-</div>
 
-## 📂 Project Structure
+### Support Documentation
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](Best-Practices) [Best Practices](Best-Practices)
+- Development guidelines
+- Educational best practices
+- Security recommendations
 
-```
-UTTA/
-├── src/
-│   ├── core/          # Core AI and LLM components
-│   ├── models/        # Knowledge base and data models
-│   ├── interfaces/    # User interface implementations
-│   └── utils/         # Utility functions and helpers
-├── docs/             # HTML documentation
-├── tests/            # Test suite
-└── resources/        # Configuration and data files
-```
+[![Status](https://img.shields.io/badge/status-complete-green.svg)](Troubleshooting) [Troubleshooting Guide](Troubleshooting)
+- Common issues and solutions
+- Debugging tips
+- Performance optimization
 
 ## 🤝 Contributing
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](Contributing)
 [![Contributors](https://img.shields.io/badge/contributors-welcome-blue.svg)](Contributing)
 
-We welcome contributions! Please see our [Contributing Guidelines](Contributing) for details on how to get started.
+We welcome contributions! See our [Contributing Guide](Contributing) for details on how to get started.
 
 ## 📄 License
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE)
 
-This project is licensed under the MIT License - see the [LICENSE](License) file for details. 
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE) file for details. 
