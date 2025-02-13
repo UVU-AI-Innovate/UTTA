@@ -7,33 +7,27 @@ The UTTA system is designed as a modular, extensible platform for AI-powered tea
 ### High-Level Architecture
 
 ```mermaid
-graph TD
-    subgraph Core[Core Engine]
+graph TB
+    Interface[Interface Layer] --> Core[Core Engine]
+    Core --> Data[Data Layer]
+    
+    subgraph Core
         LLM[LLM Integration]
         State[State Management]
         Event[Event Processing]
     end
 
-    subgraph Data[Data Layer]
+    subgraph Data
         KB[Knowledge Base]
         SS[Session Storage]
         AN[Analytics]
     end
 
-    subgraph Interface[Interface Layer]
+    subgraph Interface
         Web[Web Interface]
         CLI[CLI Interface]
         API[API Endpoints]
     end
-
-    Core --> Data
-    Core --> Interface
-    Data --> KB
-    Data --> SS
-    Data --> AN
-    Interface --> Web
-    Interface --> CLI
-    Interface --> API
 
     style Core fill:#e1f5fe,stroke:#01579b
     style Data fill:#e8f5e9,stroke:#1b5e20
@@ -87,44 +81,30 @@ sequenceDiagram
 ### Knowledge Manager
 ```mermaid
 graph LR
-    subgraph KM[Knowledge Manager]
-        Store[Vector Store]
-        Process[Content Processor]
-        Search[Semantic Search]
-        Update[Knowledge Updater]
-    end
-
-    Store --> Search
-    Process --> Store
-    Search --> Update
+    Process[Content Processor] --> Store[Vector Store]
+    Store --> Search[Semantic Search]
+    Search --> Update[Knowledge Updater]
     Update --> Store
 
-    style KM fill:#e3f2fd,stroke:#1565c0
+    style Store fill:#e3f2fd,stroke:#1565c0
 ```
 
 ### Language Processor
 ```mermaid
-graph TD
-    subgraph LP[Language Processor]
-        Input[Input Analysis]
-        Context[Context Management]
-        Generation[Response Generation]
-        Feedback[Feedback System]
-    end
-
-    Input --> Context
-    Context --> Generation
-    Generation --> Feedback
+graph TB
+    Input[Input Analysis] --> Context[Context Management]
+    Context --> Generation[Response Generation]
+    Generation --> Feedback[Feedback System]
     Feedback --> Context
 
-    style LP fill:#f3e5f5,stroke:#4a148c
+    style Input fill:#f3e5f5,stroke:#4a148c
 ```
 
 ## 📊 Data Flow
 
 ### Process Flow
 ```mermaid
-graph TD
+graph TB
     Input[1. User Input] --> Process[2. Processing]
     Process --> Engine[3. Core Engine]
     Engine --> Knowledge[4. Knowledge Integration]
@@ -187,26 +167,16 @@ graph TD
 
 ### Infrastructure Components
 ```mermaid
-graph TD
-    subgraph Cloud[Cloud Infrastructure]
-        LB[Load Balancer]
-        App1[App Server 1]
-        App2[App Server 2]
-        DB[(Database Cluster)]
-        Cache[(Cache Layer)]
-        LLM[LLM Service]
-    end
-
-    LB --> App1
-    LB --> App2
-    App1 --> DB
+graph TB
+    LB[Load Balancer] --> App1[App Server 1]
+    LB --> App2[App Server 2]
+    App1 --> DB[(Database Cluster)]
     App2 --> DB
-    App1 --> Cache
+    App1 --> Cache[(Cache Layer)]
     App2 --> Cache
-    App1 --> LLM
+    App1 --> LLM[LLM Service]
     App2 --> LLM
 
-    style Cloud fill:#f5f5f5,stroke:#616161
     style LB fill:#ffcdd2,stroke:#c62828
     style App1 fill:#c8e6c9,stroke:#2e7d32
     style App2 fill:#c8e6c9,stroke:#2e7d32
@@ -235,20 +205,13 @@ graph TD
 
 ### Performance Metrics
 ```mermaid
-graph TD
-    subgraph Monitoring[System Monitoring]
-        CPU[CPU Usage]
-        MEM[Memory Usage]
-        NET[Network I/O]
-        DISK[Disk Usage]
-    end
+graph TB
+    CPU[CPU Usage] --> Alert[Alert System]
+    MEM[Memory Usage] --> Alert
+    NET[Network I/O] --> Alert
+    DISK[Disk Usage] --> Alert
 
-    CPU --> Alert[Alert System]
-    MEM --> Alert
-    NET --> Alert
-    DISK --> Alert
-
-    style Monitoring fill:#e3f2fd,stroke:#1565c0
+    style Alert fill:#e3f2fd,stroke:#1565c0
 ```
 
 ### Health Checks
