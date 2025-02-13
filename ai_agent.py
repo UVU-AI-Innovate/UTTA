@@ -5,6 +5,19 @@ This module implements the core AI agent responsible for simulating and managing
 teacher training scenarios. It coordinates between the LLM interface, knowledge management,
 and pedagogical processing components.
 
+Key Components:
+    - TeacherTrainingAgent: Main class that orchestrates the training simulation
+    - Knowledge Base Integration: Loads and manages teaching strategies and student behaviors
+    - LLM Integration: Handles communication with the language model for response generation
+    - Scenario Management: Creates and manages teaching scenarios
+    - Evaluation System: Provides feedback on teaching responses
+
+Dependencies:
+    - llm_handler: Handles language model interactions
+    - knowledge_base: Contains teaching strategies and student characteristics
+    - evaluator: Evaluates teacher responses
+    - llm_interface: Provides interface to the language model
+
 Example:
     agent = TeacherTrainingAgent()
     scenario = agent.create_teaching_scenario("mathematics", "intermediate", student_profile)
@@ -23,17 +36,37 @@ class TeacherTrainingAgent:
     """
     Main agent class for managing teacher training simulations.
     
-    This class orchestrates the interaction between different components:
-    - LLM Interface for AI model interactions
-    - Language Processor for analyzing responses
+    This class orchestrates the interaction between different components and manages
+    the entire teaching simulation lifecycle, including scenario creation, response
+    evaluation, and feedback generation.
+    
+    Key Features:
+        - Dynamic scenario generation based on subject and difficulty
+        - Realistic student behavior simulation
+        - Comprehensive teaching response evaluation
+        - Personalized feedback generation
+        - Interactive session management
     
     Attributes:
-        llm (LLMInterface): Interface to the language model
-        processor (PedagogicalLanguageProcessor): Processor for language analysis
+        llm (LLMInterface): Interface to the language model for response generation
+        processor (PedagogicalLanguageProcessor): Processor for pedagogical analysis
+        learning_style (str): Current student's learning style preference
+        current_challenges (list): List of current student's learning challenges
+        teacher_profile (dict): Profile containing teacher characteristics
+        personality (dict): Simulated student's personality traits and state
     """
     
     def __init__(self):
-        """Initialize the TeacherTrainingAgent with required components."""
+        """
+        Initialize the TeacherTrainingAgent with required components.
+        
+        Sets up:
+            - LLM interface for AI model communication
+            - Language processor for response analysis
+            - Default learning style and challenges
+            - Empty teacher profile
+            - Initial student state with randomized personality traits
+        """
         self.llm = LLMInterface()
         self.processor = PedagogicalLanguageProcessor()
         self.learning_style = "visual"  # Default learning style
@@ -50,23 +83,37 @@ class TeacherTrainingAgent:
         """
         Create a teaching scenario based on given parameters.
         
+        This method generates a complete teaching scenario by combining the subject matter,
+        difficulty level, and student characteristics. It uses the language processor
+        to create a contextually appropriate teaching situation.
+        
         Args:
-            subject: The subject area for the scenario (e.g., "mathematics", "reading")
-            difficulty: The difficulty level (e.g., "beginner", "intermediate", "advanced")
-            student_profile: Dictionary containing student characteristics and learning style
+            subject (str): The subject area for the scenario (e.g., "mathematics", "reading")
+            difficulty (str): The difficulty level (e.g., "beginner", "intermediate", "advanced")
+            student_profile (Dict[str, Any]): Dictionary containing:
+                - learning_style: Student's preferred learning method
+                - grade_level: Current grade level
+                - strengths: Areas where the student excels
+                - challenges: Areas needing improvement
             
         Returns:
-            Dictionary containing the generated scenario details including:
-            - context: The teaching context
-            - objectives: Learning objectives
-            - student_background: Relevant student information
-            - suggested_approaches: Initial teaching strategy suggestions
+            Dict[str, Any]: A comprehensive scenario including:
+                - context: The teaching situation and environment
+                - objectives: Specific learning goals
+                - student_background: Relevant student information
+                - suggested_approaches: Initial teaching strategy suggestions
+                - potential_challenges: Anticipated difficulties
         
         Example:
             scenario = agent.create_teaching_scenario(
                 "mathematics",
                 "intermediate",
-                {"learning_style": "visual", "grade_level": "3rd"}
+                {
+                    "learning_style": "visual",
+                    "grade_level": "3rd",
+                    "strengths": ["pattern recognition"],
+                    "challenges": ["word problems"]
+                }
             )
         """
         context = {
@@ -84,20 +131,30 @@ class TeacherTrainingAgent:
         """
         Evaluate a teacher's response and generate detailed feedback.
         
+        This method analyzes the teacher's response in the context of the current
+        scenario, considering factors such as pedagogical approach, student needs,
+        and teaching effectiveness.
+        
         Args:
-            teacher_input: The teacher's response or action in the scenario
-            scenario: The current teaching scenario context
+            teacher_input (str): The teacher's response or action in the scenario
+            scenario (Dict[str, Any]): The current teaching scenario containing:
+                - context: Teaching situation
+                - objectives: Learning goals
+                - student_background: Student information
             
         Returns:
-            Dictionary containing the evaluation results including:
-            - effectiveness: Overall effectiveness score
-            - strengths: Identified strong points
-            - areas_for_improvement: Suggested improvements
-            - alternative_approaches: Other teaching strategies to consider
+            Dict[str, Any]: Comprehensive evaluation results including:
+                - effectiveness: Overall effectiveness score (0-1)
+                - strengths: List of identified strong points
+                - areas_for_improvement: Specific suggestions for improvement
+                - alternative_approaches: Other teaching strategies to consider
+                - alignment: How well the response aligns with objectives
+                - student_impact: Predicted impact on student learning
             
         Example:
             feedback = agent.evaluate_teaching_response(
-                "I would use visual aids to demonstrate fraction concepts",
+                "I would use visual aids to demonstrate fraction concepts and 
+                 connect them to real-world examples like pizza slices",
                 current_scenario
             )
         """
@@ -130,7 +187,23 @@ class TeacherTrainingAgent:
         }
 
     def _load_teaching_strategies(self):
-        """Load teaching strategies from knowledge base files."""
+        """
+        Load teaching strategies from knowledge base files.
+        
+        Attempts to load teaching strategies from the JSON file in the knowledge base.
+        If the file is not found, falls back to default strategies.
+        
+        Returns:
+            dict: A dictionary containing teaching strategies organized by:
+                - Time of day (morning, afternoon, etc.)
+                - Learning styles (visual, auditory, kinesthetic)
+                - Subject matter (math, reading, etc.)
+                - Student needs (attention, motivation, etc.)
+        
+        Note:
+            Falls back to default strategies if the file is not found
+            to ensure the system remains functional.
+        """
         try:
             with open('knowledge_base/teaching_strategies.json', 'r') as f:
                 return json.load(f)
@@ -139,7 +212,22 @@ class TeacherTrainingAgent:
             return self._get_default_teaching_strategies()
 
     def _load_student_behaviors(self):
-        """Load student behavior patterns from knowledge base files."""
+        """
+        Load student behavior patterns from knowledge base files.
+        
+        Loads predefined patterns of student behavior and appropriate
+        responses for different situations and challenges.
+        
+        Returns:
+            dict: A dictionary containing:
+                - Common behaviors and their triggers
+                - Appropriate teaching responses
+                - Behavioral indicators
+                - Intervention strategies
+        
+        Note:
+            Uses default behaviors if the knowledge base file is not found.
+        """
         try:
             with open('knowledge_base/student_behaviors.json', 'r') as f:
                 return json.load(f)
@@ -148,7 +236,22 @@ class TeacherTrainingAgent:
             return self._get_default_student_behaviors()
 
     def _load_subject_content(self):
-        """Load subject-specific content and strategies."""
+        """
+        Load subject-specific content and teaching strategies.
+        
+        Retrieves detailed information about different subjects including:
+            - Core concepts and progression
+            - Common misconceptions
+            - Effective teaching approaches
+            - Assessment strategies
+        
+        Returns:
+            dict: Subject-specific information organized by:
+                - Subject area (math, reading, science, etc.)
+                - Grade level appropriateness
+                - Teaching methodologies
+                - Common challenges and solutions
+        """
         try:
             with open('knowledge_base/subject_content.json', 'r') as f:
                 return json.load(f)
@@ -157,7 +260,24 @@ class TeacherTrainingAgent:
             return self._get_default_subject_content()
 
     def _get_fallback_knowledge(self):
-        """Provide basic fallback knowledge if files can't be loaded."""
+        """
+        Provide basic fallback knowledge if files can't be loaded.
+        
+        This is a safety mechanism that ensures the system has basic
+        functional knowledge even if the knowledge base files are
+        inaccessible or corrupted.
+        
+        Returns:
+            dict: A comprehensive set of default knowledge including:
+                - Basic teaching strategies
+                - Common student behaviors
+                - Core subject content
+                - Essential pedagogical approaches
+        
+        Note:
+            This knowledge is more generic than the full knowledge base
+            but ensures basic functionality of the system.
+        """
         return {
             "teaching_strategies": self._get_default_teaching_strategies(),
             "student_behaviors": self._get_default_student_behaviors(),
@@ -224,7 +344,21 @@ class TeacherTrainingAgent:
         }
 
     def _initialize_student_state(self):
-        """Initialize student personality and state."""
+        """
+        Initialize student personality and state with randomized characteristics.
+        
+        Creates a realistic student profile with:
+            - Base personality traits (attention span, learning style, etc.)
+            - Current emotional and cognitive state
+            - Subject preferences and challenges
+            - Social and academic characteristics
+        
+        The state is dynamic and can change during the simulation based on:
+            - Teacher interactions
+            - Time of day
+            - Activity type
+            - Previous experiences
+        """
         self.personality = {
             "base_traits": {
                 "attention_span": random.uniform(0.4, 0.8),
@@ -415,7 +549,29 @@ class TeacherTrainingAgent:
         }
 
     def _generate_student_state(self, trigger):
-        """Generate student's emotional and behavioral state based on trigger."""
+        """
+        Generate an updated student state based on triggers and context.
+        
+        This internal method updates the student's emotional and cognitive
+        state based on various triggers and the current context.
+        
+        Args:
+            trigger: Event or action that may affect student state
+        
+        Updates:
+            - Engagement level
+            - Understanding
+            - Emotional state
+            - Energy level
+            - Focus and attention
+        
+        Note:
+            State changes are influenced by:
+            - Previous state
+            - Time of day
+            - Recent interactions
+            - Environmental factors
+        """
         # Adjust current state based on trigger and personality
         self.personality["current_state"]["engagement"] += random.uniform(-0.2, 0.2)
         self.personality["current_state"]["mood"] += random.uniform(-0.1, 0.1)
@@ -427,7 +583,31 @@ class TeacherTrainingAgent:
         return self.personality["current_state"].copy()
 
     def simulate_student_response(self, teacher_response: str, scenario: dict) -> str:
-        """Generate more contextual student responses."""
+        """
+        Simulate a realistic student response to a teacher's action.
+        
+        This method generates contextually appropriate student responses by considering:
+            - Current student state (mood, energy, engagement)
+            - Teacher's approach and effectiveness
+            - Subject matter and difficulty
+            - Student's personality traits
+            - Time of day and previous interactions
+        
+        Args:
+            teacher_response (str): The teacher's action or statement
+            scenario (dict): Current teaching scenario context including:
+                - Subject matter
+                - Learning objectives
+                - Previous interactions
+                - Environmental factors
+        
+        Returns:
+            str: A realistic student response that reflects:
+                - Understanding level
+                - Emotional state
+                - Engagement level
+                - Learning style preferences
+        """
         try:
             return self.llm.generate_response(teacher_response, scenario)
         except Exception as e:
@@ -546,7 +726,31 @@ class TeacherTrainingAgent:
         ])
 
     def start_interactive_session(self, category=None):
-        """Start an interactive teaching session."""
+        """
+        Start an interactive teaching simulation session.
+        
+        This method initiates a dynamic teaching scenario where the agent:
+            - Sets up the initial teaching context
+            - Manages the flow of interaction
+            - Provides real-time feedback
+            - Adapts to teaching approaches
+            - Simulates student responses
+        
+        Args:
+            category (str, optional): Specific category or subject focus.
+                Defaults to None for general teaching scenarios.
+        
+        The session progresses through several phases:
+            1. Initial scenario setup
+            2. Teacher response collection
+            3. Student behavior simulation
+            4. Real-time feedback generation
+            5. Scenario adaptation based on interaction
+        
+        Note:
+            The session continues until explicitly ended or learning
+            objectives are met.
+        """
         # Check if profile is set up
         if not self.teacher_profile["name"]:
             self.setup_teacher_profile()
@@ -757,6 +961,32 @@ class TeacherTrainingAgent:
         return random.choice(reactions)
 
 def process_teacher_response(teacher_response, current_scenario, student_state):
+    """
+    Process and evaluate a teacher's response in the current context.
+    
+    This method performs a comprehensive analysis of the teacher's
+    response considering multiple factors and contexts.
+    
+    Args:
+        teacher_response (str): The teacher's action or statement
+        current_scenario (dict): Current teaching context
+        student_state (dict): Current student state and characteristics
+    
+    Evaluation aspects:
+        - Pedagogical appropriateness
+        - Student needs alignment
+        - Learning objective progress
+        - Engagement effectiveness
+        - Classroom management
+    
+    Returns:
+        dict: Detailed analysis including:
+            - Effectiveness score
+            - Specific strengths
+            - Areas for improvement
+            - Alternative approaches
+            - Impact prediction
+    """
     # Evaluate teacher response based on scenario context and student state.
     evaluation = evaluate_teacher_response(teacher_response, current_scenario, student_state)
     

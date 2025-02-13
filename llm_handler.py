@@ -6,6 +6,25 @@ including response analysis, scenario creation, and student reaction generation.
 It provides a structured interface to the underlying LLM while maintaining
 educational context and pedagogical principles.
 
+Key Components:
+    - PedagogicalLanguageProcessor: Main class for processing educational language
+    - TeachingContext: Data class for maintaining teaching context
+    - LLM Integration: Handles communication with language models
+    - Template Management: Manages educational prompt templates
+
+Features:
+    - Teaching response analysis
+    - Student reaction generation
+    - Scenario creation
+    - Real-time feedback
+    - Context-aware processing
+
+Dependencies:
+    - requests: For API communication
+    - json: For data serialization
+    - llm_interface: For language model interaction
+    - prompt_templates: For educational prompts
+
 Example:
     processor = PedagogicalLanguageProcessor()
     analysis = processor.analyze_teaching_response("Let's use blocks to count", context)
@@ -26,14 +45,35 @@ from prompt_templates import PromptTemplates
 @dataclass
 class TeachingContext:
     """
-    Data class for maintaining teaching context.
+    Data class for maintaining teaching context and state.
+    
+    This class encapsulates all relevant information about the current
+    teaching situation, student characteristics, and interaction history.
+    It serves as a central point for context management in the teaching
+    simulation.
     
     Attributes:
-        subject: The subject being taught
-        grade_level: The grade level of the student
-        learning_objectives: List of learning objectives
-        student_characteristics: Dictionary of student traits and needs
-        previous_interactions: List of recent interactions
+        subject (str): The subject being taught (e.g., "math", "reading")
+        grade_level (str): The grade level of the student (e.g., "2nd", "3rd")
+        learning_objectives (List[str]): Specific goals for the lesson
+        student_characteristics (Dict[str, Any]): Student traits including:
+            - learning_style: Preferred learning method
+            - attention_span: Attention capacity
+            - strengths: Areas of proficiency
+            - challenges: Areas needing support
+        previous_interactions (Optional[List[Dict[str, str]]]): History of
+            recent teacher-student interactions
+    
+    Example:
+        context = TeachingContext(
+            subject="mathematics",
+            grade_level="2nd",
+            learning_objectives=["Add two-digit numbers"],
+            student_characteristics={
+                "learning_style": "visual",
+                "attention_span": "moderate"
+            }
+        )
     """
     subject: str
     grade_level: str
@@ -45,15 +85,34 @@ class PedagogicalLanguageProcessor:
     """
     Processes natural language in educational contexts using LLMs.
     
-    This class handles all language-related tasks in the teaching simulation:
-    - Analyzing teacher responses for effectiveness
-    - Generating appropriate student reactions
-    - Creating realistic teaching scenarios
-    - Providing pedagogically sound feedback
+    This class serves as the main interface for all language-related
+    operations in the teaching simulation. It maintains educational
+    context while processing language, ensuring responses are
+    pedagogically appropriate and age-suitable.
+    
+    Key Features:
+        - Teaching response analysis
+        - Student reaction generation
+        - Scenario creation
+        - Real-time feedback
+        - Context maintenance
+    
+    Components:
+        - LLM Interface: Handles communication with language models
+        - Prompt Templates: Manages educational prompt patterns
+        - Context Management: Maintains teaching situation state
+        - Response Processing: Analyzes and generates responses
     
     Attributes:
         llm (LLMInterface): Interface to the language model
         templates (PromptTemplates): Collection of educational prompt templates
+        
+    Example:
+        processor = PedagogicalLanguageProcessor()
+        analysis = processor.analyze_teaching_response(
+            "Let's solve this step by step",
+            teaching_context
+        )
     """
     
     def __init__(self):
@@ -155,7 +214,23 @@ class PedagogicalLanguageProcessor:
         )
 
     def ensure_server_running(self):
-        """Ensure Ollama server is running."""
+        """
+        Ensure the Ollama server is running and ready to process requests.
+        
+        This method:
+            1. Checks if the server is already running
+            2. Attempts to start the server if it's not running
+            3. Verifies the server is responsive
+            4. Handles startup errors gracefully
+        
+        Returns:
+            bool: True if server is running and responsive, False otherwise
+        
+        Note:
+            - Waits up to 10 seconds for server to start
+            - Provides feedback about server status
+            - Falls back gracefully if server cannot be started
+        """
         if not self.check_server():
             print("\nStarting Ollama server...")
             try:
@@ -177,7 +252,20 @@ class PedagogicalLanguageProcessor:
         return True
 
     def check_server(self):
-        """Check if Ollama server is running."""
+        """
+        Check if the Ollama server is running and responsive.
+        
+        Performs a health check by:
+            1. Sending a GET request to the server's version endpoint
+            2. Verifying the response status
+            3. Handling connection timeouts
+        
+        Returns:
+            bool: True if server is responsive, False otherwise
+        
+        Note:
+            Uses a 2-second timeout to avoid hanging on unresponsive server
+        """
         try:
             response = requests.get(f"{self.base_url}/version", timeout=2)
             return response.status_code == 200
@@ -277,7 +365,27 @@ class PedagogicalLanguageProcessor:
             return self._get_fallback_evaluation()
 
     def _structure_free_text_response(self, text: str) -> dict:
-        """Convert free text response to structured format."""
+        """
+        Structure free-form text response into a standardized format.
+        
+        This utility method processes raw text output from the LLM and
+        converts it into a structured dictionary format suitable for
+        the application.
+        
+        Args:
+            text (str): Raw text response from the language model
+        
+        Returns:
+            dict: Structured response containing:
+                - main_points: Key points extracted from text
+                - suggestions: Teaching suggestions
+                - analysis: Detailed analysis if present
+                - metadata: Additional contextual information
+        
+        Note:
+            Handles various text formats and attempts to extract meaningful
+            structure even from inconsistent responses
+        """
         try:
             # Remove any markdown formatting
             text = text.replace("```", "").strip()
@@ -321,7 +429,25 @@ class PedagogicalLanguageProcessor:
             return self._get_fallback_evaluation()
 
     def _get_fallback_evaluation(self) -> dict:
-        """Provide fallback evaluation when LLM is unavailable."""
+        """
+        Provide fallback evaluation when LLM processing fails.
+        
+        This method serves as a safety mechanism when:
+            - The LLM server is unavailable
+            - Response processing fails
+            - Network issues occur
+        
+        Returns:
+            dict: A basic evaluation structure containing:
+                - score: Default effectiveness score
+                - strengths: Basic identified strengths
+                - suggestions: Generic improvement suggestions
+                - explanation: Simple explanation of the evaluation
+        
+        Note:
+            This ensures the system remains functional even when
+            LLM processing is unavailable
+        """
         return {
             "score": 0.5,
             "strengths": ["Response provided basic teaching interaction"],
@@ -329,8 +455,43 @@ class PedagogicalLanguageProcessor:
             "explanation": "Basic evaluation provided due to processing limitations"
         }
 
-    def generate_student_reaction(self, context: dict, teacher_response: str, effectiveness: float) -> str:
-        """Generate contextual student reaction using local LLM."""
+    def generate_student_reaction(
+        self,
+        context: dict,
+        teacher_response: str,
+        effectiveness: float
+    ) -> str:
+        """
+        Generate a realistic student reaction to a teacher's response.
+        
+        This method creates contextually appropriate student reactions
+        by considering multiple factors from the teaching context.
+        
+        Args:
+            context (dict): Teaching context including:
+                - subject: Subject being taught
+                - grade_level: Student's grade level
+                - student_profile: Student characteristics
+            teacher_response (str): The teacher's action or statement
+            effectiveness (float): Effectiveness score (0.0 to 1.0) of
+                the teacher's response
+        
+        Returns:
+            str: A natural language student reaction that reflects:
+                - Understanding level
+                - Emotional state
+                - Engagement level
+                - Age-appropriate language
+                - Learning style preferences
+        
+        Note:
+            The reaction is influenced by:
+            - Previous interactions
+            - Student's personality
+            - Subject matter
+            - Time of day
+            - Current engagement level
+        """
         if not self.ensure_server_running():
             return "*looks uncertain* Okay..."
 
