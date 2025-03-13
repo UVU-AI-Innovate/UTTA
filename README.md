@@ -1,4 +1,4 @@
-# UTTA (Unified Tool for Teaching Assistants)
+# UTTA (Utah Teacher Training Assistant)
 
 UTTA is a comprehensive framework for developing and evaluating Large Language Model (LLM) based teaching assistants. This project focuses on creating effective, AI-powered educational support systems using state-of-the-art language models and evaluation methodologies.
 
