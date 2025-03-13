@@ -1,8 +1,14 @@
 # Code of Conduct
 
+## Introduction
+
+The UTTA (Universal Teaching and Training Assistant) project is committed to fostering an open and inclusive environment for all contributors, users, and participants. This Code of Conduct outlines our expectations for all those who participate in our community, whether through code contributions, documentation, discussions, issue reporting, or any other form of engagement.
+
+Our goal is to create a positive and enriching environment that encourages innovation, learning, and collaboration in the field of AI education and training. We value the diverse perspectives and experiences that each community member brings to this project.
+
 ## Our Pledge
 
-We as members, contributors, and leaders of the UTTA (Universal Teaching and Training Assistant) project pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We as members, contributors, and leaders of the UTTA project pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
@@ -10,7 +16,7 @@ We pledge to act and interact in ways that contribute to an open, welcoming, div
 
 ### Positive Behavior
 
-Examples of behavior that contributes to a positive environment include:
+Examples of behavior that contributes to creating a positive environment for the UTTA community include:
 
 * Using welcoming and inclusive language
 * Being respectful of differing viewpoints and experiences
@@ -18,6 +24,9 @@ Examples of behavior that contributes to a positive environment include:
 * Focusing on what is best for the community
 * Showing empathy towards other community members
 * Being patient and helpful with newcomers
+* Providing constructive feedback on AI teaching methodologies
+* Sharing knowledge and experiences with educational AI implementations
+* Supporting fellow community members in their learning journey
 
 ### Unacceptable Behavior
 
@@ -39,13 +48,15 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 ## Scope
 
-This Code of Conduct applies within all community spaces, including but not limited to:
+This Code of Conduct applies within all UTTA community spaces, including but not limited to:
 
 * The GitHub repository and associated projects
-* Official communication channels
-* Community events and meetups
-* Social media presence
-* Any other forums created by the project team
+* Wiki pages and documentation
+* Issue discussions and pull requests
+* Community forums and chat channels
+* Project-related social media content
+* UTTA workshops and meetups
+* Any other forums or events created by the project team
 
 ## Enforcement
 
