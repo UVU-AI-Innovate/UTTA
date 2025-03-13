@@ -31,7 +31,7 @@ UTTA is a comprehensive framework for developing and evaluating Large Language M
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/UTTA.git
+git clone https://github.com/UVU-AI-Innovate/UTTA.git
 cd UTTA
 ```
 
@@ -48,24 +48,26 @@ pip install -r requirements.txt
 
 ## 📚 Documentation
 
-Detailed documentation is available in the [UTTA Wiki](./UTTA.wiki/):
+Detailed documentation is available in our [GitHub Wiki](https://github.com/UVU-AI-Innovate/UTTA/wiki):
 
-- [Getting Started Guide](./UTTA.wiki/Getting-Started.md)
-- [Environment Setup](./UTTA.wiki/Environment-Setup.md)
-- [Dataset Preparation](./UTTA.wiki/Dataset-Preparation.md)
-- [DSPy Tutorial](./UTTA.wiki/DSPy-Tutorial.md)
-- [DSPy Optimization](./UTTA.wiki/DSPy-Optimization.md)
+- [Getting Started](https://github.com/UVU-AI-Innovate/UTTA/wiki/Getting-Started)
+- [Environment Setup](https://github.com/UVU-AI-Innovate/UTTA/wiki/Environment-Setup)
+- [Dataset Preparation](https://github.com/UVU-AI-Innovate/UTTA/wiki/Dataset-Preparation)
+- [DSPy Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/DSPy-Tutorial)
+- [DSPy Optimization](https://github.com/UVU-AI-Innovate/UTTA/wiki/DSPy-Optimization)
+- [OpenAI Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/OpenAI-Tutorial)
+- [HuggingFace Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/HuggingFace-Tutorial)
+- [LLM Evaluation](https://github.com/UVU-AI-Innovate/UTTA/wiki/LLM-Evaluation)
 
 ## 🏗️ Project Structure
 
 ```
 UTTA/
-├── src/                    # Source code
-├── data/                   # Dataset storage
-├── examples/               # Example implementations
-├── tests/                  # Test suite
-├── docs/                   # Documentation
-└── UTTA.wiki/             # Detailed wiki pages
+├── llm-fine-tuning/        # Fine-tuning implementations
+├── llm-chatbot-framework/  # Core chatbot framework
+├── evaluation_results/     # Evaluation outputs
+├── benchmark_results/      # Benchmark data
+└── docs/                   # Additional documentation
 ```
 
 ## 🔧 Usage
