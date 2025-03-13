@@ -1,0 +1,13 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting accelerate
+  Downloading accelerate-1.5.1-py3-none-any.whl.metadata (19 kB)
+Collecting fsspec<=2024.6.1,>=2023.1.0 (from fsspec[http]<=2024.6.1,>=2023.1.0)
+  Downloading fsspec-2024.6.1-py3-none-any.whl.metadata (11 kB)
+Downloading accelerate-1.5.1-py3-none-any.whl (345 kB)
+Downloading fsspec-2024.6.1-py3-none-any.whl (177 kB)
+Installing collected packages: fsspec, accelerate
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2025.3.0
+    Uninstalling fsspec-2025.3.0:
+      Successfully uninstalled fsspec-2025.3.0
+Successfully installed accelerate-1.5.1 fsspec-2024.6.1
