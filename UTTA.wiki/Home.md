@@ -27,14 +27,14 @@ pip install -r requirements.txt
 ## 📚 Documentation Sections
 
 ### Getting Started
-- [Getting Started Guide](Getting-Started.md) - Essential first steps
-- [Environment Setup](Environment-Setup.md) - Detailed setup instructions
-- [Dataset Preparation](Dataset-Preparation.md) - How to prepare your educational datasets
+- [Getting Started Guide](Getting-Started) - Essential first steps
+- [Environment Setup](Environment-Setup) - Detailed setup instructions
+- [Dataset Preparation](Dataset-Preparation) - How to prepare your educational datasets
 
 ### Framework Implementations
 1. **DSPy Implementation**
-   - [DSPy Tutorial](DSPy-Tutorial.md) - Learn to use DSPy for teaching assistants
-   - [DSPy Optimization](DSPy-Optimization.md) - Advanced optimization techniques
+   - [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for teaching assistants
+   - [DSPy Optimization](DSPy-Optimization) - Advanced optimization techniques
 
 2. **LangChain Implementation**
    - Coming soon
@@ -43,9 +43,9 @@ pip install -r requirements.txt
    - Coming soon
 
 ### Model Training & Evaluation
-- [OpenAI Tutorial](OpenAI-Tutorial.md) - Working with OpenAI models
-- [HuggingFace Tutorial](HuggingFace-Tutorial.md) - Using HuggingFace models
-- [LLM Evaluation](LLM-Evaluation.md) - Evaluating model performance
+- [OpenAI Tutorial](OpenAI-Tutorial) - Working with OpenAI models
+- [HuggingFace Tutorial](HuggingFace-Tutorial) - Using HuggingFace models
+- [LLM Evaluation](LLM-Evaluation) - Evaluating model performance
 
 ## 🎯 Key Features
 
