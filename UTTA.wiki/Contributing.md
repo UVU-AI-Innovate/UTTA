@@ -1,350 +1,125 @@
 # Contributing to UTTA
 
-Thank you for your interest in contributing to the Utah Teacher Training Assistant (UTTA) project! This guide will help you get started with contributing to our project.
+Thank you for your interest in contributing to the UTTA project! This guide will help you get started with contributing to the project.
 
 ## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Setup](#development-setup)
-4. [Making Contributions](#making-contributions)
-5. [Pull Request Process](#pull-request-process)
-6. [Style Guidelines](#style-guidelines)
-7. [Testing](#testing)
-8. [Documentation](#documentation)
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Pull Request Process](#pull-request-process)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Community](#community)
 
 ## Code of Conduct
 
-We are committed to providing a welcoming and inclusive environment. All contributors are expected to adhere to our [Code of Conduct](Code-of-Conduct).
+Please read our [Code of Conduct](Code-of-Conduct) before contributing to the project. By participating, you are expected to uphold this code.
 
 ## Getting Started
 
-### Prerequisites
+1. **Fork the Repository**
+   * Visit [UTTA on GitHub](https://github.com/UVU-AI-Innovate/UTTA)
+   * Click the "Fork" button in the upper right corner
 
-1. Complete the [Environment Setup](Environment-Setup)
-2. Familiarize yourself with:
-   - Python 3.10+
-   - Git
-   - Virtual environments (conda)
-   - Testing frameworks (pytest)
-
-### Fork and Clone
-
-1. Fork the repository on GitHub
-2. Clone your fork:
+2. **Clone Your Fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/UTTA.git
+   git clone https://github.com/YOUR-USERNAME/UTTA.git
    cd UTTA
    ```
-3. Add upstream remote:
+
+3. **Set Up Remote**
    ```bash
    git remote add upstream https://github.com/UVU-AI-Innovate/UTTA.git
    ```
 
-## Development Setup
-
-### 1. Create Development Environment
-
-```bash
-# Create and activate conda environment
-conda create -n utta-dev python=3.10
-conda activate utta-dev
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-```
-
-### 2. Install Pre-commit Hooks
-
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install git hooks
-pre-commit install
-```
-
-### 3. Configure Development Tools
-
-```bash
-# Install development tools
-pip install black isort mypy pytest
-
-# Set up git configuration
-git config --local core.autocrlf input
-git config --local core.whitespace trailing-space,space-before-tab
-```
-
-## Making Contributions
-
-### 1. Choose an Issue
-
-- Check [open issues](https://github.com/UVU-AI-Innovate/UTTA/issues)
-- Comment on the issue you'd like to work on
-- Wait for assignment or approval
-
-### 2. Create a Branch
-
-```bash
-# Update main branch
-git checkout main
-git pull upstream main
-
-# Create feature branch
-git checkout -b feature/your-feature-name
-```
-
-### 3. Make Changes
-
-1. Write your code
-2. Add tests
-3. Update documentation
-4. Run local tests:
+4. **Set Up Development Environment**
    ```bash
-   pytest tests/
+   conda create -n utta python=3.10
+   conda activate utta
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt  # Install development dependencies
    ```
 
-### 4. Commit Changes
+## Development Workflow
 
-```bash
-# Stage changes
-git add .
+1. **Create a Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+   Use prefixes like:
+   * `feature/` for new features
+   * `fix/` for bug fixes
+   * `docs/` for documentation
+   * `test/` for adding or updating tests
 
-# Commit with descriptive message
-git commit -m "type: brief description
+2. **Make Your Changes**
+   * Write clean, well-documented code
+   * Follow the existing code style and conventions
+   * Keep commits focused and logical
 
-Detailed description of changes made.
+3. **Commit Your Changes**
+   ```bash
+   git add .
+   git commit -m "feat: Add new feature X"
+   ```
+   We follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
 
-Fixes #123"
-```
+4. **Stay Updated**
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
 
 ## Pull Request Process
 
-### 1. Prepare PR
-
-1. Update your branch:
-   ```bash
-   git checkout main
-   git pull upstream main
-   git checkout feature/your-feature-name
-   git rebase main
-   ```
-
-2. Push changes:
+1. **Push to Your Fork**
    ```bash
    git push origin feature/your-feature-name
    ```
 
-### 2. Create PR
+2. **Create a Pull Request**
+   * Go to the [UTTA repository](https://github.com/UVU-AI-Innovate/UTTA)
+   * Click "New Pull Request"
+   * Select "compare across forks"
+   * Select your fork and branch
+   * Add a clear title and description
 
-1. Go to GitHub
-2. Create new Pull Request
-3. Fill out PR template
-4. Link related issues
-5. Request review
+3. **PR Guidelines**
+   * Link to any relevant issues
+   * Include screenshots or examples if applicable
+   * Ensure all tests pass
+   * Update documentation as needed
+   * Respond to review comments promptly
 
-### 3. Review Process
-
-1. Address reviewer comments
-2. Update PR as needed
-3. Ensure CI passes
-4. Get approval
-
-## Style Guidelines
-
-### Python Code Style
-
-```python
-# Follow PEP 8 guidelines
-def calculate_score(student_response: str, reference: str) -> float:
-    """
-    Calculate similarity score between student response and reference.
-
-    Args:
-        student_response: The student's answer text
-        reference: The reference answer text
-
-    Returns:
-        float: Similarity score between 0 and 1
-    """
-    # Implementation
-    pass
-```
-
-### Docstring Format
-
-```python
-class TeachingAssistant:
-    """
-    A class representing an AI teaching assistant.
-
-    Attributes:
-        name (str): The name of the teaching assistant
-        model (str): The underlying language model
-        config (Dict): Configuration parameters
-
-    Example:
-        >>> assistant = TeachingAssistant("Math Tutor")
-        >>> response = assistant.answer("What is calculus?")
-    """
-
-    def __init__(self, name: str):
-        self.name = name
-```
-
-### Import Order
-
-```python
-# Standard library
-import os
-import sys
-from typing import Dict, List
-
-# Third-party packages
-import numpy as np
-import torch
-from transformers import AutoModel
-
-# Local imports
-from utta.core import TeachingAssistant
-from utta.utils import load_config
-```
+4. **After Approval**
+   * Your PR will be merged by a maintainer
+   * You can delete your branch after it's merged
 
 ## Testing
 
-### 1. Writing Tests
+1. **Run Tests**
+   ```bash
+   pytest
+   ```
 
-```python
-# tests/test_assistant.py
-import pytest
-from utta.core import TeachingAssistant
-
-def test_assistant_initialization():
-    """Test teaching assistant initialization."""
-    assistant = TeachingAssistant("Test Assistant")
-    assert assistant.name == "Test Assistant"
-    assert assistant.is_ready()
-
-@pytest.mark.parametrize("question,expected", [
-    ("What is Python?", True),
-    ("", False),
-    (None, False)
-])
-def test_question_validation(question, expected):
-    """Test question validation with various inputs."""
-    assistant = TeachingAssistant("Test Assistant")
-    assert assistant.validate_question(question) == expected
-```
-
-### 2. Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest tests/test_assistant.py
-
-# Run with coverage
-pytest --cov=utta tests/
-
-# Run with verbose output
-pytest -v tests/
-```
-
-### 3. Test Coverage
-
-```bash
-# Generate coverage report
-coverage run -m pytest
-coverage report
-coverage html
-```
+2. **Adding Tests**
+   * All new features should include appropriate tests
+   * Bug fixes should include a test that would have caught the issue
 
 ## Documentation
 
-### 1. Code Documentation
+1. **Code Documentation**
+   * Use docstrings for functions, classes, and modules
+   * Follow [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
 
-- Use clear variable names
-- Write descriptive docstrings
-- Include type hints
-- Add inline comments for complex logic
+2. **Wiki Documentation**
+   * Update relevant wiki pages for user-facing changes
+   * Create new wiki pages for major features
 
-### 2. Wiki Documentation
+## Community
 
-- Keep pages focused
-- Include examples
-- Update navigation
-- Link related pages
+* **GitHub Discussions**: Ask questions and share ideas
+* **GitHub Issues**: Report bugs and request features
+* **Pull Requests**: Review and discuss code changes
 
-### 3. API Documentation
-
-```python
-def evaluate_response(
-    response: str,
-    criteria: List[str],
-    weights: Optional[Dict[str, float]] = None
-) -> Dict[str, float]:
-    """
-    Evaluate a teaching assistant's response based on given criteria.
-
-    Args:
-        response: The response to evaluate
-        criteria: List of evaluation criteria
-        weights: Optional weights for each criterion
-
-    Returns:
-        Dictionary containing scores for each criterion
-
-    Raises:
-        ValueError: If criteria list is empty
-        TypeError: If weights are provided but don't match criteria
-    """
-    if not criteria:
-        raise ValueError("Criteria list cannot be empty")
-    
-    if weights and set(weights.keys()) != set(criteria):
-        raise TypeError("Weights must match criteria exactly")
-    
-    # Implementation
-    pass
-```
-
-## Best Practices
-
-### 1. Code Quality
-
-- Write modular code
-- Follow SOLID principles
-- Keep functions focused
-- Use meaningful names
-- Add error handling
-
-### 2. Performance
-
-- Profile code when needed
-- Optimize critical paths
-- Use appropriate data structures
-- Consider memory usage
-- Add caching where beneficial
-
-### 3. Security
-
-- Never commit secrets
-- Validate inputs
-- Use secure dependencies
-- Follow security guidelines
-- Report vulnerabilities
-
-## Getting Help
-
-1. Check the [FAQ](FAQ)
-2. Search existing issues
-3. Ask in discussions
-4. Join our community channels
-
-## Next Steps
-
-1. Pick an [open issue](https://github.com/UVU-AI-Innovate/UTTA/issues)
-2. Read the [DSPy Tutorial](DSPy-Tutorial)
-3. Explore the [Dataset Preparation](Dataset-Preparation) guide 
+Thank you for contributing to UTTA! 

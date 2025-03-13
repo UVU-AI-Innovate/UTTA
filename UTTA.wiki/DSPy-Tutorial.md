@@ -1,259 +1,220 @@
-# DSPy Tutorial
+# DSPy Tutorial for UTTA
 
-This tutorial guides you through using DSPy with UTTA for creating and customizing teaching assistants.
+This tutorial will guide you through using DSPy for prompt optimization in UTTA.
 
 ## What is DSPy?
 
-[DSPy](https://github.com/stanfordnlp/dspy) is a framework for solving complex language tasks by programming with foundation models. It provides:
-- Declarative programming with language models
-- Automatic prompt optimization
-- Systematic evaluation and improvement
+[DSPy](https://github.com/stanfordnlp/dspy) is a framework for programming with foundation models, developed by Stanford AI Lab. In UTTA, we use DSPy for:
+
+1. Optimizing prompts for educational tasks
+2. Creating consistent response patterns
+3. Improving the quality and accuracy of model outputs
 
 ## Prerequisites
 
-Before starting this tutorial, ensure you have:
-1. Completed the [Environment Setup](Environment-Setup)
-2. Basic understanding of Python and LLMs
-3. UTTA installed and configured
-4. OpenAI API key set up
+Before starting this tutorial, make sure you have:
 
-## Basic Usage
+* Completed the [Environment Setup](Environment-Setup)
+* Basic understanding of prompt engineering
+* Basic knowledge of Python
 
-### 1. Initialize DSPy with UTTA
+## Installation
 
-```python
-from utta.core import TeachingAssistant
-from utta.frameworks.dspy_framework import DSPyFramework
+DSPy is included in the UTTA requirements, but if you need to install it separately:
 
-# Initialize the framework
-framework = DSPyFramework()
-
-# Create teaching assistant
-assistant = TeachingAssistant(framework=framework)
+```bash
+pip install dspy-ai
 ```
 
-### 2. Define a Basic Module
+## Basic DSPy Usage in UTTA
+
+### 1. Simple DSPy Integration
+
+```python
+from utta import TeachingAssistant
+from utta.optimization import DSPyOptimizer
+
+# Initialize the teaching assistant
+assistant = TeachingAssistant(model="openai/gpt-3.5-turbo")
+
+# Create a DSPy optimizer
+optimizer = DSPyOptimizer()
+
+# Define a simple educational task
+task = {
+    "description": "Explain complex concepts to high school students",
+    "examples": [
+        {"input": "What is quantum computing?", "output": "Quantum computing uses quantum bits or 'qubits' that can exist in multiple states at once, unlike regular computer bits that are either 0 or 1. This allows quantum computers to solve certain problems much faster..."}
+    ]
+}
+
+# Optimize the assistant for the task
+optimizer.optimize(assistant, task)
+
+# Now use the optimized assistant
+response = assistant.ask("Can you explain black holes in simple terms?")
+print(response)
+```
+
+### 2. Creating a DSPy Module
+
+For more control, you can create custom DSPy modules:
 
 ```python
 import dspy
 
-class TeachingModule(dspy.Module):
+# Define a custom module for educational explanations
+class EducationalExplainer(dspy.Module):
     def __init__(self):
         super().__init__()
-        self.gen = dspy.ChainOfThought("question -> answer")
+        self.gen = dspy.ChainOfThought("question -> explanation")
     
     def forward(self, question):
-        response = self.gen(question=question)
-        return response.answer
+        # Generate a thoughtful explanation
+        explanation = self.gen(question=question).explanation
+        return explanation
 
-# Use the module
-module = TeachingModule()
-result = module.forward("What is the capital of France?")
-print(result)
+# Use it in UTTA
+from utta import TeachingAssistant
+from utta.optimization import DSPyModuleIntegrator
+
+# Create and optimize the module
+explainer = EducationalExplainer()
+integrator = DSPyModuleIntegrator()
+integrator.integrate(assistant, explainer)
+
+# Use the enhanced assistant
+response = assistant.ask("How does photosynthesis work?")
+print(response)
 ```
 
-## Advanced Features
+## Advanced DSPy Optimization
 
-### 1. Custom Prompts
+### Teleprompters for Educational Content
 
-```python
-class CustomTeachingModule(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.gen = dspy.ChainOfThought("""
-        Given a student's question about {topic}, provide:
-        1. A clear explanation
-        2. An example
-        3. A practice question
-        
-        Question: {question}
-        """)
-    
-    def forward(self, question, topic):
-        response = self.gen(question=question, topic=topic)
-        return response.answer
-
-# Usage
-custom_module = CustomTeachingModule()
-result = custom_module.forward(
-    question="How does inheritance work?",
-    topic="Object-Oriented Programming"
-)
-```
-
-### 2. Teleprompters
+DSPy's teleprompters are powerful tools for optimizing prompts based on example data:
 
 ```python
-# Define a teleprompter for automatic prompt optimization
-teleprompter = dspy.Teleprompter()
+import dspy
+from dspy.teleprompt import BootstrapFewShot
 
-# Train on example data
+# Prepare example data
 examples = [
-    ("What is a variable?", "A variable is a container for storing data..."),
-    ("Explain functions.", "A function is a reusable block of code...")
+    dspy.Example(
+        question="What causes seasons on Earth?",
+        explanation="Seasons are caused by Earth's tilted axis as it orbits the Sun. This tilt makes different parts of Earth receive more direct sunlight at different times of the year, creating seasons."
+    ),
+    # Add more examples...
 ]
 
-# Optimize prompts
-teleprompter.train(examples)
+# Create a teleprompter
+teleprompter = BootstrapFewShot(metric=dspy.metrics.Answer())
+
+# Optimize your DSPy module
+optimized_explainer = teleprompter.compile(
+    EducationalExplainer(),
+    train_data=examples,
+    num_trials=10
+)
+
+# Integrate with UTTA
+assistant.integrate_dspy_module(optimized_explainer)
 ```
 
-### 3. Signature Chains
+### Creating Multi-step Educational Workflows
+
+For complex educational tasks, you can create multi-step workflows:
 
 ```python
-class ComplexTeachingModule(dspy.Module):
+class EducationalWorkflow(dspy.Module):
     def __init__(self):
         super().__init__()
-        
-        # Define a chain of operations
-        self.analyze = dspy.Predict("question -> difficulty, prerequisites")
-        self.explain = dspy.ChainOfThought("question, difficulty -> explanation")
-        self.example = dspy.Predict("explanation -> example")
+        # Assess the student's knowledge level
+        self.assess = dspy.Predict("question -> knowledge_level")
+        # Generate an appropriate explanation
+        self.explain = dspy.ChainOfThought("question, knowledge_level -> explanation")
+        # Create follow-up questions
+        self.follow_up = dspy.Predict("question, explanation -> follow_up_questions")
     
     def forward(self, question):
-        # Execute the chain
-        analysis = self.analyze(question=question)
-        explanation = self.explain(
-            question=question,
-            difficulty=analysis.difficulty
-        )
-        example = self.example(explanation=explanation.explanation)
+        # Assess knowledge level
+        knowledge = self.assess(question=question).knowledge_level
+        # Generate explanation
+        explanation = self.explain(question=question, knowledge_level=knowledge).explanation
+        # Create follow-up questions
+        follow_ups = self.follow_up(question=question, explanation=explanation).follow_up_questions
         
         return {
-            'explanation': explanation.explanation,
-            'example': example.example,
-            'difficulty': analysis.difficulty,
-            'prerequisites': analysis.prerequisites
+            "knowledge_level": knowledge,
+            "explanation": explanation,
+            "follow_up_questions": follow_ups
         }
 ```
 
-## Integration with UTTA
+## Evaluation and Iteration
 
-### 1. Custom Framework Configuration
+To evaluate and improve your DSPy modules:
 
 ```python
-from utta.frameworks.dspy_framework import DSPyFramework
-from utta.config import FrameworkConfig
+# Create evaluation data
+eval_data = [
+    dspy.Example(question="How do vaccines work?"),
+    # Add more evaluation examples...
+]
 
-# Create custom configuration
-config = FrameworkConfig(
-    model_name="gpt-4",
-    temperature=0.7,
-    max_tokens=500
-)
+# Define evaluation metrics
+metrics = [
+    dspy.metrics.Accuracy(),
+    dspy.metrics.InformationRecall()
+]
 
-# Initialize framework with config
-framework = DSPyFramework(config=config)
+# Run evaluation
+results = dspy.evaluate(optimized_explainer, eval_data, metrics)
+print(results)
 ```
 
-### 2. Evaluation and Metrics
+## Integration with UTTA's Evaluation System
 
 ```python
 from utta.evaluation import Evaluator
-from utta.metrics import AccuracyMetric, RelevanceMetric
 
-# Create evaluator
-evaluator = Evaluator([
-    AccuracyMetric(),
-    RelevanceMetric()
-])
+# Create an evaluator
+evaluator = Evaluator()
 
-# Evaluate responses
-results = evaluator.evaluate(
-    predictions=[assistant.answer("What is Python?")],
-    references=["Python is a high-level programming language..."]
-)
+# Add your DSPy-optimized assistant
+evaluator.add_model(assistant, name="DSPy-Optimized")
+
+# Add a baseline model for comparison
+baseline = TeachingAssistant(model="openai/gpt-3.5-turbo")
+evaluator.add_model(baseline, name="Baseline")
+
+# Run evaluation
+results = evaluator.evaluate(task="explanation", dataset="education_examples.jsonl")
+print(results)
 ```
 
 ## Best Practices
 
-1. **Modular Design**
-   - Break down complex tasks into smaller modules
-   - Use clear and descriptive module names
-   - Keep modules focused and single-purpose
+1. **Start Small**: Begin with simple modules before building complex workflows
+2. **Use Real Examples**: Collect real educational exchanges for training data
+3. **Iterate**: Continuously evaluate and refine your DSPy modules
+4. **Combine Approaches**: Mix DSPy optimization with other techniques like fine-tuning
+5. **Focus on Educational Goals**: Tailor your modules to specific learning objectives
 
-2. **Prompt Engineering**
-   - Start with simple prompts
-   - Use teleprompters for optimization
-   - Include examples in prompts when helpful
+## Common Issues and Solutions
 
-3. **Error Handling**
-   ```python
-   try:
-       response = module.forward(question)
-   except dspy.InputError as e:
-       print(f"Invalid input: {e}")
-   except dspy.ModelError as e:
-       print(f"Model error: {e}")
-   ```
+* **Overfitting**: If your module works well on training data but not new queries, add more diverse examples
+* **Inconsistent Output Format**: Use structured prediction modules like `dspy.TypedPredictor`
+* **Poor Performance**: Try different teleprompters or increase the number of optimization trials
 
-4. **Performance Optimization**
-   - Cache responses when appropriate
-   - Use batching for multiple queries
-   - Monitor token usage
+## Advanced Topics
 
-## Example Projects
+* [DSPy Compiler Options](https://github.com/stanfordnlp/dspy#advanced-compiler-options)
+* [Custom Metrics Development](https://github.com/stanfordnlp/dspy#metrics)
+* [Integration with Other LLM Frameworks](https://github.com/stanfordnlp/dspy#integrations)
 
-### 1. Basic Question-Answering
+## Resources
 
-```python
-class QAModule(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.qa = dspy.ChainOfThought("context, question -> answer")
-    
-    def forward(self, context, question):
-        return self.qa(context=context, question=question).answer
-
-# Usage
-qa = QAModule()
-context = "Python was created by Guido van Rossum..."
-question = "Who created Python?"
-answer = qa.forward(context, question)
-```
-
-### 2. Interactive Teaching Assistant
-
-```python
-class InteractiveTeacher(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.assess = dspy.ChainOfThought("answer -> understanding_level")
-        self.explain = dspy.ChainOfThought("question, understanding_level -> explanation")
-    
-    def forward(self, question, previous_answer=None):
-        if previous_answer:
-            understanding = self.assess(answer=previous_answer)
-            level = understanding.understanding_level
-        else:
-            level = "beginner"
-        
-        return self.explain(
-            question=question,
-            understanding_level=level
-        ).explanation
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Model Errors**
-   - Check API key configuration
-   - Verify model availability
-   - Monitor rate limits
-
-2. **Prompt Issues**
-   - Review prompt format
-   - Check for missing variables
-   - Ensure clear instructions
-
-3. **Integration Problems**
-   - Verify UTTA version compatibility
-   - Check framework configuration
-   - Review error messages
-
-## Next Steps
-
-1. Explore the [OpenAI Tutorial](OpenAI-Tutorial) for comparison
-2. Learn about [Dataset Preparation](Dataset-Preparation)
-3. Contribute to the [UTTA Project](Contributing) 
+* [Official DSPy Documentation](https://github.com/stanfordnlp/dspy)
+* [Stanford AI Lab Research](https://ai.stanford.edu/research/)
+* [UTTA Documentation](Home) 

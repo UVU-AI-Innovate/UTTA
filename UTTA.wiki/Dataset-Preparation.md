@@ -1,131 +1,133 @@
 # Dataset Preparation Guide
 
-This guide explains how to prepare and format datasets for training and evaluating UTTA teaching assistants.
+This guide covers how to prepare and format datasets for training and evaluating UTTA models.
 
-## Overview
+## Introduction
 
-UTTA supports various dataset formats and sources for:
-- Training custom teaching assistants
-- Evaluating teaching effectiveness
-- Fine-tuning language models
-- Testing response quality
+High-quality datasets are essential for effectively training and evaluating AI teaching assistants. This guide will help you understand how to create, format, and preprocess data for use with UTTA.
 
-## Dataset Structure
+## Types of Datasets
 
-### Basic Format
+### Educational Q&A Datasets
+
+Educational question and answer datasets typically include:
+- Student questions
+- Expert answers
+- Optional metadata (subject area, grade level, etc.)
+
+### Teaching Dialogue Datasets
+
+Conversational datasets modeling teacher-student interactions:
+- Multi-turn dialogues
+- Student questions/misconceptions
+- Teacher explanations and guidance
+
+### Assessment Datasets
+
+Datasets for evaluating model performance:
+- Questions with reference answers
+- Rubrics for evaluation
+- Multiple difficulty levels
+
+## Data Format
+
+UTTA supports several data formats:
+
+### JSONL Format (Recommended)
+
+```jsonl
+{"question": "What is photosynthesis?", "answer": "Photosynthesis is the process used by plants to convert light energy into chemical energy...", "subject": "Biology", "grade_level": "High School"}
+{"question": "How do I solve for x in 2x + 5 = 13?", "answer": "To solve for x, first subtract 5 from both sides: 2x = 8. Then divide both sides by 2: x = 4.", "subject": "Mathematics", "grade_level": "Middle School"}
+```
+
+### CSV Format
+
+```csv
+question,answer,subject,grade_level
+"What is photosynthesis?","Photosynthesis is the process used by plants to convert light energy into chemical energy...","Biology","High School"
+"How do I solve for x in 2x + 5 = 13?","To solve for x, first subtract 5 from both sides: 2x = 8. Then divide both sides by 2: x = 4.","Mathematics","Middle School"
+```
+
+### Conversation Format
+
+For dialogue datasets:
 
 ```json
 {
-    "conversations": [
-        {
-            "id": "conv_001",
-            "messages": [
-                {
-                    "role": "student",
-                    "content": "What is a variable in Python?"
-                },
-                {
-                    "role": "assistant",
-                    "content": "A variable is a container that stores a value..."
-                }
-            ],
-            "metadata": {
-                "topic": "Python Basics",
-                "difficulty": "beginner"
-            }
-        }
-    ]
-}
-```
-
-### Extended Format
-
-```json
-{
-    "conversations": [
-        {
-            "id": "conv_002",
-            "messages": [
-                {
-                    "role": "student",
-                    "content": "How do I use a for loop?",
-                    "context": {
-                        "prior_knowledge": ["variables", "basic syntax"],
-                        "learning_style": "visual"
-                    }
-                },
-                {
-                    "role": "assistant",
-                    "content": "A for loop is used to iterate over a sequence...",
-                    "examples": [
-                        {
-                            "code": "for i in range(5):\n    print(i)",
-                            "output": "0\n1\n2\n3\n4"
-                        }
-                    ],
-                    "follow_up_questions": [
-                        "What about while loops?",
-                        "Can you nest loops?"
-                    ]
-                }
-            ],
-            "metadata": {
-                "topic": "Control Flow",
-                "difficulty": "beginner",
-                "tags": ["loops", "iteration", "basics"]
-            }
-        }
-    ]
-}
-```
-
-## Data Collection
-
-### 1. Manual Collection
-
-```python
-from utta.data import DataCollector
-
-# Initialize collector
-collector = DataCollector()
-
-# Add conversation
-collector.add_conversation(
-    student_question="What is inheritance in OOP?",
-    assistant_response="Inheritance is a mechanism that allows a class...",
-    metadata={
-        "topic": "Object-Oriented Programming",
-        "difficulty": "intermediate"
+  "conversations": [
+    {
+      "turns": [
+        {"role": "student", "content": "I don't understand why water is a polar molecule."},
+        {"role": "teacher", "content": "Great question! Water (H₂O) is polar because of the uneven distribution of electrons..."},
+        {"role": "student", "content": "So that's why oil and water don't mix?"},
+        {"role": "teacher", "content": "Exactly! Oil molecules are non-polar, meaning..."}
+      ],
+      "metadata": {
+        "subject": "Chemistry",
+        "grade_level": "High School"
+      }
     }
-)
-
-# Save dataset
-collector.save("oop_dataset.json")
+  ]
+}
 ```
 
-### 2. Automated Collection
+## Creating Educational Datasets
+
+### From Existing Sources
+
+Several educational datasets can be adapted for UTTA:
+- [SciQ](https://allenai.org/data/sciq)
+- [AI2 Reasoning Challenge (ARC)](https://allenai.org/data/arc)
+- [OpenBookQA](https://allenai.org/data/open-book-qa)
+
+### Generating with LLMs
+
+You can use LLMs to generate educational content:
 
 ```python
-from utta.data import AutomaticCollector
-from utta.sources import StackOverflowSource, DocumentationSource
+from utta.data import DatasetGenerator
 
-# Initialize collector with sources
-collector = AutomaticCollector([
-    StackOverflowSource(tags=["python", "beginner"]),
-    DocumentationSource(url="https://docs.python.org/3/")
-])
+# Initialize a generator
+generator = DatasetGenerator(model="openai/gpt-4")
 
-# Collect data
-dataset = collector.collect(
-    topics=["variables", "functions", "classes"],
+# Generate a math Q&A dataset
+math_dataset = generator.generate(
+    subject="Mathematics",
+    grade_levels=["Middle School", "High School"],
+    topics=["Algebra", "Geometry", "Calculus"],
     num_examples=100
 )
 
-# Save dataset
-dataset.save("python_basics_dataset.json")
+# Save the dataset
+math_dataset.save("math_qa_dataset.jsonl")
 ```
 
-### 3. Data Augmentation
+### Human-in-the-Loop Data Collection
+
+For highest quality:
+1. Start with LLM-generated examples
+2. Have educators review and edit
+3. Collect real student questions
+4. Iterate and expand the dataset
+
+## Data Preprocessing
+
+### Cleaning
+
+```python
+from utta.data import DataCleaner
+
+# Initialize cleaner
+cleaner = DataCleaner()
+
+# Clean dataset
+cleaned_data = cleaner.clean("raw_dataset.jsonl")
+
+# Save cleaned data
+cleaned_data.save("cleaned_dataset.jsonl")
+```
+
+### Augmentation
 
 ```python
 from utta.data import DataAugmenter
@@ -133,131 +135,18 @@ from utta.data import DataAugmenter
 # Initialize augmenter
 augmenter = DataAugmenter()
 
-# Load existing dataset
-dataset = augmenter.load("original_dataset.json")
-
-# Apply augmentations
-augmented_dataset = augmenter.augment(
-    dataset,
-    techniques=[
-        "paraphrase",
-        "add_examples",
-        "vary_difficulty"
-    ]
+# Augment dataset with paraphrased questions
+augmented_data = augmenter.augment(
+    "dataset.jsonl",
+    methods=["paraphrase", "difficulty_variation"],
+    multiplier=2
 )
 
-# Save augmented dataset
-augmented_dataset.save("augmented_dataset.json")
-```
-
-## Data Preprocessing
-
-### 1. Basic Preprocessing
-
-```python
-from utta.preprocessing import Preprocessor
-
-# Initialize preprocessor
-preprocessor = Preprocessor()
-
-# Load and preprocess dataset
-dataset = preprocessor.load("raw_dataset.json")
-processed_dataset = preprocessor.process(
-    dataset,
-    steps=[
-        "remove_duplicates",
-        "clean_text",
-        "validate_format"
-    ]
-)
-
-# Save processed dataset
-processed_dataset.save("processed_dataset.json")
-```
-
-### 2. Advanced Preprocessing
-
-```python
-from utta.preprocessing import AdvancedPreprocessor
-from utta.validation import DataValidator
-
-# Initialize preprocessor with custom settings
-preprocessor = AdvancedPreprocessor(
-    text_cleaner_config={
-        "remove_html": True,
-        "fix_unicode": True,
-        "standardize_quotes": True
-    },
-    validator_config={
-        "min_length": 50,
-        "max_length": 1000,
-        "required_fields": ["content", "metadata"]
-    }
-)
-
-# Process dataset
-processed_dataset = preprocessor.process(
-    "raw_dataset.json",
-    additional_steps=[
-        "normalize_difficulty_levels",
-        "extract_code_snippets",
-        "categorize_topics"
-    ]
-)
-```
-
-## Data Validation
-
-### 1. Schema Validation
-
-```python
-from utta.validation import SchemaValidator
-
-# Define schema
-schema = {
-    "type": "object",
-    "properties": {
-        "conversations": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["id", "messages", "metadata"]
-            }
-        }
-    }
-}
-
-# Validate dataset
-validator = SchemaValidator(schema)
-is_valid = validator.validate("dataset.json")
-```
-
-### 2. Content Quality Checks
-
-```python
-from utta.validation import QualityChecker
-
-# Initialize checker
-checker = QualityChecker()
-
-# Check dataset quality
-quality_report = checker.check(
-    "dataset.json",
-    checks=[
-        "spelling",
-        "grammar",
-        "code_validity",
-        "content_relevance"
-    ]
-)
-
-# Print report
-print(quality_report.summary())
+# Save augmented data
+augmented_data.save("augmented_dataset.jsonl")
 ```
 
 ## Dataset Splitting
-
-### 1. Basic Splitting
 
 ```python
 from utta.data import DatasetSplitter
@@ -267,100 +156,53 @@ splitter = DatasetSplitter()
 
 # Split dataset
 train, val, test = splitter.split(
-    "dataset.json",
-    ratios=[0.7, 0.15, 0.15]
+    "full_dataset.jsonl",
+    ratios=[0.7, 0.15, 0.15],
+    stratify_by="subject"
 )
 
 # Save splits
-train.save("train.json")
-val.save("val.json")
-test.save("test.json")
+train.save("train.jsonl")
+val.save("val.jsonl")
+test.save("test.jsonl")
 ```
 
-### 2. Stratified Splitting
+## Dataset Analysis
 
 ```python
-from utta.data import StratifiedSplitter
+from utta.data import DatasetAnalyzer
 
-# Initialize splitter
-splitter = StratifiedSplitter(
-    stratify_by=["difficulty", "topic"]
-)
+# Initialize analyzer
+analyzer = DatasetAnalyzer()
 
-# Split dataset
-splits = splitter.split(
-    "dataset.json",
-    ratios=[0.7, 0.15, 0.15],
-    ensure_representation=True
-)
+# Analyze dataset
+stats = analyzer.analyze("dataset.jsonl")
+
+# Print statistics
+print(stats.summary())
+print(stats.distributions())
+print(stats.quality_issues())
 ```
 
 ## Best Practices
 
-### 1. Data Quality
-
-- Ensure consistent formatting
-- Validate all entries
-- Remove duplicate content
-- Balance topic distribution
-- Include diverse difficulty levels
-
-### 2. Metadata
-
-- Add detailed topic tags
-- Include difficulty levels
-- Mark prerequisites
-- Add source information
-- Include timestamps
-
-### 3. Content Guidelines
-
-- Keep responses focused
-- Include practical examples
-- Add follow-up questions
-- Maintain consistent style
-- Include code snippets where relevant
+1. **Diverse Content**: Include a wide range of topics, difficulty levels, and question types
+2. **Balance**: Ensure balanced representation across subjects and grade levels
+3. **Quality Control**: Manually review samples for accuracy and educational value
+4. **Metadata**: Include rich metadata to enable targeted training and evaluation
+5. **Versioning**: Maintain clear dataset versions as you iterate and improve
 
 ## Example Workflow
 
-```python
-from utta.data import DataPipeline
+1. Collect initial data from existing sources
+2. Clean and preprocess the data
+3. Augment with LLM-generated examples
+4. Have educators review and refine
+5. Split into train/val/test sets
+6. Use for training and evaluation
 
-# Define pipeline
-pipeline = DataPipeline([
-    ("collect", AutomaticCollector()),
-    ("preprocess", Preprocessor()),
-    ("augment", DataAugmenter()),
-    ("validate", QualityChecker()),
-    ("split", DatasetSplitter())
-])
+## Resources
 
-# Configure pipeline
-config = {
-    "collect": {
-        "sources": ["stackoverflow", "documentation"],
-        "num_examples": 1000
-    },
-    "preprocess": {
-        "steps": ["clean", "deduplicate", "normalize"]
-    },
-    "augment": {
-        "techniques": ["paraphrase", "add_examples"]
-    },
-    "validate": {
-        "checks": ["quality", "format", "content"]
-    },
-    "split": {
-        "ratios": [0.7, 0.15, 0.15]
-    }
-}
-
-# Run pipeline
-train, val, test = pipeline.run(config)
-```
-
-## Next Steps
-
-1. Learn how to use your dataset in the [DSPy Tutorial](DSPy-Tutorial)
-2. Explore model training in the [OpenAI Tutorial](OpenAI-Tutorial)
-3. Contribute to the [UTTA Project](Contributing) 
+- [Sample Datasets Repository](https://github.com/UVU-AI-Innovate/UTTA/tree/main/datasets)
+- [Data Preparation Scripts](https://github.com/UVU-AI-Innovate/UTTA/tree/main/tools/data_preparation)
+- [Data Quality Guidelines](https://github.com/UVU-AI-Innovate/UTTA/wiki/Data-Quality-Guidelines) 

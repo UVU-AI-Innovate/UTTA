@@ -1,315 +1,235 @@
-# OpenAI Tutorial
+# OpenAI Tutorial for UTTA
 
-This tutorial guides you through using OpenAI's models with UTTA for creating effective teaching assistants.
+This tutorial will guide you through using OpenAI models with the UTTA framework.
+
+## Introduction
+
+OpenAI's models like GPT-3.5 and GPT-4 provide powerful capabilities for educational applications. This guide will show you how to effectively leverage these models within UTTA for teaching and training purposes.
 
 ## Prerequisites
 
 Before starting this tutorial, ensure you have:
-1. Completed the [Environment Setup](Environment-Setup)
-2. OpenAI API key configured
-3. Basic understanding of Python and LLMs
-4. UTTA installed and configured
 
-## Basic Usage
+* Completed the [Environment Setup](Environment-Setup)
+* An OpenAI API key
+* Basic understanding of the UTTA framework
 
-### 1. Initialize OpenAI with UTTA
+## Setting Up OpenAI Access
+
+1. **Create an OpenAI Account**
+   * Sign up at [OpenAI](https://platform.openai.com/)
+   * Navigate to the API section
+
+2. **Generate an API Key**
+   * Go to "API Keys" in your account
+   * Click "Create new secret key"
+   * Copy and store your key securely
+
+3. **Set Up Environment Variable**
+   ```bash
+   # Add to your environment or .env file
+   export OPENAI_API_KEY="your-key-here"
+   ```
+
+## Basic Usage of OpenAI Models
+
+### Initializing with OpenAI Models
 
 ```python
-from utta.core import TeachingAssistant
-from utta.frameworks.openai_framework import OpenAIFramework
+from utta import TeachingAssistant
 
-# Initialize the framework
-framework = OpenAIFramework()
+# Initialize with GPT-3.5-Turbo
+assistant = TeachingAssistant(model="openai/gpt-3.5-turbo")
 
-# Create teaching assistant
-assistant = TeachingAssistant(framework=framework)
-```
+# Or initialize with GPT-4
+advanced_assistant = TeachingAssistant(model="openai/gpt-4")
 
-### 2. Simple Question-Answering
-
-```python
 # Ask a question
-response = assistant.answer("What is object-oriented programming?")
-print(response)
-
-# Ask with context
-context = """
-Object-oriented programming (OOP) is a programming paradigm based on the concept of objects,
-which can contain data and code. The data is in the form of fields (often known as attributes),
-and the code is in the form of procedures (often known as methods).
-"""
-
-response = assistant.answer(
-    "What are the main components of OOP?",
-    context=context
-)
+response = assistant.ask("What are the key principles of machine learning?")
 print(response)
 ```
 
-## Advanced Features
-
-### 1. Custom Configuration
+### Configuring Model Parameters
 
 ```python
-from utta.config import FrameworkConfig
-
-# Create custom configuration
-config = FrameworkConfig(
-    model_name="gpt-4",
+# Configure with specific parameters
+assistant = TeachingAssistant(
+    model="openai/gpt-4",
     temperature=0.7,
     max_tokens=500,
-    top_p=0.9,
-    frequency_penalty=0.0,
-    presence_penalty=0.0
+    top_p=0.95
 )
 
-# Initialize framework with config
-framework = OpenAIFramework(config=config)
-assistant = TeachingAssistant(framework=framework)
+# You can also update parameters after initialization
+assistant.update_model_parameters(temperature=0.5)
 ```
 
-### 2. System Messages
+## Advanced OpenAI Features
+
+### System Messages for Role Definition
 
 ```python
-# Define teaching style
-system_message = """
-You are a patient and knowledgeable computer science teacher.
-Always:
-1. Start with basic concepts
-2. Provide relevant examples
-3. Include practice exercises
-4. Encourage critical thinking
-"""
-
-# Create assistant with custom system message
+# Define a specific teaching persona
 assistant = TeachingAssistant(
-    framework=framework,
-    system_message=system_message
+    model="openai/gpt-3.5-turbo",
+    system_message="You are a university professor specializing in computer science. Explain concepts thoroughly with relevant examples and ask students questions to check understanding."
 )
 ```
 
-### 3. Function Calling
+### Function Calling
 
 ```python
-from typing import List, Dict
+from utta.tools import MathTool, WebSearchTool
 
-def generate_practice_problems(topic: str, difficulty: str) -> List[Dict]:
-    """Generate practice problems for a given topic."""
-    response = assistant.framework.call_function(
-        "generate_problems",
-        {
-            "topic": topic,
-            "difficulty": difficulty,
-            "num_problems": 3
-        }
-    )
-    return response["problems"]
+# Add tools to your assistant
+assistant = TeachingAssistant(model="openai/gpt-4")
+assistant.add_tool(MathTool())
+assistant.add_tool(WebSearchTool())
 
-# Usage
-problems = generate_practice_problems("Python Lists", "intermediate")
-for problem in problems:
-    print(f"Question: {problem['question']}")
-    print(f"Answer: {problem['answer']}\n")
+# Now the assistant can use these tools
+response = assistant.ask("Calculate the derivative of x^3 + 2x^2 - 5x + 3")
+print(response)
 ```
 
-## Integration with UTTA
+### Using Different OpenAI Models
 
-### 1. Custom Prompts
+UTTA supports different OpenAI models:
 
 ```python
-from utta.prompts import PromptTemplate
+# Using the most recent GPT-4 model
+assistant_gpt4 = TeachingAssistant(model="openai/gpt-4")
 
-# Create custom prompt template
-teaching_prompt = PromptTemplate(
-    template="""
-    Topic: {topic}
-    Student Level: {level}
-    Question: {question}
+# Using GPT-3.5-Turbo for faster, more cost-effective responses
+assistant_gpt35 = TeachingAssistant(model="openai/gpt-3.5-turbo")
+
+# Using a specific model version
+assistant_specific = TeachingAssistant(model="openai/gpt-4-0613")
+```
+
+## Educational Applications
+
+### Creating Personalized Explanations
+
+```python
+def generate_explanation(concept, grade_level, learning_style):
+    prompt = f"Explain {concept} to a {grade_level} student with a {learning_style} learning style."
     
-    Please provide:
-    1. A clear explanation
-    2. Relevant examples
-    3. Common misconceptions
-    4. Practice exercises
-    """
-)
+    assistant = TeachingAssistant(model="openai/gpt-4")
+    response = assistant.ask(prompt)
+    
+    return response
 
-# Use custom prompt
-response = assistant.answer(
-    question="How do Python decorators work?",
-    prompt_template=teaching_prompt,
-    topic="Python Advanced Features",
-    level="intermediate"
-)
+# Generate explanations for different students
+visual_learner = generate_explanation("photosynthesis", "8th grade", "visual")
+auditory_learner = generate_explanation("photosynthesis", "8th grade", "auditory")
 ```
 
-### 2. Conversation Management
+### Creating Interactive Quizzes
 
 ```python
-# Start a teaching session
-session = assistant.start_session()
+from utta.education import QuizGenerator
 
-# Have a conversation
-responses = []
-responses.append(session.send("What is a variable in Python?"))
-responses.append(session.send("Can you give me an example?"))
-responses.append(session.send("What about different data types?"))
+# Initialize a quiz generator
+quiz_gen = QuizGenerator(model="openai/gpt-4")
 
-# Review conversation history
-history = session.get_history()
-for message in history:
-    print(f"{message['role']}: {message['content']}\n")
+# Generate a quiz on a specific topic
+quiz = quiz_gen.create_quiz(
+    topic="World War II",
+    difficulty="high school",
+    num_questions=5,
+    question_types=["multiple_choice", "short_answer"]
+)
+
+# Print the quiz
+for i, question in enumerate(quiz.questions):
+    print(f"Q{i+1}: {question.text}")
+    if question.type == "multiple_choice":
+        for j, option in enumerate(question.options):
+            print(f"  {chr(65+j)}) {option}")
 ```
 
-### 3. Error Handling
+## Cost Management
+
+OpenAI API usage incurs costs. Here's how to manage them:
 
 ```python
-from utta.exceptions import ModelError, RateLimitError
+from utta.utils import TokenCounter
 
-try:
-    response = assistant.answer("Complex question about quantum computing")
-except ModelError as e:
-    print(f"Model error: {e}")
-except RateLimitError as e:
-    print(f"Rate limit exceeded: {e}")
-    # Implement retry logic or fallback
+# Initialize a token counter
+counter = TokenCounter()
+
+# Check token usage for a prompt
+prompt = "Explain the concept of photosynthesis in detail."
+tokens = counter.count_tokens(prompt, model="openai/gpt-4")
+print(f"This prompt will use approximately {tokens} tokens.")
+
+# Estimate cost
+estimated_cost = counter.estimate_cost(tokens, model="openai/gpt-4")
+print(f"Estimated cost: ${estimated_cost:.4f}")
+```
+
+## Evaluating Responses
+
+```python
+from utta.evaluation import ResponseEvaluator
+
+# Initialize an evaluator
+evaluator = ResponseEvaluator()
+
+# Evaluate a response against reference material
+score = evaluator.evaluate(
+    model_response="Photosynthesis is the process where plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar.",
+    reference="Photosynthesis is the process by which plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy in the form of glucose or other sugars.",
+    criteria=["accuracy", "completeness", "clarity"]
+)
+
+print(f"Evaluation score: {score}")
+print(f"Feedback: {evaluator.get_feedback()}")
+```
+
+## Fine-Tuning OpenAI Models
+
+For advanced customization, you can fine-tune OpenAI models:
+
+```python
+from utta.fine_tuning import OpenAIFineTuner
+
+# Initialize the fine-tuner
+tuner = OpenAIFineTuner(
+    base_model="gpt-3.5-turbo",
+    dataset_path="education_examples.jsonl"
+)
+
+# Start the fine-tuning process
+job_id = tuner.start_fine_tuning()
+print(f"Fine-tuning job started with ID: {job_id}")
+
+# Check status
+status = tuner.check_status(job_id)
+print(f"Status: {status}")
+
+# When complete, use the fine-tuned model
+assistant = TeachingAssistant(model=f"openai/{tuner.get_model_name()}")
 ```
 
 ## Best Practices
 
-### 1. Token Management
-
-```python
-from utta.utils import count_tokens
-
-# Check token count before sending
-question = "Long and complex question..."
-token_count = count_tokens(question)
-
-if token_count > 2000:
-    # Split into smaller chunks or summarize
-    pass
-```
-
-### 2. Cost Optimization
-
-```python
-# Use cheaper models for simple tasks
-config_simple = FrameworkConfig(
-    model_name="gpt-3.5-turbo",
-    max_tokens=100
-)
-
-# Use more powerful models for complex tasks
-config_complex = FrameworkConfig(
-    model_name="gpt-4",
-    max_tokens=500
-)
-
-# Switch based on task complexity
-def get_appropriate_config(question: str) -> FrameworkConfig:
-    complexity = assess_complexity(question)
-    return config_complex if complexity > 0.7 else config_simple
-```
-
-### 3. Response Validation
-
-```python
-from utta.validation import validate_response
-
-def ensure_quality_response(response: str) -> bool:
-    checks = [
-        "contains_example",
-        "appropriate_length",
-        "relevant_content"
-    ]
-    
-    return validate_response(response, checks)
-```
-
-## Example Projects
-
-### 1. Interactive Coding Tutor
-
-```python
-class CodingTutor:
-    def __init__(self):
-        self.assistant = TeachingAssistant(framework=OpenAIFramework())
-        self.session = self.assistant.start_session()
-    
-    def review_code(self, code: str) -> str:
-        prompt = f"""
-        Please review this code:
-        ```python
-        {code}
-        ```
-        Provide:
-        1. Code quality assessment
-        2. Potential improvements
-        3. Best practices suggestions
-        """
-        return self.session.send(prompt)
-    
-    def explain_error(self, error_message: str) -> str:
-        return self.session.send(
-            f"Please explain this error and how to fix it: {error_message}"
-        )
-
-# Usage
-tutor = CodingTutor()
-code = "def factorial(n): return 1 if n <= 1 else n*factorial(n-1)"
-review = tutor.review_code(code)
-```
-
-### 2. Concept Mapper
-
-```python
-class ConceptMapper:
-    def __init__(self):
-        self.assistant = TeachingAssistant(framework=OpenAIFramework())
-    
-    def create_concept_map(self, topic: str) -> dict:
-        prompt = f"""
-        Create a concept map for: {topic}
-        Include:
-        1. Main concepts
-        2. Relationships between concepts
-        3. Prerequisites
-        4. Advanced applications
-        """
-        response = self.assistant.answer(prompt)
-        return self.parse_concept_map(response)
-    
-    def parse_concept_map(self, response: str) -> dict:
-        # Implementation to convert response to structured format
-        pass
-
-# Usage
-mapper = ConceptMapper()
-python_concepts = mapper.create_concept_map("Python Object-Oriented Programming")
-```
+1. **Be Specific in Prompts**: Clear instructions lead to better responses
+2. **Use System Messages**: Set the educational context and expectations
+3. **Start with GPT-3.5**: Use the more cost-effective model for development
+4. **Monitor Token Usage**: Keep track of costs, especially with larger models
+5. **Implement Safeguards**: Add checks to ensure content is appropriate for educational use
+6. **Verify Information**: Always verify factual accuracy of model outputs
 
 ## Troubleshooting
 
-### Common Issues
+* **Rate Limits**: If you encounter rate limits, implement exponential backoff
+* **Token Limits**: Break long prompts into smaller chunks
+* **Cost Management**: Set budget alerts and limitations in your application
+* **Version Changes**: Stay updated on model version changes
 
-1. **API Rate Limits**
-   - Implement exponential backoff
-   - Use token bucket rate limiting
-   - Monitor usage patterns
+## Further Resources
 
-2. **Response Quality**
-   - Adjust temperature and top_p
-   - Refine system messages
-   - Implement validation checks
-
-3. **Cost Management**
-   - Monitor token usage
-   - Use appropriate models
-   - Implement caching
-
-## Next Steps
-
-1. Explore the [DSPy Tutorial](DSPy-Tutorial) for comparison
-2. Learn about [Dataset Preparation](Dataset-Preparation)
-3. Contribute to the [UTTA Project](Contributing) 
+* [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+* [UTTA Documentation](Home)
+* [OpenAI Model Capabilities](https://platform.openai.com/docs/models) 

@@ -1,156 +1,131 @@
 # Environment Setup Guide
 
-This guide provides detailed instructions for setting up your development environment for UTTA.
+This guide provides detailed instructions for setting up your development environment for the UTTA project.
 
 ## System Requirements
 
-### Hardware Requirements
-- **CPU**: Modern multi-core processor
-- **RAM**: Minimum 8GB, recommended 16GB+
-- **Storage**: 20GB+ free space
-- **GPU**: Optional but recommended for HuggingFace models
-  - NVIDIA GPU with 8GB+ VRAM
-  - CUDA support
+* **Operating System**: Linux, macOS, or Windows
+* **Python**: Version 3.10 or higher
+* **RAM**: At least 8GB (16GB+ recommended for larger models)
+* **Disk Space**: At least 2GB for installation and dependencies
+* **GPU**: Optional but recommended for training and running larger models
 
-### Software Requirements
-- **Operating System**: Linux, macOS, or Windows
-- **Python**: Version 3.10 or higher
-- **Conda**: Latest version
-- **Git**: Latest version
+## Python Environment Setup
 
-## Step-by-Step Setup
+We strongly recommend using Conda for managing your Python environment:
 
-### 1. Python Installation
-```bash
-# Check Python version
-python --version
+### Using Conda (Recommended)
 
-# If needed, install Python 3.10 using your package manager
-# For Ubuntu:
-sudo apt update
-sudo apt install python3.10
-```
+1. **Install Conda**:
+   * Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual)
 
-### 2. Conda Installation
-```bash
-# Download Miniconda (recommended)
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
+2. **Create a new environment**:
+   ```bash
+   conda create -n utta python=3.10
+   conda activate utta
+   ```
 
-# Or use system package manager
-# For Ubuntu:
-sudo apt install conda
-```
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 3. UTTA Environment Setup
-```bash
-# Clone the repository
-git clone https://github.com/UVU-AI-Innovate/UTTA.git
-cd UTTA
+### Using venv (Alternative)
 
-# Create and activate conda environment
-conda create -n utta python=3.10
-conda activate utta
+1. **Create a virtual environment**:
+   ```bash
+   python -m venv utta-env
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
-```
+2. **Activate the environment**:
+   * On Windows: `utta-env\Scripts\activate`
+   * On macOS/Linux: `source utta-env/bin/activate`
 
-### 4. API Keys Setup
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-#### OpenAI API
+## API Keys Configuration
+
+### OpenAI API
+
 1. Create an account at [OpenAI](https://platform.openai.com/)
-2. Generate an API key
-3. Set the environment variable:
+2. Generate an API key from your account dashboard
+3. Add the key to your environment:
    ```bash
-   export OPENAI_API_KEY='your-api-key-here'
+   export OPENAI_API_KEY="your-openai-key"
    ```
+   For Windows: `set OPENAI_API_KEY=your-openai-key`
 
-#### HuggingFace Hub
+### HuggingFace API
+
 1. Create an account at [HuggingFace](https://huggingface.co/)
-2. Generate an access token
-3. Login using the CLI:
+2. Generate an API token from your account settings
+3. Add the token to your environment:
    ```bash
-   huggingface-cli login
+   export HUGGINGFACE_API_KEY="your-huggingface-key"
    ```
+   For Windows: `set HUGGINGFACE_API_KEY=your-huggingface-key`
 
-### 5. GPU Setup (Optional)
+## Using .env Files (Recommended)
 
-For HuggingFace models, CUDA support is recommended:
+For easier management of API keys, create a `.env` file in the project root:
 
-1. **Install CUDA Toolkit**
-   ```bash
-   # Check NVIDIA driver
-   nvidia-smi
-   
-   # Install CUDA (example for Ubuntu)
-   sudo apt install nvidia-cuda-toolkit
-   ```
+```
+OPENAI_API_KEY=your-openai-key
+HUGGINGFACE_API_KEY=your-huggingface-key
+# Add other environment variables as needed
+```
 
-2. **Install PyTorch with CUDA**
-   ```bash
-   # Install PyTorch with CUDA support
-   conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-   ```
-
-## Verification
-
-Test your installation:
+Then load it using:
 
 ```python
-# Test basic functionality
-python -c "from utta.core import TeachingAssistant; print('Core module working!')"
-
-# Test GPU support (if applicable)
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+from dotenv import load_dotenv
+load_dotenv()  # This loads the variables from .env
 ```
 
-## Common Issues and Solutions
+## GPU Support
 
-### 1. Dependency Conflicts
-```bash
-# If you encounter conflicts, try:
-conda create -n utta python=3.10 --no-deps
-conda activate utta
-pip install -r requirements.txt --no-deps
+If you have a compatible NVIDIA GPU, you can enable GPU acceleration:
+
+1. **Install CUDA Toolkit**:
+   * Download from [NVIDIA Developer](https://developer.nvidia.com/cuda-downloads)
+
+2. **Install PyTorch with CUDA support**:
+   ```bash
+   conda install pytorch cudatoolkit=11.7 -c pytorch
+   ```
+
+3. **Verify GPU detection**:
+   ```python
+   import torch
+   print(f"CUDA available: {torch.cuda.is_available()}")
+   print(f"Number of GPUs: {torch.cuda.device_count()}")
+   ```
+
+## Troubleshooting
+
+### Common Issues
+
+* **ImportError**: Make sure you've activated your environment and installed all dependencies
+* **API Key Errors**: Verify your API keys are correctly set and accessible
+* **CUDA Errors**: Ensure compatible versions of PyTorch and CUDA
+
+### Environment Verification
+
+Run this script to verify your environment:
+
+```python
+import sys
+import torch
+import os
+
+print(f"Python version: {sys.version}")
+print(f"PyTorch version: {torch.__version__}")
+print(f"CUDA available: {torch.cuda.is_available()}")
+print(f"OpenAI API Key configured: {'OPENAI_API_KEY' in os.environ}")
+print(f"HuggingFace API Key configured: {'HUGGINGFACE_API_KEY' in os.environ}")
 ```
 
-### 2. CUDA Issues
-- Ensure NVIDIA drivers are up to date
-- Check CUDA version compatibility
-- Verify GPU is recognized:
-  ```bash
-  nvidia-smi
-  ```
-
-### 3. API Authentication
-- Double-check API keys
-- Verify environment variables
-- Test API access:
-  ```python
-  import openai
-  openai.Model.list()  # Should return available models
-  ```
-
-## Development Tools
-
-### Recommended IDE Setup
-- VSCode with Python extension
-- PyCharm Professional/Community
-- Jupyter Lab/Notebook
-
-### Useful Extensions
-- Python
-- Jupyter
-- Git
-- Docker
-- YAML
-
-## Next Steps
-
-1. Follow the [Getting Started Guide](Getting-Started)
-2. Prepare your datasets using [Dataset Preparation](Dataset-Preparation)
-3. Choose a framework tutorial:
-   - [DSPy Tutorial](DSPy-Tutorial)
-   - [OpenAI Tutorial](OpenAI-Tutorial)
-   - [HuggingFace Tutorial](HuggingFace-Tutorial) 
+For additional help, please check the [UTTA GitHub repository](https://github.com/UVU-AI-Innovate/UTTA/issues) or create a new issue. 

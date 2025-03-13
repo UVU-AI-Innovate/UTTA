@@ -1,22 +1,18 @@
-# UTTA Wiki Navigation
+# UTTA Wiki
 
 ## Getting Started
 * [Home](Home)
-* [Getting Started Guide](Getting-Started)
+* [Getting Started](Getting-Started)
 * [Environment Setup](Environment-Setup)
-* [Dataset Preparation](Dataset-Preparation)
+* [Code of Conduct](Code-of-Conduct)
 
 ## Framework Guides
 * [DSPy Tutorial](DSPy-Tutorial)
-* [DSPy Optimization](DSPy-Optimization)
 * [OpenAI Tutorial](OpenAI-Tutorial)
 * [HuggingFace Tutorial](HuggingFace-Tutorial)
 
-## Evaluation
-* [LLM Evaluation](LLM-Evaluation)
-* [Overview of Fine-Tuning](Overview-of-Fine-Tuning)
+## Data Management
+* [Dataset Preparation](Dataset-Preparation)
 
-## Resources
-* [GitHub Repository](https://github.com/UVU-AI-Innovate/UTTA)
-* [Contributing Guidelines](https://github.com/UVU-AI-Innovate/UTTA/blob/main/CONTRIBUTING.md)
-* [License](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE) 
+## Community
+* [Contributing](Contributing) 

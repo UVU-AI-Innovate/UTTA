@@ -1,108 +1,52 @@
-# Welcome to UTTA (Utah Teacher Training Assistant)
+# Welcome to the UTTA Wiki
 
-UTTA is a comprehensive framework for developing and evaluating Large Language Model (LLM) based teaching assistants. This project focuses on creating effective, AI-powered educational support systems using state-of-the-art language models and evaluation methodologies.
+**UTTA** (Universal Teaching and Training Assistant) is an open-source framework designed to train and optimize AI models for educational applications. This wiki serves as the comprehensive documentation for the UTTA project.
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.10 or higher
-- Conda package manager
-- Git
+* [Getting Started](Getting-Started) - Setup instructions and basic usage
+* [Environment Setup](Environment-Setup) - How to set up your development environment
+* [Code of Conduct](Code-of-Conduct) - Community guidelines for participation
 
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/UVU-AI-Innovate/UTTA.git
-cd UTTA
-
-# Create and activate environment
-conda create -n utta python=3.10
-conda activate utta
-
-# Install requirements
-pip install -r requirements.txt
-```
-
-## 📚 Documentation Sections
-
-### Getting Started
-- [Getting Started Guide](Getting-Started) - Essential first steps
-- [Environment Setup](Environment-Setup) - Detailed setup instructions
-- [Dataset Preparation](Dataset-Preparation) - How to prepare your educational datasets
+## 📚 Documentation
 
 ### Framework Implementations
-1. **DSPy Implementation**
-   - [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for teaching assistants
-   - [DSPy Optimization](DSPy-Optimization) - Advanced optimization techniques
 
-2. **LangChain Implementation**
-   - Coming soon
+* [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for prompt optimization
+* [OpenAI Tutorial](OpenAI-Tutorial) - Guide for using OpenAI models
+* [HuggingFace Tutorial](HuggingFace-Tutorial) - Guide for using HuggingFace models
 
-3. **LlamaIndex Implementation**
-   - Coming soon
+### Data Preparation
 
-### Model Training & Evaluation
-- [OpenAI Tutorial](OpenAI-Tutorial) - Working with OpenAI models
-- [HuggingFace Tutorial](HuggingFace-Tutorial) - Using HuggingFace models
-- [LLM Evaluation](LLM-Evaluation) - Evaluating model performance
+* [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training
 
-## 🎯 Key Features
+## 🔑 Key Features
 
-### 1. Multiple Framework Support
-- DSPy integration for optimized prompting
-- LangChain for complex chains and agents
-- LlamaIndex for efficient knowledge retrieval
+* **Framework Agnostic** - Works with various LLM frameworks (OpenAI, HuggingFace, etc.)
+* **Optimization Tools** - Includes tools for prompt optimization and fine-tuning
+* **Evaluation Suite** - Comprehensive tools for evaluating model performance
+* **Educational Focus** - Specialized for educational use cases and teaching applications
 
-### 2. Educational Focus
-- Specialized for teaching assistance
-- Support for various educational scenarios
-- Customizable content delivery
+## 🧩 Project Components
 
-### 3. Comprehensive Evaluation
-- Automated evaluation pipelines
-- Human-in-the-loop evaluation
-- Educational metrics and benchmarks
+The UTTA project consists of several key components:
 
-## 🛠️ Project Components
-
-1. **Core Framework**
-   - Teaching assistant base classes
-   - Framework integrations
-   - Utility functions
-
-2. **Educational Tools**
-   - Question answering
-   - Content explanation
-   - Student assessment
-   - Feedback generation
-
-3. **Evaluation System**
-   - Response quality metrics
-   - Educational effectiveness measures
-   - Performance benchmarks
+1. **Core Framework** - The base UTTA implementation
+2. **Optimization Tools** - For improving model performance
+3. **Evaluation Suite** - For assessing model capabilities
+4. **Example Applications** - Demonstrating real-world usage
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
+We welcome contributions from the community! Please check out:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+* [Contributing Guide](Contributing) - How to contribute to the project
 
-See our [Contributing Guidelines](https://github.com/UVU-AI-Innovate/UTTA/blob/main/CONTRIBUTING.md) for more details.
+## 🆘 Support & Community
 
-## 📞 Support & Community
-
-- Open an issue on GitHub for bug reports or feature requests
-- Join our community discussions
-- Contact the maintainers for collaboration opportunities
+* GitHub Issues: For bug reports and feature requests
+* GitHub Discussions: For general questions and discussions
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE) file for details.
-
----
-
-*UTTA - Empowering Education with AI* 
+UTTA is released under the [MIT License](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE). 
