@@ -1,125 +1,51 @@
 # Contributing to UTTA
 
-Thank you for your interest in contributing to the UTTA project! This guide will help you get started with contributing to the project.
+Thank you for your interest in contributing to the Universal Teaching and Training Assistant (UTTA) project! We welcome contributions from everyone, regardless of experience level.
 
-## Table of Contents
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Pull Request Process](#pull-request-process)
-- [Testing](#testing)
-- [Documentation](#documentation)
-- [Community](#community)
+## How to Contribute
 
-## Code of Conduct
+Here are several ways you can contribute to UTTA:
 
-Please read our [Code of Conduct](Code-of-Conduct) before contributing to the project. By participating, you are expected to uphold this code.
+1. **Code contributions**: Add new features, fix bugs, or improve existing functionality
+2. **Documentation**: Help improve our guides, tutorials, and API documentation
+3. **Testing**: Create tests, report bugs, or validate fixes
+4. **Examples and tutorials**: Create or improve examples demonstrating UTTA in educational contexts
+5. **Dataset contributions**: Help expand our training datasets for educational AI
+6. **Feedback**: Provide feedback on your experience using UTTA in teaching/training environments
 
 ## Getting Started
 
-1. **Fork the Repository**
-   * Visit [UTTA on GitHub](https://github.com/UVU-AI-Innovate/UTTA)
-   * Click the "Fork" button in the upper right corner
-
-2. **Clone Your Fork**
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/UTTA.git
-   cd UTTA
-   ```
-
-3. **Set Up Remote**
-   ```bash
-   git remote add upstream https://github.com/UVU-AI-Innovate/UTTA.git
-   ```
-
-4. **Set Up Development Environment**
-   ```bash
-   conda create -n utta python=3.10
-   conda activate utta
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt  # Install development dependencies
-   ```
-
-## Development Workflow
-
-1. **Create a Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-   Use prefixes like:
-   * `feature/` for new features
-   * `fix/` for bug fixes
-   * `docs/` for documentation
-   * `test/` for adding or updating tests
-
-2. **Make Your Changes**
-   * Write clean, well-documented code
-   * Follow the existing code style and conventions
-   * Keep commits focused and logical
-
-3. **Commit Your Changes**
-   ```bash
-   git add .
-   git commit -m "feat: Add new feature X"
-   ```
-   We follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
-
-4. **Stay Updated**
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
+1. **Set up your environment**: Follow the instructions in the [Environment Setup](Environment-Setup) guide
+2. **Fork the repository**: Create your own fork of the UTTA repository
+3. **Create a new branch**: Make your changes in a new git branch
+4. **Make your changes**: Implement your feature or bug fix
+5. **Test your changes**: Ensure your changes don't break existing functionality
+6. **Submit a pull request**: Open a PR against the main UTTA repository
 
 ## Pull Request Process
 
-1. **Push to Your Fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+1. Ensure your code follows the project's coding standards
+2. Update documentation to reflect any changes
+3. Include tests that verify your changes
+4. Your PR should clearly describe what changes you've made and why
+5. A maintainer will review your PR and may request additional changes
+6. Once approved, a maintainer will merge your PR
 
-2. **Create a Pull Request**
-   * Go to the [UTTA repository](https://github.com/UVU-AI-Innovate/UTTA)
-   * Click "New Pull Request"
-   * Select "compare across forks"
-   * Select your fork and branch
-   * Add a clear title and description
+## Code Standards
 
-3. **PR Guidelines**
-   * Link to any relevant issues
-   * Include screenshots or examples if applicable
-   * Ensure all tests pass
-   * Update documentation as needed
-   * Respond to review comments promptly
+- Follow the existing code style in the project
+- Write clear, concise, and descriptive commit messages
+- Document your code with appropriate comments and docstrings
+- Write tests for new functionality
 
-4. **After Approval**
-   * Your PR will be merged by a maintainer
-   * You can delete your branch after it's merged
+## Communication
 
-## Testing
+- Use GitHub Issues for bug reports, feature requests, and discussions
+- Be respectful and constructive in all communications
+- Follow our [Code of Conduct](Code-of-Conduct)
 
-1. **Run Tests**
-   ```bash
-   pytest
-   ```
+## Recognition
 
-2. **Adding Tests**
-   * All new features should include appropriate tests
-   * Bug fixes should include a test that would have caught the issue
+All contributors will be recognized in our project documentation and release notes. We appreciate every contribution, no matter how small!
 
-## Documentation
-
-1. **Code Documentation**
-   * Use docstrings for functions, classes, and modules
-   * Follow [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
-
-2. **Wiki Documentation**
-   * Update relevant wiki pages for user-facing changes
-   * Create new wiki pages for major features
-
-## Community
-
-* **GitHub Discussions**: Ask questions and share ideas
-* **GitHub Issues**: Report bugs and request features
-* **Pull Requests**: Review and discuss code changes
-
-Thank you for contributing to UTTA! 
+Thank you for helping make UTTA better! 
