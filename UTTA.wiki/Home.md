@@ -20,71 +20,21 @@
 
 * [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training
 
-## 🏗️ Project Architecture
-
-UTTA consists of two main components that work together to create AI-powered educational assistants:
-
-1. **LLM Chatbot Framework** (`llm-chatbot-framework/`)
-   * Core implementation for building teaching assistants with:
-     * LLM integration (OpenAI, HuggingFace, DSPy)
-     * Knowledge retrieval capabilities
-     * Web interface for users
-     * Evaluation tools to measure performance
-
-2. **LLM Fine-Tuning Module** (`llm-fine-tuning/`)
-   * Tools for customizing LLMs to educational tasks:
-     * Multiple fine-tuning approaches (OpenAI, HuggingFace, DSPy)
-     * Dataset preprocessing utilities
-     * Performance comparison tools
-     * Integration with the chatbot framework
-
-### How Components Interact
-
-```
-┌────────────────────────┐      ┌────────────────────┐
-│  LLM Chatbot Framework │◄─────┤  LLM Fine-Tuning   │
-│                        │      │                    │
-│  - User Interface      │      │  - Model Training  │
-│  - Context Management  │      │  - Optimization    │
-│  - Response Generation │      │  - Evaluation      │
-└────────────┬───────────┘      └────────────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│      End Users          │
-│  (Students & Educators) │
-└─────────────────────────┘
-```
-
-The fine-tuned models are integrated into the chatbot framework to provide specialized educational assistance.
-
 ## 🔑 Key Features
 
-* **Framework Agnostic** - Works with various LLM frameworks (OpenAI, HuggingFace, DSPy)
+* **Framework Agnostic** - Works with various LLM frameworks (OpenAI, HuggingFace, etc.)
 * **Optimization Tools** - Includes tools for prompt optimization and fine-tuning
 * **Evaluation Suite** - Comprehensive tools for evaluating model performance
 * **Educational Focus** - Specialized for educational use cases and teaching applications
 
-## 🧩 Project Components in Detail
+## 🧩 Project Components
 
-### Core Framework (`llm-chatbot-framework/`)
+The UTTA project consists of several key components:
 
-* **`src/core/`** - Core functionality and base classes
-* **`src/llm/`** - LLM integrations for different providers
-* **`src/retrieval/`** - Knowledge retrieval components
-* **`src/web/`** - Web interface implementation
-* **`src/evaluation/`** - Evaluation tools and metrics
-* **`src/utils/`** - Utility functions and helpers
-* **`knowledge_base/`** - Educational content storage
-* **`examples/`** - Usage examples and demonstrations
-
-### Fine-Tuning Module (`llm-fine-tuning/`)
-
-* **`src/dspy/`** - DSPy-based fine-tuning implementation
-* **`src/huggingface/`** - HuggingFace-based fine-tuning
-* **`src/openai/`** - OpenAI-based fine-tuning
-* **`examples/`** - Example fine-tuning workflows
-* **`finetune.py`** - Main entry point for fine-tuning
+1. **Core Framework** - The base UTTA implementation
+2. **Optimization Tools** - For improving model performance
+3. **Evaluation Suite** - For assessing model capabilities
+4. **Example Applications** - Demonstrating real-world usage
 
 ## 🤝 Contributing
 
@@ -99,8 +49,4 @@ We welcome contributions from the community! Please check out:
 
 ## 📄 License
 
-UTTA is released under the [MIT License](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE).
-
----
-
-Last updated: 2024-03-13 
+UTTA is released under the [MIT License](https://github.com/UVU-AI-Innovate/UTTA/blob/main/LICENSE). 

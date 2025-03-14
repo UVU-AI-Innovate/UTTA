@@ -4,17 +4,21 @@
 * [Home](Home)
 * [Getting Started](Getting-Started)
 * [Environment Setup](Environment-Setup)
-* [Project Structure](Project-Structure)
-* [Code of Conduct](Code-of-Conduct)
+* [Technical Architecture](Technical-Architecture)
 
 ## Framework Guides
 * [DSPy Tutorial](DSPy-Tutorial)
 * [OpenAI Tutorial](OpenAI-Tutorial)
 * [HuggingFace Tutorial](HuggingFace-Tutorial)
 
-## Data & Evaluation
+## Data Management
 * [Dataset Preparation](Dataset-Preparation)
-* [LLM Evaluation](LLM-Evaluation)
+
+## CLI Tools
+* [Simple Chatbot](Simple-Chatbot)
+* [Fine-Tuning CLI](Fine-Tuning-CLI)
+* [Evaluation Tools](Evaluation-Tools)
 
 ## Community
-* [Contributing](Contributing) 
+* [Contributing](Contributing)
+* [Code of Conduct](Code-of-Conduct) 

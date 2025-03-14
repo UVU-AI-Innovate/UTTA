@@ -5,7 +5,7 @@ UTTA is a comprehensive framework for developing and evaluating Large Language M
 ## 🌟 Features
 
 - **Multiple LLM Integration**
-  - Support for various LLM frameworks (DSPy, LangChain, LlamaIndex)
+  - Support for various LLM frameworks (DSPy, OpenAI, HuggingFace)
   - Easy integration with popular models (LLaMA 2, Mistral, etc.)
   - Flexible model switching and comparison capabilities
 
@@ -18,6 +18,11 @@ UTTA is a comprehensive framework for developing and evaluating Large Language M
   - Comprehensive metrics for response quality
   - Automated evaluation pipelines
   - Human-in-the-loop evaluation support
+
+- **Terminal-Based Interface**
+  - CLI tools for all core functionalities
+  - Interactive chatbot terminal interface
+  - Fine-tuning management through command line
 
 ## 🚀 Getting Started
 
@@ -41,9 +46,9 @@ conda create -n utta python=3.10
 conda activate utta
 ```
 
-3. Install dependencies:
+3. Install the package and dependencies:
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ## 📚 Documentation
@@ -53,52 +58,86 @@ Detailed documentation is available in our [GitHub Wiki](https://github.com/UVU-
 - [Getting Started](https://github.com/UVU-AI-Innovate/UTTA/wiki/Getting-Started)
 - [Environment Setup](https://github.com/UVU-AI-Innovate/UTTA/wiki/Environment-Setup)
 - [Dataset Preparation](https://github.com/UVU-AI-Innovate/UTTA/wiki/Dataset-Preparation)
+- [Technical Architecture](https://github.com/UVU-AI-Innovate/UTTA/wiki/Technical-Architecture)
 - [DSPy Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/DSPy-Tutorial)
-- [DSPy Optimization](https://github.com/UVU-AI-Innovate/UTTA/wiki/DSPy-Optimization)
 - [OpenAI Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/OpenAI-Tutorial)
 - [HuggingFace Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/HuggingFace-Tutorial)
-- [LLM Evaluation](https://github.com/UVU-AI-Innovate/UTTA/wiki/LLM-Evaluation)
 
 ## 🏗️ Project Structure
 
 ```
 UTTA/
-├── llm-fine-tuning/        # Fine-tuning implementations
-├── llm-chatbot-framework/  # Core chatbot framework
-├── evaluation_results/     # Evaluation outputs
-├── benchmark_results/      # Benchmark data
-└── docs/                   # Additional documentation
+├── utta/                    # Main package
+│   ├── core/                # Core functionality (Vector DB, Document Processor)
+│   ├── chatbot/             # Chatbot functionality and LLM handlers
+│   ├── fine_tuning/         # Fine-tuning implementations
+│   ├── evaluation/          # Evaluation tools and metrics
+│   └── utils/               # Utility functions and helpers
+├── examples/                # Usage examples
+│   ├── simple_chatbot.py    # Basic chatbot example
+│   └── fine_tuning/         # Fine-tuning examples
+├── tools/                   # CLI tools
+│   └── fine_tuning_cli.py   # Fine-tuning CLI tool
+├── tests/                   # Test files
+│   └── test_chatbot.py      # Chatbot tests
+├── data/                    # Data files
+│   ├── evaluation/          # Evaluation results
+│   └── benchmarks/          # Benchmark results
+├── chatbot.py               # Convenience script to run the chatbot
+├── finetune.py              # Convenience script to run the fine-tuning CLI
+├── run_tests.py             # Script to run all tests
+├── setup.py                 # Package installation setup
+└── requirements.txt         # Project dependencies
 ```
 
 ## 🔧 Usage
 
-UTTA supports multiple LLM frameworks, each with its own implementation approach:
+### Simple Chatbot
 
-### DSPy Implementation
-```python
-# Example DSPy implementation
-from utta.dspy import TeachingAssistant
+Run the simple terminal-based chatbot using the convenience script:
 
-assistant = TeachingAssistant()
-response = assistant.answer_question("Explain photosynthesis")
+```bash
+# From the UTTA directory
+./chatbot.py
+
+# Or using the module path
+python examples/simple_chatbot.py
 ```
 
-### LangChain Implementation
-```python
-# Example LangChain implementation
-from utta.langchain import UTTAChain
+### Fine-Tuning CLI
 
-chain = UTTAChain()
-response = chain.run("Explain the concept of gravity")
+UTTA provides a comprehensive CLI tool for managing fine-tuning, accessible through a convenience script:
+
+```bash
+# From the UTTA directory
+./finetune.py --help
+
+# Or using the module path
+python tools/fine_tuning_cli.py --help
+
+# Or using the installed entry point
+utta-finetune --help
+
+# DSPy optimization
+./finetune.py dspy optimize --examples examples.json --module teacher_responder
+
+# OpenAI fine-tuning
+./finetune.py openai start --file training_data.jsonl --model gpt-3.5-turbo
+
+# HuggingFace fine-tuning
+./finetune.py huggingface fine-tune --file training_data.jsonl --model microsoft/phi-2 --use-lora
 ```
 
-### LlamaIndex Implementation
-```python
-# Example LlamaIndex implementation
-from utta.llamaindex import UTTAIndex
+### Running Tests
 
-index = UTTAIndex()
-response = index.query("What is the theory of relativity?")
+UTTA includes a comprehensive test suite:
+
+```bash
+# Run all tests
+./run_tests.py
+
+# Run individual test files
+python tests/test_chatbot.py
 ```
 
 ## 🤝 Contributing
@@ -117,7 +156,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Thanks to all contributors who have helped shape UTTA
-- Special thanks to the DSPy, LangChain, and LlamaIndex communities
+- Special thanks to the DSPy, OpenAI, and HuggingFace communities
 - Gratitude to the educational institutions that have provided valuable feedback
 
 ## 📞 Contact
