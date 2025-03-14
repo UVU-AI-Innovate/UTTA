@@ -6,24 +6,22 @@
 
 * [Getting Started](Getting-Started) - Setup instructions and basic usage
 * [Environment Setup](Environment-Setup) - How to set up your development environment
-* [Code of Conduct](Code-of-Conduct) - Community guidelines for participation
 
 ## 📚 Documentation
 
-### Framework Implementations
+* [Technical Architecture](Technical-Architecture) - Overview of the system design
+* [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training
 
-* [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for prompt optimization
-* [OpenAI Tutorial](OpenAI-Tutorial) - Guide for using OpenAI models
-* [HuggingFace Tutorial](HuggingFace-Tutorial) - Guide for using HuggingFace models
-
-### Fine-Tuning
+## 🔧 Fine-Tuning
 
 * [Fine-Tuning Methods](Fine-Tuning-Methods) - Overview of all fine-tuning approaches
 * [Fine-Tuning CLI](Fine-Tuning-CLI) - Command-line tool for fine-tuning models
 
-### Data Preparation
+## 📘 Implementation Tutorials
 
-* [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training
+* [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for prompt optimization
+* [OpenAI Tutorial](OpenAI-Tutorial) - Guide for using OpenAI models
+* [HuggingFace Tutorial](HuggingFace-Tutorial) - Guide for using HuggingFace models
 
 ## 🔑 Key Features
 
@@ -41,13 +39,12 @@ The UTTA project consists of several key components:
 3. **Evaluation Suite** - For assessing model capabilities
 4. **Example Applications** - Demonstrating real-world usage
 
-## 🤝 Contributing
-
-We welcome contributions from the community! Please check out:
+## 🤝 Community
 
 * [Contributing Guide](Contributing) - How to contribute to the project
+* [Code of Conduct](Code-of-Conduct) - Community guidelines for participation
 
-## 🆘 Support & Community
+## 🆘 Support
 
 * GitHub Issues: For bug reports and feature requests
 * GitHub Discussions: For general questions and discussions

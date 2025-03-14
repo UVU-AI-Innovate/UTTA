@@ -1,19 +1,43 @@
 # Contributing to UTTA
 
-Thank you for your interest in contributing to the UTTA project! This guide will help you get started with contributing to the project.
+Thank you for your interest in contributing to the Universal Teaching and Training Assistant (UTTA) project! This guide will help you get started with contributing to the project.
+
+## Code of Conduct
+
+Please read our [Code of Conduct](Code-of-Conduct) before contributing. We expect all contributors to adhere to these guidelines to ensure a positive and inclusive community.
 
 ## Table of Contents
-- [Code of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
 - [Pull Request Process](#pull-request-process)
 - [Testing](#testing)
 - [Documentation](#documentation)
+- [Coding Standards](#coding-standards)
 - [Community](#community)
 
-## Code of Conduct
+## How to Contribute
 
-Please read our [Code of Conduct](Code-of-Conduct) before contributing to the project. By participating, you are expected to uphold this code.
+### Reporting Bugs
+
+If you find a bug, please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
+
+- A clear, descriptive title
+- A detailed description of the bug
+- Steps to reproduce the bug
+- Expected behavior
+- Actual behavior
+- Screenshots (if applicable)
+- Environment information (OS, Python version, etc.)
+
+### Suggesting Features
+
+We welcome feature suggestions! Please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
+
+- A clear, descriptive title
+- A detailed description of the feature
+- Why this feature would be beneficial
+- Any implementation ideas you have
 
 ## Getting Started
 
@@ -36,8 +60,7 @@ Please read our [Code of Conduct](Code-of-Conduct) before contributing to the pr
    ```bash
    conda create -n utta python=3.10
    conda activate utta
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt  # Install development dependencies
+   pip install -e .
    ```
 
 ## Development Workflow
@@ -97,24 +120,26 @@ Please read our [Code of Conduct](Code-of-Conduct) before contributing to the pr
 
 ## Testing
 
-1. **Run Tests**
-   ```bash
-   pytest
-   ```
+Run tests using the test runner script:
 
-2. **Adding Tests**
-   * All new features should include appropriate tests
-   * Bug fixes should include a test that would have caught the issue
+```bash
+./run_tests.py
+```
+
+All new features should include appropriate tests, and bug fixes should include a test that would have caught the issue.
 
 ## Documentation
 
-1. **Code Documentation**
-   * Use docstrings for functions, classes, and modules
-   * Follow [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
+- Update documentation for any changes you make
+- Follow the existing documentation style
+- Add examples for new features
 
-2. **Wiki Documentation**
-   * Update relevant wiki pages for user-facing changes
-   * Create new wiki pages for major features
+## Coding Standards
+
+- Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines
+- Write docstrings for all functions, classes, and modules
+- Include type hints where appropriate
+- Write unit tests for new functionality
 
 ## Community
 
@@ -122,4 +147,6 @@ Please read our [Code of Conduct](Code-of-Conduct) before contributing to the pr
 * **GitHub Issues**: Report bugs and request features
 * **Pull Requests**: Review and discuss code changes
 
-Thank you for contributing to UTTA! 
+## License
+
+By contributing to UTTA, you agree that your contributions will be licensed under the project's MIT License. 
