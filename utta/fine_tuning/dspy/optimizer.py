@@ -12,6 +12,7 @@ from pathlib import Path
 
 import dspy
 from dspy.teleprompt import BootstrapFewShot
+from dspy.clients.openai import OpenAI
 
 class DSPyOptimizer:
     """
@@ -44,7 +45,7 @@ class DSPyOptimizer:
         self.temperature = temperature
         
         # Initialize the LLM
-        self.lm = dspy.OpenAI(
+        self.lm = OpenAI(
             model=model_name,
             max_tokens=max_tokens,
             temperature=temperature
