@@ -1,0 +1,31 @@
+name: utta
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch>=2.0.0
+  - torchvision
+  - torchaudio
+  - cudatoolkit
+  - numpy
+  - pandas
+  - scikit-learn
+  - spacy
+  - matplotlib
+  - plotly
+  - pip:
+    - streamlit>=1.32.0
+    - dspy-ai==2.0.4
+    - sentence-transformers>=2.2.2
+    - python-dotenv
+    - textstat
+    - faiss-gpu
+    - gensim>=4.3.3
+    - nltk>=3.9.1
+    - transformers
+    - openai
+    - backoff
+    - jupyter

@@ -6,6 +6,9 @@ import logging
 from pathlib import Path
 from typing import Dict, Any, Optional
 import json
+import threading
+import torch
+import asyncio
 
 # Configure logging
 logging.basicConfig(
@@ -21,6 +24,8 @@ sys.path.append(str(src_dir))
 try:
     import streamlit as st
     from dotenv import load_dotenv
+    import dspy
+    import spacy
 except ImportError as e:
     logger.error(f"Failed to import required packages: {e}")
     sys.exit(1)
@@ -36,6 +41,92 @@ try:
 except ImportError as e:
     logger.error(f"Failed to import local modules: {e}")
     sys.exit(1)
+
+# Initialize spaCy model at module level
+try:
+    if not spacy.util.is_package("en_core_web_sm"):
+        spacy.cli.download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
+    logger.info("Successfully loaded spaCy model")
+except Exception as e:
+    logger.error(f"Failed to load spaCy model: {e}")
+    nlp = None
+
+# Initialize components in the main thread
+_thread_local = threading.local()
+
+def init_torch():
+    """Initialize PyTorch settings."""
+    try:
+        # Set PyTorch settings
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        torch.set_default_device(device)
+        torch.set_default_dtype(torch.float32)
+        torch.set_num_threads(1)  # Prevent threading issues
+        logger.info(f"PyTorch initialized with device: {device}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to initialize PyTorch: {e}")
+        return False
+
+def setup_async_event_loop():
+    """Set up the asyncio event loop for the current thread."""
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to set up event loop: {e}")
+        return False
+
+@st.cache_resource(show_spinner=False)
+def get_llm():
+    """Get or initialize LLM interface."""
+    try:
+        init_torch()
+        setup_async_event_loop()
+        llm = EnhancedDSPyLLMInterface()
+        logger.info("Initialized DSPy LLM interface")
+        return llm
+    except Exception as e:
+        logger.error(f"Failed to initialize DSPy interface: {e}")
+        return None
+
+@st.cache_resource(show_spinner=False)
+def get_indexer():
+    """Get or initialize document indexer."""
+    try:
+        init_torch()
+        indexer = DocumentIndexer()
+        logger.info("Initialized DocumentIndexer")
+        return indexer
+    except Exception as e:
+        logger.error(f"Failed to initialize document indexer: {e}")
+        return None
+
+@st.cache_resource(show_spinner=False)
+def get_evaluator():
+    """Get or initialize metrics evaluator."""
+    try:
+        evaluator = AutomatedMetricsEvaluator()
+        logger.info("Initialized AutomatedMetricsEvaluator")
+        return evaluator
+    except Exception as e:
+        logger.error(f"Failed to initialize evaluator: {e}")
+        return None
+
+@st.cache_resource
+def initialize_components():
+    """Initialize all components with caching."""
+    try:
+        init_torch()
+        llm = get_llm()
+        indexer = get_indexer()
+        evaluator = get_evaluator()
+        return all([llm, indexer, evaluator])
+    except Exception as e:
+        logger.error(f"Failed to initialize components: {e}")
+        return False
 
 # Page configuration
 st.set_page_config(
@@ -77,35 +168,28 @@ st.markdown("""
         flex-wrap: wrap;
         gap: 10px;
     }
+    .error-message {
+        color: #ff4b4b;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #ffe5e5;
+        margin: 10px 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 def initialize_session_state():
     """Initialize session state variables."""
     if 'initialized' not in st.session_state:
-        # Initialize components
-        try:
-            st.session_state.llm = EnhancedDSPyLLMInterface()
-            st.session_state.indexer = DocumentIndexer()
-            st.session_state.evaluator = AutomatedMetricsEvaluator()
-            
-            # Initialize chat history
-            st.session_state.messages = []
-            
-            # Initialize settings
-            st.session_state.settings = {
-                "grade_level": 5,
-                "subject": "General",
-                "learning_style": "Visual"
-            }
-            
-            st.session_state.initialized = True
-            logger.info("Session state initialized successfully")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize session state: {e}")
-            st.error("Failed to initialize application. Please check the logs.")
-            return False
+        # Initialize chat history and settings
+        st.session_state.messages = []
+        st.session_state.settings = {
+            "grade_level": 5,
+            "subject": "General",
+            "learning_style": "Visual"
+        }
+        st.session_state.initialized = True
+        logger.info("Session state initialized successfully")
     return True
 
 def save_uploaded_file(uploaded_file) -> Optional[str]:
@@ -125,27 +209,30 @@ def save_uploaded_file(uploaded_file) -> Optional[str]:
 
 def display_metrics(metrics):
     """Display evaluation metrics in a organized layout."""
+    if not metrics:
+        return
+        
     st.markdown("#### Response Evaluation")
     
     # Create three columns for metrics
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("Clarity", f"{metrics.clarity:.2f}")
-        st.metric("Engagement", f"{metrics.engagement:.2f}")
+        st.metric("Clarity", f"{getattr(metrics, 'clarity', 0):.2f}")
+        st.metric("Engagement", f"{getattr(metrics, 'engagement', 0):.2f}")
     
     with col2:
-        st.metric("Pedagogical Approach", f"{metrics.pedagogical_approach:.2f}")
-        st.metric("Emotional Support", f"{metrics.emotional_support:.2f}")
+        st.metric("Pedagogical Approach", f"{getattr(metrics, 'pedagogical_approach', 0):.2f}")
+        st.metric("Emotional Support", f"{getattr(metrics, 'emotional_support', 0):.2f}")
     
     with col3:
-        st.metric("Content Accuracy", f"{metrics.content_accuracy:.2f}")
-        st.metric("Age Appropriateness", f"{metrics.age_appropriateness:.2f}")
+        st.metric("Content Accuracy", f"{getattr(metrics, 'content_accuracy', 0):.2f}")
+        st.metric("Age Appropriateness", f"{getattr(metrics, 'age_appropriateness', 0):.2f}")
     
-    if metrics.feedback:
-        with st.expander("View Detailed Feedback", expanded=True):
-            for item in metrics.feedback:
-                st.markdown(f"- {item}")
+    if hasattr(metrics, 'feedback') and metrics.feedback:
+        st.markdown("##### Detailed Feedback")
+        for item in metrics.feedback:
+            st.markdown(f"- {item}")
 
 def display_chat_history():
     """Display chat history with metrics."""
@@ -163,7 +250,7 @@ def display_chat_history():
             
             # Display metrics if available
             if "metrics" in msg:
-                with st.expander("View Response Evaluation"):
+                with st.expander("View Response Evaluation", expanded=False):
                     display_metrics(msg["metrics"])
 
 def sidebar_settings():
@@ -205,15 +292,19 @@ def sidebar_settings():
                     with open(file_path, "r") as f:
                         content = f.read()
                     
-                    doc_id = st.session_state.indexer.add_document(
-                        content,
-                        metadata={
-                            "subject": subject,
-                            "grade_level": grade_level,
-                            "type": uploaded_file.type
-                        }
-                    )
-                    st.sidebar.success("Document added successfully!")
+                    indexer = get_indexer()
+                    if indexer:
+                        doc_id = indexer.add_document(
+                            content,
+                            metadata={
+                                "subject": subject,
+                                "grade_level": grade_level,
+                                "type": uploaded_file.type
+                            }
+                        )
+                        st.sidebar.success("Document added successfully!")
+                    else:
+                        st.sidebar.error("Document indexer not available")
                 except Exception as e:
                     logger.error(f"Failed to process document: {e}")
                     st.sidebar.error("Failed to process document")
@@ -233,6 +324,22 @@ def main():
     Configure the settings in the sidebar and start chatting below.
     """)
     
+    # Initialize components with caching
+    if not initialize_components():
+        st.error("Failed to initialize components. Please check the logs and try reloading the page.")
+        return
+    
+    # Get thread-local components
+    llm = get_llm()
+    indexer = get_indexer()
+    evaluator = get_evaluator()
+    
+    if not all([llm, indexer, evaluator]):
+        st.error("Some components are not available. Please check the logs and try reloading the page.")
+        if nlp is None:
+            st.error("SpaCy model is not available. Some features may be limited.")
+        return
+    
     # Chat interface
     chat_container = st.container()
     
@@ -251,51 +358,56 @@ def main():
                 # Get context from knowledge base
                 context = []
                 try:
-                    results = st.session_state.indexer.search(
+                    results = indexer.search(
                         prompt,
                         filters={"subject": st.session_state.settings["subject"]}
                     )
                     context = [r["content"] for r in results]
                 except Exception as e:
                     logger.warning(f"Failed to search knowledge base: {e}")
+                    st.warning("Could not search knowledge base. Proceeding without context.")
                 
                 # Generate response
                 with st.spinner("Generating response..."):
-                    response = st.session_state.llm.generate_response(
-                        prompt,
-                        context=context,
-                        metadata=st.session_state.settings
-                    )
+                    try:
+                        response = llm.generate_response(
+                            prompt,
+                            context=context,
+                            metadata=st.session_state.settings
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to generate response: {e}")
+                        st.error("Failed to generate response. Please try again.")
+                        return
                 
-                # Evaluate response
-                try:
-                    metrics = st.session_state.evaluator.evaluate_response(
-                        response,
-                        prompt,
-                        st.session_state.settings["grade_level"],
-                        context
-                    )
-                    
-                    # Add assistant message with metrics
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": response,
-                        "metrics": metrics
-                    })
-                    
-                except Exception as e:
-                    logger.warning(f"Failed to evaluate response: {e}")
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": response
-                    })
+                # Evaluate response if evaluator is available
+                metrics = None
+                if evaluator:
+                    try:
+                        metrics = evaluator.evaluate_response(
+                            response,
+                            prompt,
+                            st.session_state.settings["grade_level"],
+                            context
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to evaluate response: {e}")
+                        st.warning("Could not evaluate response. Proceeding without metrics.")
                 
-                # Rerun to update display
+                # Add assistant message with metrics if available
+                message = {
+                    "role": "assistant",
+                    "content": response
+                }
+                if metrics:
+                    message["metrics"] = metrics
+                
+                st.session_state.messages.append(message)
                 st.rerun()
                 
             except Exception as e:
-                logger.error(f"Error generating response: {e}")
-                st.error("Failed to generate response. Please try again.")
+                logger.error(f"Error in chat interaction: {e}")
+                st.error("An error occurred. Please try again.")
 
 if __name__ == "__main__":
     main() 
