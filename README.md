@@ -1,4 +1,4 @@
-# Teacher Training Chatbot Framework
+# Utah Teacher Training Assistant (UTTA)
 
 A comprehensive framework for developing and training chatbots specialized in teacher training and pedagogical assistance.
 
@@ -31,7 +31,7 @@ llm-chatbot-framework/
 
 1. Set up the environment:
 ```bash
-conda create -n utta python=3.9
+conda create -n utta python=3.10
 conda activate utta
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
