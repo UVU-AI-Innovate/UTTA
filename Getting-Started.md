@@ -1,77 +1,71 @@
 # Getting Started with UTTA
 
-Welcome to the Universal Teaching and Training Assistant (UTTA) framework! This guide will help you get started with using UTTA for your educational AI applications.
+Welcome to UTTA (Universal Teaching and Training Assistant)! This guide will help you get started with using and contributing to the project.
 
-## What is UTTA?
+## Prerequisites
 
-UTTA is a framework designed to help educators, trainers, and instructional designers leverage AI in teaching and training environments. It provides tools and components for creating AI-powered educational experiences, such as:
+Before you begin, ensure you have the following:
 
-- Interactive learning assistants
-- Automated grading and feedback systems
-- Content generation for educational materials
-- Personalized learning experiences
+* Python 3.10 or higher
+* Conda (recommended for environment management)
+* Git
+* Basic understanding of LLMs (Large Language Models) and Python
 
-## Quick Installation
+## Installation
 
-Before you begin, make sure you have:
-- Python 3.10 or newer
-- pip or conda package manager
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/UVU-AI-Innovate/UTTA.git
+   cd UTTA
+   ```
 
-Install UTTA using pip:
+2. **Set Up the Environment**
+   ```bash
+   conda create -n utta python=3.10
+   conda activate utta
+   pip install -r requirements.txt
+   ```
 
-```bash
-pip install utta
-```
+3. **Configure API Keys** (if using external models)
+   
+   For OpenAI models:
+   ```bash
+   # Add to your environment or create a .env file
+   export OPENAI_API_KEY="your-key-here"
+   ```
 
-For development setup, see our [Environment Setup](Environment-Setup) guide.
+   For HuggingFace models:
+   ```bash
+   # Add to your environment or create a .env file
+   export HUGGINGFACE_API_KEY="your-key-here"
+   ```
 
-## Basic Usage
+4. **Verify Installation**
+   ```bash
+   python -c "from utta import TeachingAssistant; print('UTTA is installed correctly')"
+   ```
+
+## Quick Start Example
 
 Here's a simple example to get you started:
 
 ```python
-from utta import Assistant
+from utta import TeachingAssistant
 
-# Create an assistant for a specific subject
-math_assistant = Assistant(subject="mathematics")
+# Initialize the teaching assistant
+assistant = TeachingAssistant(model="openai/gpt-3.5-turbo")
 
-# Get a response to a student's question
-response = math_assistant.answer("How do I solve quadratic equations?")
+# Ask a question
+response = assistant.ask("What is the difference between supervised and unsupervised learning?")
 print(response)
 ```
 
-## Framework Components
-
-UTTA consists of several core components:
-
-1. **Assistant**: The main interface for creating AI teaching assistants
-2. **ContentGenerator**: For creating educational content and materials
-3. **FeedbackEngine**: For providing automated feedback on student work
-4. **KnowledgeBase**: For storing and retrieving domain-specific knowledge
-5. **PersonalizationEngine**: For customizing learning experiences
-
 ## Next Steps
 
-To learn more about UTTA, check out these resources:
-
-- [Framework Guides](Framework-Guides): Detailed documentation on key components
-- [Tutorials](Tutorials): Step-by-step guides for common use cases
-- [Examples](Examples): Sample applications and implementations
-- [API Reference](API-Reference): Complete API documentation
-
-## Framework Tutorials
-
-We have several tutorials to help you get started with different aspects of UTTA:
-
-- [DSPy Tutorial](DSPy-Tutorial): Learn how to use DSPy with UTTA
-- [OpenAI Tutorial](OpenAI-Tutorial): Integrate OpenAI models with UTTA
-- [HuggingFace Tutorial](HuggingFace-Tutorial): Use HuggingFace models in your UTTA applications
-
-## Community and Support
-
-- [Contributing](Contributing): Learn how to contribute to UTTA
-- [Code of Conduct](Code-of-Conduct): Community guidelines
-- [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues): Report bugs or request features
+- Check out the [Environment Setup](Environment-Setup) guide for more detailed configuration
+- Learn about using [DSPy for optimization](DSPy-Tutorial)
+- Explore our guides for [OpenAI](OpenAI-Tutorial) and [HuggingFace](HuggingFace-Tutorial) integration
+- Learn how to [prepare datasets](Dataset-Preparation) for training and evaluation
 
 ## Common Issues
 

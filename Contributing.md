@@ -1,102 +1,125 @@
 # Contributing to UTTA
 
-Thank you for your interest in contributing to the Universal Teaching and Training Assistant (UTTA) project! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to the UTTA project! This guide will help you get started with contributing to the project.
+
+## Table of Contents
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Pull Request Process](#pull-request-process)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Community](#community)
 
 ## Code of Conduct
 
-Please read our [Code of Conduct](https://github.com/UVU-AI-Innovate/UTTA/wiki/Code-of-Conduct) before contributing. We expect all contributors to adhere to these guidelines to ensure a positive and inclusive community.
+Please read our [Code of Conduct](Code-of-Conduct) before contributing to the project. By participating, you are expected to uphold this code.
 
-## How to Contribute
+## Getting Started
 
-### Reporting Bugs
+1. **Fork the Repository**
+   * Visit [UTTA on GitHub](https://github.com/UVU-AI-Innovate/UTTA)
+   * Click the "Fork" button in the upper right corner
 
-If you find a bug, please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
+2. **Clone Your Fork**
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/UTTA.git
+   cd UTTA
+   ```
 
-- A clear, descriptive title
-- A detailed description of the bug
-- Steps to reproduce the bug
-- Expected behavior
-- Actual behavior
-- Screenshots (if applicable)
-- Environment information (OS, Python version, etc.)
+3. **Set Up Remote**
+   ```bash
+   git remote add upstream https://github.com/UVU-AI-Innovate/UTTA.git
+   ```
 
-### Suggesting Features
+4. **Set Up Development Environment**
+   ```bash
+   conda create -n utta python=3.10
+   conda activate utta
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt  # Install development dependencies
+   ```
 
-We welcome feature suggestions! Please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
+## Development Workflow
 
-- A clear, descriptive title
-- A detailed description of the feature
-- Why this feature would be beneficial
-- Any implementation ideas you have
+1. **Create a Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+   Use prefixes like:
+   * `feature/` for new features
+   * `fix/` for bug fixes
+   * `docs/` for documentation
+   * `test/` for adding or updating tests
 
-### Pull Requests
+2. **Make Your Changes**
+   * Write clean, well-documented code
+   * Follow the existing code style and conventions
+   * Keep commits focused and logical
 
-1. Fork the repository
-2. Create a new branch for your feature or bug fix
-3. Make your changes
-4. Run tests to ensure your changes don't break existing functionality
-5. Submit a pull request
+3. **Commit Your Changes**
+   ```bash
+   git add .
+   git commit -m "feat: Add new feature X"
+   ```
+   We follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
 
-## Development Setup
+4. **Stay Updated**
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
 
-1. Clone the repository:
-```bash
-git clone https://github.com/UVU-AI-Innovate/UTTA.git
-cd UTTA
-```
+## Pull Request Process
 
-2. Create and activate the conda environment:
-```bash
-conda create -n utta python=3.10
-conda activate utta
-```
+1. **Push to Your Fork**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-3. Install the package in development mode:
-```bash
-pip install -e .
-```
+2. **Create a Pull Request**
+   * Go to the [UTTA repository](https://github.com/UVU-AI-Innovate/UTTA)
+   * Click "New Pull Request"
+   * Select "compare across forks"
+   * Select your fork and branch
+   * Add a clear title and description
 
-## Coding Standards
+3. **PR Guidelines**
+   * Link to any relevant issues
+   * Include screenshots or examples if applicable
+   * Ensure all tests pass
+   * Update documentation as needed
+   * Respond to review comments promptly
 
-- Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines
-- Write docstrings for all functions, classes, and modules
-- Include type hints where appropriate
-- Write unit tests for new functionality
+4. **After Approval**
+   * Your PR will be merged by a maintainer
+   * You can delete your branch after it's merged
 
 ## Testing
 
-Run tests using the test runner script:
+1. **Run Tests**
+   ```bash
+   pytest
+   ```
 
-```bash
-./run_tests.py
-```
+2. **Adding Tests**
+   * All new features should include appropriate tests
+   * Bug fixes should include a test that would have caught the issue
 
 ## Documentation
 
-- Update documentation for any changes you make
-- Follow the existing documentation style
-- Add examples for new features
+1. **Code Documentation**
+   * Use docstrings for functions, classes, and modules
+   * Follow [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
 
-## Commit Messages
+2. **Wiki Documentation**
+   * Update relevant wiki pages for user-facing changes
+   * Create new wiki pages for major features
 
-- Use clear, descriptive commit messages
-- Follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
-  - `feat:` for new features
-  - `fix:` for bug fixes
-  - `docs:` for documentation changes
-  - `style:` for formatting changes
-  - `refactor:` for code refactoring
-  - `test:` for adding or modifying tests
-  - `chore:` for maintenance tasks
+## Community
 
-## Review Process
-
-- All pull requests will be reviewed by at least one maintainer
-- Feedback will be provided on the pull request
-- Changes may be requested before merging
-
-## License
-
-By contributing to UTTA, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+* **GitHub Discussions**: Ask questions and share ideas
+* **GitHub Issues**: Report bugs and request features
+* **Pull Requests**: Review and discuss code changes
 
 Thank you for contributing to UTTA! 
