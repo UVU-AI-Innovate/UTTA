@@ -4,63 +4,108 @@ import os
 import sys
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict, Any, Optional
 import json
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Add src directory to path
-src_dir = Path(__file__).parent.parent
+src_dir = Path(__file__).parent
 sys.path.append(str(src_dir))
 
-# Import dependencies with error handling
 try:
     import streamlit as st
     from dotenv import load_dotenv
 except ImportError as e:
     logger.error(f"Failed to import required packages: {e}")
-    logger.error("Please install required packages: pip install streamlit python-dotenv")
     sys.exit(1)
 
 # Load environment variables
 load_dotenv()
 
-# Import local modules with error handling
+# Import local modules
 try:
     from llm.dspy.handler import EnhancedDSPyLLMInterface
     from knowledge_base.document_indexer import DocumentIndexer
     from metrics.automated_metrics import AutomatedMetricsEvaluator
 except ImportError as e:
     logger.error(f"Failed to import local modules: {e}")
-    logger.error("Please ensure all project files are in the correct location")
     sys.exit(1)
 
-# Initialize session state
-def init_session_state():
+# Page configuration
+st.set_page_config(
+    page_title="Teaching Assistant",
+    page_icon="📚",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS
+st.markdown("""
+<style>
+    .stMetric {
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .feedback-box {
+        background-color: #e6f3ff;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+    .chat-message {
+        padding: 15px;
+        border-radius: 10px;
+        margin: 5px 0;
+    }
+    .user-message {
+        background-color: #e6f3ff;
+        margin-left: 20%;
+    }
+    .assistant-message {
+        background-color: #f0f2f6;
+        margin-right: 20%;
+    }
+    .metrics-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+def initialize_session_state():
     """Initialize session state variables."""
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
-    if 'llm_interface' not in st.session_state:
+    if 'initialized' not in st.session_state:
+        # Initialize components
         try:
-            st.session_state.llm_interface = EnhancedDSPyLLMInterface()
+            st.session_state.llm = EnhancedDSPyLLMInterface()
+            st.session_state.indexer = DocumentIndexer()
+            st.session_state.evaluator = AutomatedMetricsEvaluator()
+            
+            # Initialize chat history
+            st.session_state.messages = []
+            
+            # Initialize settings
+            st.session_state.settings = {
+                "grade_level": 5,
+                "subject": "General",
+                "learning_style": "Visual"
+            }
+            
+            st.session_state.initialized = True
+            logger.info("Session state initialized successfully")
+            
         except Exception as e:
-            logger.error(f"Failed to initialize LLM interface: {e}")
-            st.error("Failed to initialize LLM interface. Please check your API keys and configuration.")
+            logger.error(f"Failed to initialize session state: {e}")
+            st.error("Failed to initialize application. Please check the logs.")
             return False
-    if 'document_indexer' not in st.session_state:
-        try:
-            st.session_state.document_indexer = DocumentIndexer()
-        except Exception as e:
-            logger.error(f"Failed to initialize document indexer: {e}")
-            st.warning("Document indexer initialization failed. Some features may be limited.")
-    if 'metrics_evaluator' not in st.session_state:
-        try:
-            st.session_state.metrics_evaluator = AutomatedMetricsEvaluator()
-        except Exception as e:
-            logger.error(f"Failed to initialize metrics evaluator: {e}")
-            st.warning("Metrics evaluator initialization failed. Evaluation features will be limited.")
     return True
 
 def save_uploaded_file(uploaded_file) -> Optional[str]:
@@ -78,144 +123,179 @@ def save_uploaded_file(uploaded_file) -> Optional[str]:
         st.error("Failed to save uploaded file")
         return None
 
-def main():
-    """Main web application."""
-    st.set_page_config(
-        page_title="Teaching Assistant",
-        page_icon="📚",
-        layout="wide"
+def display_metrics(metrics):
+    """Display evaluation metrics in a organized layout."""
+    st.markdown("#### Response Evaluation")
+    
+    # Create three columns for metrics
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Clarity", f"{metrics.clarity:.2f}")
+        st.metric("Engagement", f"{metrics.engagement:.2f}")
+    
+    with col2:
+        st.metric("Pedagogical Approach", f"{metrics.pedagogical_approach:.2f}")
+        st.metric("Emotional Support", f"{metrics.emotional_support:.2f}")
+    
+    with col3:
+        st.metric("Content Accuracy", f"{metrics.content_accuracy:.2f}")
+        st.metric("Age Appropriateness", f"{metrics.age_appropriateness:.2f}")
+    
+    if metrics.feedback:
+        with st.expander("View Detailed Feedback", expanded=True):
+            for item in metrics.feedback:
+                st.markdown(f"- {item}")
+
+def display_chat_history():
+    """Display chat history with metrics."""
+    for msg in st.session_state.messages:
+        role = msg["role"]
+        content = msg["content"]
+        
+        # Style messages differently based on role
+        if role == "user":
+            st.markdown(f'<div class="chat-message user-message">👤 You: {content}</div>', 
+                       unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="chat-message assistant-message">🤖 Assistant: {content}</div>', 
+                       unsafe_allow_html=True)
+            
+            # Display metrics if available
+            if "metrics" in msg:
+                with st.expander("View Response Evaluation"):
+                    display_metrics(msg["metrics"])
+
+def sidebar_settings():
+    """Configure settings in the sidebar."""
+    st.sidebar.title("Teaching Assistant Settings")
+    
+    # Student Profile
+    st.sidebar.header("Student Profile")
+    grade_level = st.sidebar.slider("Grade Level", 1, 12, 
+                                  st.session_state.settings["grade_level"])
+    
+    subject = st.sidebar.selectbox("Subject",
+        ["General", "Mathematics", "Science", "Language Arts", "Social Studies"],
+        index=0 if st.session_state.settings["subject"] == "General" else None
     )
     
-    st.title("Teaching Assistant")
+    learning_style = st.sidebar.selectbox("Learning Style",
+        ["Visual", "Auditory", "Reading/Writing", "Kinesthetic"],
+        index=0 if st.session_state.settings["learning_style"] == "Visual" else None
+    )
     
-    # Initialize session state
-    if not init_session_state():
-        st.error("Failed to initialize application. Please check the logs and configuration.")
-        return
+    # Update settings
+    st.session_state.settings.update({
+        "grade_level": grade_level,
+        "subject": subject,
+        "learning_style": learning_style
+    })
     
-    # Sidebar configuration
-    with st.sidebar:
-        st.header("Configuration")
-        
-        # Student profile
-        st.subheader("Student Profile")
-        grade_level = st.selectbox("Grade Level", range(1, 13))
-        learning_style = st.selectbox(
-            "Learning Style",
-            ["Visual", "Auditory", "Reading/Writing", "Kinesthetic"]
-        )
-        
-        # Context settings
-        st.subheader("Teaching Context")
-        subject = st.selectbox(
-            "Subject",
-            ["Mathematics", "Science", "Language Arts", "Social Studies"]
-        )
-        topic = st.text_input("Topic")
-        
-        # Document upload
-        st.subheader("Knowledge Base")
-        uploaded_file = st.file_uploader("Upload Teaching Material")
-        if uploaded_file:
+    # Document Upload
+    st.sidebar.header("Knowledge Base")
+    uploaded_file = st.sidebar.file_uploader("Upload Teaching Material",
+                                           type=["txt", "md", "pdf"])
+    
+    if uploaded_file:
+        if st.sidebar.button("Add to Knowledge Base"):
             file_path = save_uploaded_file(uploaded_file)
             if file_path:
                 try:
                     with open(file_path, "r") as f:
                         content = f.read()
-                    metadata = {
-                        "subject": subject,
-                        "grade_level": grade_level,
-                        "type": uploaded_file.type
-                    }
-                    st.session_state.document_indexer.add_document(content, metadata)
-                    st.success("Document added to knowledge base")
+                    
+                    doc_id = st.session_state.indexer.add_document(
+                        content,
+                        metadata={
+                            "subject": subject,
+                            "grade_level": grade_level,
+                            "type": uploaded_file.type
+                        }
+                    )
+                    st.sidebar.success("Document added successfully!")
                 except Exception as e:
-                    logger.error(f"Failed to process uploaded document: {e}")
-                    st.error("Failed to process document")
+                    logger.error(f"Failed to process document: {e}")
+                    st.sidebar.error("Failed to process document")
+
+def main():
+    """Main application."""
+    if not initialize_session_state():
+        return
+    
+    # Configure sidebar
+    sidebar_settings()
+    
+    # Main content
+    st.title("📚 Teaching Assistant")
+    st.markdown("""
+    Welcome to the Teaching Assistant! I'm here to help you with your teaching needs.
+    Configure the settings in the sidebar and start chatting below.
+    """)
     
     # Chat interface
     chat_container = st.container()
     
-    # Display chat history
     with chat_container:
-        for message in st.session_state.messages:
-            role = message["role"]
-            content = message["content"]
-            with st.chat_message(role):
-                st.write(content)
-                
-                # Show evaluation for assistant responses
-                if role == "assistant" and "evaluation" in message:
-                    with st.expander("Response Evaluation"):
-                        metrics = message["evaluation"]
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.metric("Clarity", f"{metrics['clarity']:.2f}")
-                            st.metric("Engagement", f"{metrics['engagement']:.2f}")
-                            st.metric("Pedagogical Approach", f"{metrics['pedagogical_approach']:.2f}")
-                        with col2:
-                            st.metric("Emotional Support", f"{metrics['emotional_support']:.2f}")
-                            st.metric("Content Accuracy", f"{metrics['content_accuracy']:.2f}")
-                            st.metric("Age Appropriateness", f"{metrics['age_appropriateness']:.2f}")
-    
-    # Chat input
-    if prompt := st.chat_input():
-        # Add user message
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        display_chat_history()
         
-        # Get context from knowledge base
-        context = []
-        try:
-            results = st.session_state.document_indexer.search(
-                prompt,
-                filters={"subject": subject} if subject else None
-            )
-            context = [r["content"] for r in results]
-        except Exception as e:
-            logger.warning(f"Failed to search knowledge base: {e}")
-        
-        # Generate response
-        try:
-            response = st.session_state.llm_interface.generate_response(
-                prompt,
-                context=context,
-                metadata={
-                    "grade_level": grade_level,
-                    "learning_style": learning_style,
-                    "subject": subject,
-                    "topic": topic
-                }
-            )
+        # Chat input
+        if prompt := st.chat_input("Ask a question or enter a topic..."):
+            # Add user message
+            st.session_state.messages.append({
+                "role": "user",
+                "content": prompt
+            })
             
-            # Evaluate response
             try:
-                metrics = st.session_state.metrics_evaluator.evaluate_response(
-                    response,
-                    prompt,
-                    grade_level,
-                    context
-                )
+                # Get context from knowledge base
+                context = []
+                try:
+                    results = st.session_state.indexer.search(
+                        prompt,
+                        filters={"subject": st.session_state.settings["subject"]}
+                    )
+                    context = [r["content"] for r in results]
+                except Exception as e:
+                    logger.warning(f"Failed to search knowledge base: {e}")
                 
-                # Add assistant message with evaluation
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": response,
-                    "evaluation": metrics.__dict__
-                })
+                # Generate response
+                with st.spinner("Generating response..."):
+                    response = st.session_state.llm.generate_response(
+                        prompt,
+                        context=context,
+                        metadata=st.session_state.settings
+                    )
+                
+                # Evaluate response
+                try:
+                    metrics = st.session_state.evaluator.evaluate_response(
+                        response,
+                        prompt,
+                        st.session_state.settings["grade_level"],
+                        context
+                    )
+                    
+                    # Add assistant message with metrics
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": response,
+                        "metrics": metrics
+                    })
+                    
+                except Exception as e:
+                    logger.warning(f"Failed to evaluate response: {e}")
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": response
+                    })
+                
+                # Rerun to update display
+                st.rerun()
+                
             except Exception as e:
-                logger.warning(f"Failed to evaluate response: {e}")
-                # Add assistant message without evaluation
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": response
-                })
-                
-        except Exception as e:
-            logger.error(f"Failed to generate response: {e}")
-            st.error("Failed to generate response. Please try again.")
-            
-        # Rerun to update display
-        st.rerun()
+                logger.error(f"Error generating response: {e}")
+                st.error("Failed to generate response. Please try again.")
 
 if __name__ == "__main__":
     main() 
