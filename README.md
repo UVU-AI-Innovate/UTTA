@@ -1,176 +1,134 @@
-# Utah Teacher Training Assistant (UTTA)
+# UTTA (Universal Teacher Training Assistant)
 
-A comprehensive framework for developing and training chatbots specialized in teacher training and pedagogical assistance.
+A sophisticated chatbot framework designed for teacher training, leveraging advanced LLM capabilities with DSPy integration, knowledge base management, and automated evaluation metrics.
 
-## 🎯 Project Overview
+## Features
 
-This framework provides a modular system for building chatbots that can assist in teacher training, offering:
-- Pedagogical response generation
-- Student reaction simulation
-- Teaching strategy analysis
-- Scaffolded learning support
-- Metacognitive prompting
+- **Enhanced LLM Interface**: Optimized for pedagogical interactions using DSPy
+- **Knowledge Base Integration**: Efficient document indexing and retrieval
+- **Fine-Tuning Capabilities**: Specialized model training for educational contexts
+- **Automated Evaluation**: Comprehensive metrics for teaching responses
+- **Web Interface**: Interactive testing and development environment
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
-llm-chatbot-framework/
-├── src/
-│   ├── llm/              # LLM integration and handling
-│   │   ├── dspy/        # DSPy-based LLM components
-│   │   └── handlers/    # Various LLM handlers
-│   ├── knowledge_base/   # Knowledge base integration
-│   ├── fine_tuning/      # Model fine-tuning components
-│   └── evaluation/       # Evaluation metrics and tools
-├── tests/                # Test suites
-├── data/                 # Training and evaluation data
-└── requirements.txt      # Project dependencies
+UTTA/
+├── data/               # Training data and model storage
+├── src/               # Source code
+│   ├── evaluation/    # Response evaluation metrics
+│   ├── fine_tuning/   # Model fine-tuning components
+│   ├── knowledge_base/# Document indexing and retrieval
+│   └── llm/          # LLM interface and DSPy handlers
+├── tests/             # Unit tests
+└── test_*.py         # Integration and component tests
 ```
 
-## 🚀 Getting Started
+## Setup
 
-1. Set up the environment:
+1. Create and activate a conda environment:
 ```bash
 conda create -n utta python=3.10
 conda activate utta
+```
+
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-2. Set up model access:
-
-### OpenAI API (Default)
-1. Create an OpenAI account at https://platform.openai.com/signup
-2. Generate an API key at https://platform.openai.com/api-keys
-3. Set your API key:
+3. Set up environment variables:
 ```bash
-export OPENAI_API_KEY='your-api-key'
+cp .env.example .env
+# Edit .env with your API keys and configurations
 ```
 
-### Alternative Models (Cost-Effective Options)
+## Core Dependencies
 
-#### Option 1: Local Ollama Models
-1. Install Ollama from https://ollama.ai/
-2. Pull and run a model:
+- **LLM and NLP**:
+  - dspy-ai>=2.6.12
+  - langchain>=0.1.0
+  - transformers>=4.49.0
+  - spacy>=3.8.4
+
+- **Knowledge Base**:
+  - sentence-transformers>=3.4.1
+  - llama-index>=0.12.22
+  - faiss-cpu>=1.7.4
+
+- **Data Processing**:
+  - pandas>=2.2.3
+  - numpy>=1.26.4
+  - torch>=2.1.0
+
+For a complete list of dependencies, see `requirements.txt`.
+
+## Components
+
+### LLM Interface
+- Enhanced DSPy integration for pedagogical interactions
+- Context-aware response generation
+- Performance optimization with caching
+
+### Knowledge Base
+- Document chunking and indexing
+- Semantic search capabilities
+- Knowledge graph for pedagogical relationships
+
+### Fine-Tuning
+- Custom training data preparation
+- DSPy-based optimization
+- Model evaluation metrics
+
+### Automated Evaluation
+- Response clarity assessment
+- Engagement metrics
+- Age-appropriate content verification
+- Pedagogical elements analysis
+
+## Testing
+
+Run the test suite:
 ```bash
-# Install Ollama
-curl https://ollama.ai/install.sh | sh
+# Run all tests
+pytest
 
-# Pull Mistral (recommended for teaching tasks)
-ollama pull mistral
-
-# For better performance but more resources:
-ollama pull llama2
+# Run specific test files
+pytest test_components.py
+pytest test_web_app.py
+pytest test_integration.py
 ```
 
-3. Update the model in your code:
-```python
-llm = EnhancedDSPyLLMInterface(model_name="ollama/mistral")
-```
+## Development
 
-#### Option 2: Hugging Face Models
-1. Install transformers:
+1. Code Style:
 ```bash
-pip install transformers
+# Format code
+black .
+
+# Check style
+flake8
 ```
 
-2. Use open-source models:
-```python
-from transformers import pipeline
-
-# Phi-2 (Microsoft's compact but powerful model)
-model = pipeline('text-generation', model='microsoft/phi-2')
-
-# Or SOLAR (Upstage's efficient model)
-model = pipeline('text-generation', model='upstage/SOLAR-10.7B-Instruct-v1.0')
-```
-
-#### Cost Comparison (as of 2024):
-- GPT-3.5-turbo: $0.0010 / 1K tokens
-- GPT-4: $0.03 / 1K tokens
-- Local models: Free after initial setup
-- Phi-2: Free, 2.7B parameters
-- Mistral: Free, 7B parameters
-- SOLAR: Free, 10.7B parameters
-
-Choose based on your needs:
-- Development/Testing: Use local models (Ollama)
-- Production/High accuracy: Use OpenAI API
-- Balance: Use Phi-2 or Mistral locally
-
-## 📋 Development Milestones
-
-### 1️⃣ Chatbot Development
-- [x] DSPy LLM integration
-- [x] Pedagogical language processing
-- [x] Student reaction generation
-- [x] Teaching analysis
-
-### 2️⃣ Knowledge Base Integration
-- [ ] Document indexing
-- [ ] Context retrieval
-- [ ] Knowledge graph integration
-- [ ] Semantic search
-
-### 3️⃣ Fine-Tuning
-- [x] Training data preparation
-- [x] Model fine-tuning pipeline
-- [x] Evaluation metrics
-- [ ] Hyperparameter optimization
-
-### 4️⃣ Evaluation
-- [x] Automated metrics
-- [x] Teaching quality assessment
-- [ ] Student engagement analysis
-- [ ] Learning outcome evaluation
-
-## 💻 Usage Examples
-
-```python
-from src.llm.dspy.handler import EnhancedDSPyLLMInterface
-
-# Initialize the interface (choose your model)
-llm = EnhancedDSPyLLMInterface(model_name="gpt-3.5-turbo")  # OpenAI (default)
-# llm = EnhancedDSPyLLMInterface(model_name="ollama/mistral")  # Local Mistral
-# llm = EnhancedDSPyLLMInterface(model_name="microsoft/phi-2")  # Phi-2
-
-# Generate a teaching response
-response = llm.generate_comprehensive_response(
-    student_query="What is photosynthesis?",
-    student_profile={
-        "level": "intermediate",
-        "learning_style": "visual"
-    }
-)
-
-# Access different components of the response
-print(response['response'])  # Main teaching response
-print(response['scaffolding'])  # Scaffolded learning components
-print(response['metacognition'])  # Metacognitive prompts
-```
-
-## 🧪 Running Tests
-
+2. Running the Web Interface:
 ```bash
-pytest tests/
+streamlit run src/web_app.py
 ```
 
-## 📚 Documentation
-
-Each component includes detailed documentation in its respective directory:
-- `src/llm/README.md` - LLM integration details
-- `src/knowledge_base/README.md` - Knowledge base setup
-- `src/fine_tuning/README.md` - Fine-tuning process
-- `src/evaluation/README.md` - Evaluation metrics
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+3. Make your changes
+4. Run tests
+5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the terms of the LICENSE file included in the repository.
+
+## Acknowledgments
+
+- DSPy team for the foundational LLM framework
+- Contributors and testers
