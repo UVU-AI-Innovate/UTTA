@@ -37,10 +37,66 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-2. Configure your OpenAI API key:
+2. Set up model access:
+
+### OpenAI API (Default)
+1. Create an OpenAI account at https://platform.openai.com/signup
+2. Generate an API key at https://platform.openai.com/api-keys
+3. Set your API key:
 ```bash
 export OPENAI_API_KEY='your-api-key'
 ```
+
+### Alternative Models (Cost-Effective Options)
+
+#### Option 1: Local Ollama Models
+1. Install Ollama from https://ollama.ai/
+2. Pull and run a model:
+```bash
+# Install Ollama
+curl https://ollama.ai/install.sh | sh
+
+# Pull Mistral (recommended for teaching tasks)
+ollama pull mistral
+
+# For better performance but more resources:
+ollama pull llama2
+```
+
+3. Update the model in your code:
+```python
+llm = EnhancedDSPyLLMInterface(model_name="ollama/mistral")
+```
+
+#### Option 2: Hugging Face Models
+1. Install transformers:
+```bash
+pip install transformers
+```
+
+2. Use open-source models:
+```python
+from transformers import pipeline
+
+# Phi-2 (Microsoft's compact but powerful model)
+model = pipeline('text-generation', model='microsoft/phi-2')
+
+# Or SOLAR (Upstage's efficient model)
+model = pipeline('text-generation', model='upstage/SOLAR-10.7B-Instruct-v1.0')
+```
+
+#### Cost Comparison (as of 2024):
+- GPT-3.5-turbo: $0.0010 / 1K tokens
+- GPT-4: $0.03 / 1K tokens
+- Local models: Free after initial setup
+- Phi-2: Free, 2.7B parameters
+- Mistral: Free, 7B parameters
+- SOLAR: Free, 10.7B parameters
+
+Choose based on your needs:
+- Development/Testing: Use local models (Ollama)
+- Production/High accuracy: Use OpenAI API
+- Balance: Use Phi-2 or Mistral locally
 
 ## 📋 Development Milestones
 
@@ -73,8 +129,10 @@ export OPENAI_API_KEY='your-api-key'
 ```python
 from src.llm.dspy.handler import EnhancedDSPyLLMInterface
 
-# Initialize the interface
-llm = EnhancedDSPyLLMInterface()
+# Initialize the interface (choose your model)
+llm = EnhancedDSPyLLMInterface(model_name="gpt-3.5-turbo")  # OpenAI (default)
+# llm = EnhancedDSPyLLMInterface(model_name="ollama/mistral")  # Local Mistral
+# llm = EnhancedDSPyLLMInterface(model_name="microsoft/phi-2")  # Phi-2
 
 # Generate a teaching response
 response = llm.generate_comprehensive_response(
