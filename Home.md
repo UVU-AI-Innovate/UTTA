@@ -1,27 +1,41 @@
 # Welcome to the UTTA Wiki
 
-**UTTA** (Universal Teaching and Training Assistant) is an open-source framework designed to train and optimize AI models for educational applications. This wiki serves as the comprehensive documentation for the UTTA project.
+**UTTA** (Utah Teacher Training Assistant) is an open-source framework designed to train and optimize AI models for educational applications. This wiki serves as the comprehensive documentation and theoretical resource for the UTTA project.
 
 ## 🚀 Quick Start
 
 * [Getting Started](Getting-Started) - Setup instructions and basic usage
 * [Environment Setup](Environment-Setup) - How to set up your development environment
 
-## 📚 Documentation
+## 📚 Theoretical Foundations
 
-* [Technical Architecture](Technical-Architecture) - Overview of the system design
-* [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training
+Understand the core concepts behind language models and AI in education:
 
-## 🔧 Fine-Tuning
+* [Introduction to LLMs](LLMs-Introduction) - Fundamentals of Large Language Models
+* [Embeddings and Vector Representations](Embeddings) - How meaning is encoded in vectors
+* [Vector Databases](Vector-Databases) - Storing and retrieving semantic information
+* [Retrieval-Augmented Generation (RAG)](RAG) - Enhancing LLMs with external knowledge 
+* [Prompt Engineering](Prompt-Engineering) - Designing effective prompts for education
+* [Fine-Tuning Fundamentals](Fine-Tuning-Fundamentals) - Theory behind model customization
+* [Evaluation Methods](Evaluation-Methods) - Assessing educational AI performance
+* [Benchmarking](Benchmarking) - Standardized testing for educational models
 
-* [Fine-Tuning Methods](Fine-Tuning-Methods) - Overview of all fine-tuning approaches
-* [Fine-Tuning CLI](Fine-Tuning-CLI) - Command-line tool for fine-tuning models
+## 💻 Implementation Tutorials
 
-## 📘 Implementation Tutorials
+Apply theoretical knowledge with practical guides:
 
 * [DSPy Tutorial](DSPy-Tutorial) - Learn to use DSPy for prompt optimization
 * [OpenAI Tutorial](OpenAI-Tutorial) - Guide for using OpenAI models
 * [HuggingFace Tutorial](HuggingFace-Tutorial) - Guide for using HuggingFace models
+* [Fine-Tuning CLI](Fine-Tuning-CLI) - Command-line tool for fine-tuning models
+
+## 📄 Reference
+
+Detailed technical information:
+
+* [Technical Architecture](Technical-Architecture) - System design and components
+* [Dataset Preparation](Dataset-Preparation) - Creating educational datasets
+* [Fine-Tuning Methods](Fine-Tuning-Methods) - Specific techniques for customization
 
 ## 🔑 Key Features
 
