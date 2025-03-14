@@ -1,3 +1,9 @@
+# Include base requirements from project root
+-r ../requirements.txt
+
+# Additional framework-specific dependencies that aren't in the root requirements
+# Add any framework-specific dependencies here if needed in the future
+
 # Core dependencies
 numpy>=1.20.0
 pandas>=1.3.0

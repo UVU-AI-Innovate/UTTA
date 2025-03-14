@@ -4,6 +4,7 @@
 * [Home](Home)
 * [Getting Started](Getting-Started)
 * [Environment Setup](Environment-Setup)
+* [Project Structure](Project-Structure)
 * [Code of Conduct](Code-of-Conduct)
 
 ## Framework Guides
@@ -11,8 +12,9 @@
 * [OpenAI Tutorial](OpenAI-Tutorial)
 * [HuggingFace Tutorial](HuggingFace-Tutorial)
 
-## Data Management
+## Data & Evaluation
 * [Dataset Preparation](Dataset-Preparation)
+* [LLM Evaluation](LLM-Evaluation)
 
 ## Community
 * [Contributing](Contributing) 
