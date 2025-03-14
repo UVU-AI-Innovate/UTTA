@@ -5,6 +5,20 @@ Uses DSPy for efficient and reliable LLM interactions.
 """
 
 import streamlit as st
+import os
+import sys
+import json
+import logging
+import datetime
+from pathlib import Path
+
+# Add the project root to Python path
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root))
+
+# Update imports to use absolute paths
+from src.llm.dspy.adapter import create_llm_interface, EnhancedLLMInterface
+from src.llm.dspy.handler import PedagogicalLanguageProcessor
 
 # Set page configuration first - this must be the first Streamlit command
 st.set_page_config(
@@ -14,20 +28,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-import os
 import pandas as pd
 import plotly.express as px
-from datetime import datetime
-import json
 from dotenv import load_dotenv
 import subprocess
 import getpass
-import logging
 import random
-
-# Import our DSPy adapter and implementations
-from dspy_adapter import create_llm_interface, EnhancedLLMInterface
-from dspy_llm_handler import PedagogicalLanguageProcessor
 
 # Configure logging
 logging.basicConfig(
@@ -674,7 +680,7 @@ class WebInterface:
                     st.session_state.history.append({
                         "role": "teacher",
                         "content": teacher_input,
-                        "timestamp": datetime.now().strftime("%H:%M:%S")
+                        "timestamp": datetime.datetime.now().strftime("%H:%M:%S")
                     })
                     
                     # Generate student response
@@ -689,7 +695,7 @@ class WebInterface:
                     st.session_state.history.append({
                         "role": "student",
                         "content": student_response,
-                        "timestamp": datetime.now().strftime("%H:%M:%S")
+                        "timestamp": datetime.datetime.now().strftime("%H:%M:%S")
                     })
                     
                     # Analyze teaching approach after at least one exchange
@@ -1533,7 +1539,7 @@ class WebInterface:
 
     def _get_timestamp(self):
         """Get the current timestamp for messages."""
-        return datetime.now().strftime("%H:%M:%S")
+        return datetime.datetime.now().strftime("%H:%M:%S")
 
     def create_default_scenario(self):
         """Create a default scenario if none exists."""

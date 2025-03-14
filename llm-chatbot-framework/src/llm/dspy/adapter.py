@@ -14,9 +14,11 @@ import os
 import json
 import logging
 from typing import List, Dict, Any, Optional, Union
+from pathlib import Path
 
 # Import the DSPy implementation
-from dspy_llm_handler import EnhancedDSPyLLMInterface, PedagogicalLanguageProcessor
+from .handler import EnhancedDSPyLLMInterface, PedagogicalLanguageProcessor
+import dspy
 
 # Configure logging
 logging.basicConfig(
@@ -93,11 +95,118 @@ class LLMInterface:
 class EnhancedLLMInterface(LLMInterface):
     """Extension of the LLMInterface with enhanced capabilities."""
     
-    def __init__(self, model_name="gpt-3.5-turbo", temperature=0.7):
-        """Initialize the interface with additional components."""
-        super().__init__(model_name, temperature)
-        self.pedagogical_processor = None
-        logging.info("Enhanced LLM Interface initialized")
+    def __init__(self, 
+                 model_name: str = "gpt-3.5-turbo",
+                 cache_dir: Optional[Path] = None):
+        """
+        Initialize the enhanced LLM interface.
+        
+        Args:
+            model_name: Name of the LLM model to use
+            cache_dir: Optional directory for caching responses
+        """
+        super().__init__(model_name, 0.7)
+        self.logger = logging.getLogger(__name__)
+        self.cache_dir = cache_dir or Path("cache")
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize DSPy
+        try:
+            dspy.settings.configure(lm=model_name)
+            self.logger.info(f"Initialized DSPy with model: {model_name}")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize DSPy: {str(e)}")
+            raise
+        
+        # Load cache if it exists
+        self.response_cache = self.load_cache()
+    
+    def load_cache(self) -> Dict[str, Any]:
+        """Load the response cache from disk."""
+        cache_file = self.cache_dir / "response_cache.json"
+        if cache_file.exists():
+            try:
+                with open(cache_file, "r") as f:
+                    return json.load(f)
+            except Exception as e:
+                self.logger.error(f"Error loading cache: {str(e)}")
+                return {}
+        return {}
+    
+    def save_cache(self):
+        """Save the response cache to disk."""
+        cache_file = self.cache_dir / "response_cache.json"
+        try:
+            with open(cache_file, "w") as f:
+                json.dump(self.response_cache, f)
+        except Exception as e:
+            self.logger.error(f"Error saving cache: {str(e)}")
+    
+    def get_cache_key(self, messages: List[Dict[str, str]], context: Dict[str, Any]) -> str:
+        """Generate a unique cache key for the request."""
+        import hashlib
+        request_str = json.dumps({"messages": messages, "context": context}, sort_keys=True)
+        return hashlib.sha256(request_str.encode()).hexdigest()
+    
+    def get_response(self, 
+                    messages: List[Dict[str, str]], 
+                    context: Optional[Dict[str, Any]] = None,
+                    use_cache: bool = True) -> str:
+        """
+        Get a response from the LLM with optional caching.
+        
+        Args:
+            messages: List of message dictionaries
+            context: Optional context dictionary
+            use_cache: Whether to use response caching
+            
+        Returns:
+            The LLM's response
+        """
+        context = context or {}
+        
+        # Check cache if enabled
+        if use_cache:
+            cache_key = self.get_cache_key(messages, context)
+            if cache_key in self.response_cache:
+                self.logger.info("Using cached response")
+                return self.response_cache[cache_key]
+        
+        try:
+            # Define the response signature
+            class ChatResponse(dspy.Signature):
+                """Signature for chat responses."""
+                messages = dspy.InputField(desc="Chat messages")
+                context = dspy.InputField(desc="Additional context")
+                response = dspy.OutputField(desc="Generated response")
+            
+            # Create the DSPy program
+            class ChatProgram(dspy.Module):
+                def __init__(self):
+                    super().__init__()
+                    self.gen = dspy.ChainOfThought(ChatResponse)
+                
+                def forward(self, messages, context):
+                    pred = self.gen(messages=messages, context=context)
+                    return pred.response
+            
+            # Initialize and run the program
+            program = ChatProgram()
+            response = program(
+                messages=str(messages),
+                context=str(context)
+            )
+            
+            # Cache the response if enabled
+            if use_cache:
+                self.response_cache[cache_key] = response
+                self.save_cache()
+            
+            return response
+            
+        except Exception as e:
+            self.logger.error(f"Error getting response: {str(e)}")
+            raise
     
     def set_pedagogical_processor(self, processor):
         """Set the pedagogical processor for educational responses."""
@@ -322,19 +431,16 @@ class EnhancedLLMInterface(LLMInterface):
 
 
 # Factory function for creating the appropriate interface
-def create_llm_interface(model_name="gpt-3.5-turbo", enhanced=True, temperature=0.7):
+def create_llm_interface(model_name: str = "gpt-3.5-turbo",
+                        cache_dir: Optional[Path] = None) -> EnhancedLLMInterface:
     """
-    Create an LLM interface with the specified parameters.
+    Create an enhanced LLM interface.
     
     Args:
-        model_name: Name of the model to use
-        enhanced: Whether to use the enhanced interface
-        temperature: Temperature parameter for generation
+        model_name: Name of the LLM model to use
+        cache_dir: Optional directory for caching responses
         
     Returns:
-        LLMInterface or EnhancedLLMInterface: The appropriate interface
+        An initialized EnhancedLLMInterface instance
     """
-    if enhanced:
-        return EnhancedLLMInterface(model_name=model_name, temperature=temperature)
-    else:
-        return LLMInterface(model_name=model_name, temperature=temperature) 
+    return EnhancedLLMInterface(model_name=model_name, cache_dir=cache_dir) 

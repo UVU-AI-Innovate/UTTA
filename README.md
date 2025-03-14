@@ -1,171 +1,118 @@
-# UTTA (Utah Teacher Training Assistant)
+# Teacher Training Chatbot Framework
 
-UTTA is a comprehensive framework for developing and evaluating Large Language Model (LLM) based teaching assistants. This project focuses on creating effective, AI-powered educational support systems using state-of-the-art language models and evaluation methodologies.
+A comprehensive framework for developing and training chatbots specialized in teacher training and pedagogical assistance.
 
-## 🌟 Features
+## 🎯 Project Overview
 
-- **Multiple LLM Integration**
-  - Support for various LLM frameworks (DSPy, OpenAI, HuggingFace)
-  - Easy integration with popular models (LLaMA 2, Mistral, etc.)
-  - Flexible model switching and comparison capabilities
-
-- **Educational Focus**
-  - Specialized for teaching assistant applications
-  - Support for various educational scenarios
-  - Customizable educational content delivery
-
-- **Advanced Evaluation Framework**
-  - Comprehensive metrics for response quality
-  - Automated evaluation pipelines
-  - Human-in-the-loop evaluation support
-
-- **Terminal-Based Interface**
-  - CLI tools for all core functionalities
-  - Interactive chatbot terminal interface
-  - Fine-tuning management through command line
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Python 3.10 or higher
-- Conda package manager
-- Git
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/UVU-AI-Innovate/UTTA.git
-cd UTTA
-```
-
-2. Create and activate the conda environment:
-```bash
-conda create -n utta python=3.10
-conda activate utta
-```
-
-3. Install the package and dependencies:
-```bash
-pip install -e .
-```
-
-## 📚 Documentation
-
-Detailed documentation is available in our [GitHub Wiki](https://github.com/UVU-AI-Innovate/UTTA/wiki):
-
-- [Getting Started](https://github.com/UVU-AI-Innovate/UTTA/wiki/Getting-Started)
-- [Environment Setup](https://github.com/UVU-AI-Innovate/UTTA/wiki/Environment-Setup)
-- [Dataset Preparation](https://github.com/UVU-AI-Innovate/UTTA/wiki/Dataset-Preparation)
-- [Technical Architecture](https://github.com/UVU-AI-Innovate/UTTA/wiki/Technical-Architecture)
-- [DSPy Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/DSPy-Tutorial)
-- [OpenAI Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/OpenAI-Tutorial)
-- [HuggingFace Tutorial](https://github.com/UVU-AI-Innovate/UTTA/wiki/HuggingFace-Tutorial)
+This framework provides a modular system for building chatbots that can assist in teacher training, offering:
+- Pedagogical response generation
+- Student reaction simulation
+- Teaching strategy analysis
+- Scaffolded learning support
+- Metacognitive prompting
 
 ## 🏗️ Project Structure
 
 ```
-UTTA/
-├── utta/                    # Main package
-│   ├── core/                # Core functionality (Vector DB, Document Processor)
-│   ├── chatbot/             # Chatbot functionality and LLM handlers
-│   ├── fine_tuning/         # Fine-tuning implementations
-│   ├── evaluation/          # Evaluation tools and metrics
-│   └── utils/               # Utility functions and helpers
-├── examples/                # Usage examples
-│   ├── simple_chatbot.py    # Basic chatbot example
-│   └── fine_tuning/         # Fine-tuning examples
-├── tools/                   # CLI tools
-│   └── fine_tuning_cli.py   # Fine-tuning CLI tool
-├── tests/                   # Test files
-│   └── test_chatbot.py      # Chatbot tests
-├── data/                    # Data files
-│   ├── evaluation/          # Evaluation results
-│   └── benchmarks/          # Benchmark results
-├── chatbot.py               # Convenience script to run the chatbot
-├── finetune.py              # Convenience script to run the fine-tuning CLI
-├── run_tests.py             # Script to run all tests
-├── setup.py                 # Package installation setup
-└── requirements.txt         # Project dependencies
+llm-chatbot-framework/
+├── src/
+│   ├── llm/              # LLM integration and handling
+│   │   ├── dspy/        # DSPy-based LLM components
+│   │   └── handlers/    # Various LLM handlers
+│   ├── knowledge_base/   # Knowledge base integration
+│   ├── fine_tuning/      # Model fine-tuning components
+│   └── evaluation/       # Evaluation metrics and tools
+├── tests/                # Test suites
+├── data/                 # Training and evaluation data
+└── requirements.txt      # Project dependencies
 ```
 
-## 🔧 Usage
+## 🚀 Getting Started
 
-### Simple Chatbot
+1. Set up the environment:
+```bash
+conda create -n utta python=3.9
+conda activate utta
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+```
 
-Run the simple terminal-based chatbot using the convenience script:
+2. Configure your OpenAI API key:
+```bash
+export OPENAI_API_KEY='your-api-key'
+```
+
+## 📋 Development Milestones
+
+### 1️⃣ Chatbot Development
+- [x] DSPy LLM integration
+- [x] Pedagogical language processing
+- [x] Student reaction generation
+- [x] Teaching analysis
+
+### 2️⃣ Knowledge Base Integration
+- [ ] Document indexing
+- [ ] Context retrieval
+- [ ] Knowledge graph integration
+- [ ] Semantic search
+
+### 3️⃣ Fine-Tuning
+- [x] Training data preparation
+- [x] Model fine-tuning pipeline
+- [x] Evaluation metrics
+- [ ] Hyperparameter optimization
+
+### 4️⃣ Evaluation
+- [x] Automated metrics
+- [x] Teaching quality assessment
+- [ ] Student engagement analysis
+- [ ] Learning outcome evaluation
+
+## 💻 Usage Examples
+
+```python
+from src.llm.dspy.handler import EnhancedDSPyLLMInterface
+
+# Initialize the interface
+llm = EnhancedDSPyLLMInterface()
+
+# Generate a teaching response
+response = llm.generate_comprehensive_response(
+    student_query="What is photosynthesis?",
+    student_profile={
+        "level": "intermediate",
+        "learning_style": "visual"
+    }
+)
+
+# Access different components of the response
+print(response['response'])  # Main teaching response
+print(response['scaffolding'])  # Scaffolded learning components
+print(response['metacognition'])  # Metacognitive prompts
+```
+
+## 🧪 Running Tests
 
 ```bash
-# From the UTTA directory
-./chatbot.py
-
-# Or using the module path
-python examples/simple_chatbot.py
+pytest tests/
 ```
 
-### Fine-Tuning CLI
+## 📚 Documentation
 
-UTTA provides a comprehensive CLI tool for managing fine-tuning, accessible through a convenience script:
-
-```bash
-# From the UTTA directory
-./finetune.py --help
-
-# Or using the module path
-python tools/fine_tuning_cli.py --help
-
-# Or using the installed entry point
-utta-finetune --help
-
-# DSPy optimization
-./finetune.py dspy optimize --examples examples.json --module teacher_responder
-
-# OpenAI fine-tuning
-./finetune.py openai start --file training_data.jsonl --model gpt-3.5-turbo
-
-# HuggingFace fine-tuning
-./finetune.py huggingface fine-tune --file training_data.jsonl --model microsoft/phi-2 --use-lora
-```
-
-### Running Tests
-
-UTTA includes a comprehensive test suite:
-
-```bash
-# Run all tests
-./run_tests.py
-
-# Run individual test files
-python tests/test_chatbot.py
-```
+Each component includes detailed documentation in its respective directory:
+- `src/llm/README.md` - LLM integration details
+- `src/knowledge_base/README.md` - Knowledge base setup
+- `src/fine_tuning/README.md` - Fine-tuning process
+- `src/evaluation/README.md` - Evaluation metrics
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to:
-
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Improve documentation
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors who have helped shape UTTA
-- Special thanks to the DSPy, OpenAI, and HuggingFace communities
-- Gratitude to the educational institutions that have provided valuable feedback
-
-## 📞 Contact
-
-For questions and support, please:
-- Open an issue in the GitHub repository
-- Contact the maintainers directly
-- Join our community discussions
-
----
-
-*UTTA - Empowering Education with AI*
+This project is licensed under the MIT License - see the LICENSE file for details.
