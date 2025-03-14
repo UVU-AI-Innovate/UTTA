@@ -16,6 +16,11 @@
 * [OpenAI Tutorial](OpenAI-Tutorial) - Guide for using OpenAI models
 * [HuggingFace Tutorial](HuggingFace-Tutorial) - Guide for using HuggingFace models
 
+### Fine-Tuning
+
+* [Fine-Tuning Methods](Fine-Tuning-Methods) - Overview of all fine-tuning approaches
+* [Fine-Tuning CLI](Fine-Tuning-CLI) - Command-line tool for fine-tuning models
+
 ### Data Preparation
 
 * [Dataset Preparation](Dataset-Preparation) - Learn how to prepare and format datasets for training

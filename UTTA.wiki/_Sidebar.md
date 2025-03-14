@@ -11,12 +11,15 @@
 * [OpenAI Tutorial](OpenAI-Tutorial)
 * [HuggingFace Tutorial](HuggingFace-Tutorial)
 
+## Fine-Tuning
+* [Fine-Tuning Methods](Fine-Tuning-Methods)
+* [Fine-Tuning CLI](Fine-Tuning-CLI)
+
 ## Data Management
 * [Dataset Preparation](Dataset-Preparation)
 
 ## CLI Tools
 * [Simple Chatbot](Simple-Chatbot)
-* [Fine-Tuning CLI](Fine-Tuning-CLI)
 * [Evaluation Tools](Evaluation-Tools)
 
 ## Community
