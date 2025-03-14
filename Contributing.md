@@ -1,51 +1,102 @@
 # Contributing to UTTA
 
-Thank you for your interest in contributing to the Universal Teaching and Training Assistant (UTTA) project! We welcome contributions from everyone, regardless of experience level.
+Thank you for your interest in contributing to the Universal Teaching and Training Assistant (UTTA) project! This document provides guidelines and instructions for contributing to the project.
+
+## Code of Conduct
+
+Please read our [Code of Conduct](https://github.com/UVU-AI-Innovate/UTTA/wiki/Code-of-Conduct) before contributing. We expect all contributors to adhere to these guidelines to ensure a positive and inclusive community.
 
 ## How to Contribute
 
-Here are several ways you can contribute to UTTA:
+### Reporting Bugs
 
-1. **Code contributions**: Add new features, fix bugs, or improve existing functionality
-2. **Documentation**: Help improve our guides, tutorials, and API documentation
-3. **Testing**: Create tests, report bugs, or validate fixes
-4. **Examples and tutorials**: Create or improve examples demonstrating UTTA in educational contexts
-5. **Dataset contributions**: Help expand our training datasets for educational AI
-6. **Feedback**: Provide feedback on your experience using UTTA in teaching/training environments
+If you find a bug, please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
 
-## Getting Started
+- A clear, descriptive title
+- A detailed description of the bug
+- Steps to reproduce the bug
+- Expected behavior
+- Actual behavior
+- Screenshots (if applicable)
+- Environment information (OS, Python version, etc.)
 
-1. **Set up your environment**: Follow the instructions in the [Environment Setup](Environment-Setup) guide
-2. **Fork the repository**: Create your own fork of the UTTA repository
-3. **Create a new branch**: Make your changes in a new git branch
-4. **Make your changes**: Implement your feature or bug fix
-5. **Test your changes**: Ensure your changes don't break existing functionality
-6. **Submit a pull request**: Open a PR against the main UTTA repository
+### Suggesting Features
 
-## Pull Request Process
+We welcome feature suggestions! Please create an issue on our [GitHub Issues](https://github.com/UVU-AI-Innovate/UTTA/issues) page with the following information:
 
-1. Ensure your code follows the project's coding standards
-2. Update documentation to reflect any changes
-3. Include tests that verify your changes
-4. Your PR should clearly describe what changes you've made and why
-5. A maintainer will review your PR and may request additional changes
-6. Once approved, a maintainer will merge your PR
+- A clear, descriptive title
+- A detailed description of the feature
+- Why this feature would be beneficial
+- Any implementation ideas you have
 
-## Code Standards
+### Pull Requests
 
-- Follow the existing code style in the project
-- Write clear, concise, and descriptive commit messages
-- Document your code with appropriate comments and docstrings
-- Write tests for new functionality
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes
+4. Run tests to ensure your changes don't break existing functionality
+5. Submit a pull request
 
-## Communication
+## Development Setup
 
-- Use GitHub Issues for bug reports, feature requests, and discussions
-- Be respectful and constructive in all communications
-- Follow our [Code of Conduct](Code-of-Conduct)
+1. Clone the repository:
+```bash
+git clone https://github.com/UVU-AI-Innovate/UTTA.git
+cd UTTA
+```
 
-## Recognition
+2. Create and activate the conda environment:
+```bash
+conda create -n utta python=3.10
+conda activate utta
+```
 
-All contributors will be recognized in our project documentation and release notes. We appreciate every contribution, no matter how small!
+3. Install the package in development mode:
+```bash
+pip install -e .
+```
 
-Thank you for helping make UTTA better! 
+## Coding Standards
+
+- Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines
+- Write docstrings for all functions, classes, and modules
+- Include type hints where appropriate
+- Write unit tests for new functionality
+
+## Testing
+
+Run tests using the test runner script:
+
+```bash
+./run_tests.py
+```
+
+## Documentation
+
+- Update documentation for any changes you make
+- Follow the existing documentation style
+- Add examples for new features
+
+## Commit Messages
+
+- Use clear, descriptive commit messages
+- Follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
+  - `feat:` for new features
+  - `fix:` for bug fixes
+  - `docs:` for documentation changes
+  - `style:` for formatting changes
+  - `refactor:` for code refactoring
+  - `test:` for adding or modifying tests
+  - `chore:` for maintenance tasks
+
+## Review Process
+
+- All pull requests will be reviewed by at least one maintainer
+- Feedback will be provided on the pull request
+- Changes may be requested before merging
+
+## License
+
+By contributing to UTTA, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+
+Thank you for contributing to UTTA! 
