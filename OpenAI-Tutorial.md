@@ -1,235 +1,272 @@
-# OpenAI Tutorial for UTTA
+# OpenAI Tutorial
 
-This tutorial will guide you through using OpenAI models with the UTTA framework.
-
-## Introduction
-
-OpenAI's models like GPT-3.5 and GPT-4 provide powerful capabilities for educational applications. This guide will show you how to effectively leverage these models within UTTA for teaching and training purposes.
+This tutorial will guide you through using OpenAI models with the UTTA framework for creating effective educational assistants and tools.
 
 ## Prerequisites
 
-Before starting this tutorial, ensure you have:
+Before you begin, make sure you have:
+- Completed the [Environment Setup](Environment-Setup)
+- An OpenAI API key
+- Basic understanding of prompt engineering
 
-* Completed the [Environment Setup](Environment-Setup)
-* An OpenAI API key
-* Basic understanding of the UTTA framework
+## Setting Up OpenAI with UTTA
 
-## Setting Up OpenAI Access
+### API Key Configuration
 
-1. **Create an OpenAI Account**
-   * Sign up at [OpenAI](https://platform.openai.com/)
-   * Navigate to the API section
+First, ensure your OpenAI API key is properly configured:
 
-2. **Generate an API Key**
-   * Go to "API Keys" in your account
-   * Click "Create new secret key"
-   * Copy and store your key securely
-
-3. **Set Up Environment Variable**
+1. Add your API key to your environment variables:
    ```bash
-   # Add to your environment or .env file
-   export OPENAI_API_KEY="your-key-here"
+   export OPENAI_API_KEY="your-openai-api-key"
    ```
 
-## Basic Usage of OpenAI Models
+2. Or add it to a `.env` file in your project root:
+   ```
+   OPENAI_API_KEY=your-openai-api-key
+   ```
 
-### Initializing with OpenAI Models
+3. Load the environment variables in your code:
+   ```python
+   from dotenv import load_dotenv
+   load_dotenv()
+   ```
+
+### Installing Dependencies
+
+Make sure you have the necessary dependencies:
+
+```bash
+pip install utta[openai]
+```
+
+## Basic Usage with OpenAI Models
+
+### Creating a Simple Teaching Assistant
 
 ```python
-from utta import TeachingAssistant
+from utta import Assistant
+from utta.models import OpenAIModel
 
-# Initialize with GPT-3.5-Turbo
-assistant = TeachingAssistant(model="openai/gpt-3.5-turbo")
-
-# Or initialize with GPT-4
-advanced_assistant = TeachingAssistant(model="openai/gpt-4")
+# Initialize with a specific OpenAI model
+model = OpenAIModel(model_name="gpt-4")
+assistant = Assistant(model=model)
 
 # Ask a question
-response = assistant.ask("What are the key principles of machine learning?")
+response = assistant.answer("What is the Pythagorean theorem?")
 print(response)
 ```
 
-### Configuring Model Parameters
+### Customizing OpenAI Parameters
+
+You can customize various parameters for OpenAI models:
 
 ```python
-# Configure with specific parameters
-assistant = TeachingAssistant(
-    model="openai/gpt-4",
+from utta.models import OpenAIModel
+
+# Create a model with custom parameters
+model = OpenAIModel(
+    model_name="gpt-3.5-turbo",
     temperature=0.7,
     max_tokens=500,
-    top_p=0.95
+    top_p=0.95,
+    frequency_penalty=0.5,
+    presence_penalty=0.0
 )
 
-# You can also update parameters after initialization
-assistant.update_model_parameters(temperature=0.5)
+assistant = Assistant(model=model)
 ```
 
 ## Advanced OpenAI Features
 
-### System Messages for Role Definition
+### Using System Messages for Educational Contexts
 
 ```python
-# Define a specific teaching persona
-assistant = TeachingAssistant(
-    model="openai/gpt-3.5-turbo",
-    system_message="You are a university professor specializing in computer science. Explain concepts thoroughly with relevant examples and ask students questions to check understanding."
+from utta import Assistant
+from utta.models import OpenAIModel
+
+# Create a model with educational system prompt
+model = OpenAIModel(
+    model_name="gpt-4",
+    system_message="You are an expert mathematics tutor helping high school students. \
+                   Provide clear, step-by-step explanations and include examples \
+                   that illustrate key concepts. Encourage critical thinking and \
+                   guide students to solutions rather than providing answers directly."
 )
-```
 
-### Function Calling
-
-```python
-from utta.tools import MathTool, WebSearchTool
-
-# Add tools to your assistant
-assistant = TeachingAssistant(model="openai/gpt-4")
-assistant.add_tool(MathTool())
-assistant.add_tool(WebSearchTool())
-
-# Now the assistant can use these tools
-response = assistant.ask("Calculate the derivative of x^3 + 2x^2 - 5x + 3")
+math_tutor = Assistant(model=model)
+response = math_tutor.answer("How do I solve systems of linear equations?")
 print(response)
 ```
 
-### Using Different OpenAI Models
-
-UTTA supports different OpenAI models:
+### Function Calling for Structured Educational Outputs
 
 ```python
-# Using the most recent GPT-4 model
-assistant_gpt4 = TeachingAssistant(model="openai/gpt-4")
+from utta import Assistant
+from utta.models import OpenAIModel
+from utta.tools import MathProblemSolver, ConceptDiagramGenerator
 
-# Using GPT-3.5-Turbo for faster, more cost-effective responses
-assistant_gpt35 = TeachingAssistant(model="openai/gpt-3.5-turbo")
+# Define functions that the model can call
+functions = [
+    {
+        "name": "solve_math_problem",
+        "description": "Solves a mathematical problem step by step",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "problem": {
+                    "type": "string",
+                    "description": "The math problem to solve"
+                },
+                "grade_level": {
+                    "type": "string",
+                    "description": "The grade level of the student (elementary, middle, high, college)"
+                }
+            },
+            "required": ["problem"]
+        }
+    },
+    {
+        "name": "generate_concept_diagram",
+        "description": "Generates a description for a diagram explaining a concept",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "concept": {
+                    "type": "string",
+                    "description": "The concept to explain visually"
+                },
+                "complexity": {
+                    "type": "string",
+                    "enum": ["basic", "intermediate", "advanced"],
+                    "description": "The complexity level of the diagram"
+                }
+            },
+            "required": ["concept"]
+        }
+    }
+]
 
-# Using a specific model version
-assistant_specific = TeachingAssistant(model="openai/gpt-4-0613")
+# Create model with function calling
+model = OpenAIModel(
+    model_name="gpt-4",
+    functions=functions,
+    function_call="auto"
+)
+
+# Initialize the assistant with tools
+assistant = Assistant(
+    model=model,
+    tools={
+        "solve_math_problem": MathProblemSolver(),
+        "generate_concept_diagram": ConceptDiagramGenerator()
+    }
+)
+
+# The assistant will automatically use function calling when appropriate
+response = assistant.answer("Can you help me solve 2x + 5 = 13?")
+print(response)
 ```
 
-## Educational Applications
-
-### Creating Personalized Explanations
+### Using OpenAI's Vision Models for Educational Content
 
 ```python
-def generate_explanation(concept, grade_level, learning_style):
-    prompt = f"Explain {concept} to a {grade_level} student with a {learning_style} learning style."
+from utta import Assistant
+from utta.models import OpenAIVisionModel
+import base64
+
+# Function to encode image
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Load the image
+image_data = encode_image("path/to/math_problem.jpg")
+
+# Create vision model
+vision_model = OpenAIVisionModel(model_name="gpt-4-vision-preview")
+
+# Create assistant with vision capabilities
+vision_assistant = Assistant(model=vision_model)
+
+# Analyze an image containing educational content
+response = vision_assistant.analyze_image(
+    image=image_data,
+    prompt="This is a photo of a math problem. Can you solve it step by step?"
+)
+
+print(response)
+```
+
+## Best Practices for Educational Applications
+
+1. **Use appropriate temperature settings**:
+   - Lower (0.0-0.3) for factual questions and problem-solving
+   - Medium (0.3-0.7) for explanations and examples
+   - Higher (0.7-1.0) for creative educational content
+
+2. **Select the right model for the task**:
+   - `gpt-4` for complex problems and nuanced explanations
+   - `gpt-3.5-turbo` for general educational content and faster responses
+   - Vision models for analyzing diagrams, equations, and educational images
+
+3. **Craft effective system messages**:
+   - Specify the educational role (tutor, teacher, coach)
+   - Define the target audience's educational level
+   - Outline the appropriate tone and teaching style
+   - Include relevant pedagogical approaches
+
+4. **Handle model uncertainty appropriately**:
+   - Teach students to critically evaluate information
+   - Allow the model to express uncertainty when appropriate
+   - Implement citation or reference requirements
+
+## Troubleshooting Common Issues
+
+- **Rate Limiting**: Implement appropriate retries and backoff strategies
+- **Token Limits**: Break complex educational content into manageable chunks
+- **Cost Management**: Use simpler models for initial interactions, reserve GPT-4 for complex tasks
+
+## Example Educational Applications
+
+### Interactive Math Tutor
+
+```python
+from utta import Assistant
+from utta.models import OpenAIModel
+from utta.tools import MathProblemSolver
+
+# Create a specialized math tutor
+math_tutor = Assistant(
+    model=OpenAIModel(
+        model_name="gpt-4",
+        system_message="You are a patient and encouraging math tutor who specializes in helping students understand concepts, not just get answers."
+    ),
+    tools={"solve_math_problem": MathProblemSolver()}
+)
+
+def tutor_session():
+    print("Math Tutor: Hi! I'm your math tutor. What would you like help with today?")
     
-    assistant = TeachingAssistant(model="openai/gpt-4")
-    response = assistant.ask(prompt)
-    
-    return response
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit", "bye"]:
+            print("Math Tutor: Goodbye! Keep practicing!")
+            break
+            
+        response = math_tutor.answer(user_input)
+        print(f"Math Tutor: {response}")
 
-# Generate explanations for different students
-visual_learner = generate_explanation("photosynthesis", "8th grade", "visual")
-auditory_learner = generate_explanation("photosynthesis", "8th grade", "auditory")
+# Run the tutor session
+if __name__ == "__main__":
+    tutor_session()
 ```
-
-### Creating Interactive Quizzes
-
-```python
-from utta.education import QuizGenerator
-
-# Initialize a quiz generator
-quiz_gen = QuizGenerator(model="openai/gpt-4")
-
-# Generate a quiz on a specific topic
-quiz = quiz_gen.create_quiz(
-    topic="World War II",
-    difficulty="high school",
-    num_questions=5,
-    question_types=["multiple_choice", "short_answer"]
-)
-
-# Print the quiz
-for i, question in enumerate(quiz.questions):
-    print(f"Q{i+1}: {question.text}")
-    if question.type == "multiple_choice":
-        for j, option in enumerate(question.options):
-            print(f"  {chr(65+j)}) {option}")
-```
-
-## Cost Management
-
-OpenAI API usage incurs costs. Here's how to manage them:
-
-```python
-from utta.utils import TokenCounter
-
-# Initialize a token counter
-counter = TokenCounter()
-
-# Check token usage for a prompt
-prompt = "Explain the concept of photosynthesis in detail."
-tokens = counter.count_tokens(prompt, model="openai/gpt-4")
-print(f"This prompt will use approximately {tokens} tokens.")
-
-# Estimate cost
-estimated_cost = counter.estimate_cost(tokens, model="openai/gpt-4")
-print(f"Estimated cost: ${estimated_cost:.4f}")
-```
-
-## Evaluating Responses
-
-```python
-from utta.evaluation import ResponseEvaluator
-
-# Initialize an evaluator
-evaluator = ResponseEvaluator()
-
-# Evaluate a response against reference material
-score = evaluator.evaluate(
-    model_response="Photosynthesis is the process where plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar.",
-    reference="Photosynthesis is the process by which plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy in the form of glucose or other sugars.",
-    criteria=["accuracy", "completeness", "clarity"]
-)
-
-print(f"Evaluation score: {score}")
-print(f"Feedback: {evaluator.get_feedback()}")
-```
-
-## Fine-Tuning OpenAI Models
-
-For advanced customization, you can fine-tune OpenAI models:
-
-```python
-from utta.fine_tuning import OpenAIFineTuner
-
-# Initialize the fine-tuner
-tuner = OpenAIFineTuner(
-    base_model="gpt-3.5-turbo",
-    dataset_path="education_examples.jsonl"
-)
-
-# Start the fine-tuning process
-job_id = tuner.start_fine_tuning()
-print(f"Fine-tuning job started with ID: {job_id}")
-
-# Check status
-status = tuner.check_status(job_id)
-print(f"Status: {status}")
-
-# When complete, use the fine-tuned model
-assistant = TeachingAssistant(model=f"openai/{tuner.get_model_name()}")
-```
-
-## Best Practices
-
-1. **Be Specific in Prompts**: Clear instructions lead to better responses
-2. **Use System Messages**: Set the educational context and expectations
-3. **Start with GPT-3.5**: Use the more cost-effective model for development
-4. **Monitor Token Usage**: Keep track of costs, especially with larger models
-5. **Implement Safeguards**: Add checks to ensure content is appropriate for educational use
-6. **Verify Information**: Always verify factual accuracy of model outputs
-
-## Troubleshooting
-
-* **Rate Limits**: If you encounter rate limits, implement exponential backoff
-* **Token Limits**: Break long prompts into smaller chunks
-* **Cost Management**: Set budget alerts and limitations in your application
-* **Version Changes**: Stay updated on model version changes
 
 ## Further Resources
 
-* [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-* [UTTA Documentation](Home)
-* [OpenAI Model Capabilities](https://platform.openai.com/docs/models) 
+- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+- [UTTA Model Reference](link-to-utta-model-docs)
+- [Educational Prompt Engineering Guide](link-to-prompt-engineering-guide)
+
+For other model integrations, see:
+- [HuggingFace Tutorial](HuggingFace-Tutorial)
+- [DSPy Tutorial](DSPy-Tutorial) 

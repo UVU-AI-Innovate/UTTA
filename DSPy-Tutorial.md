@@ -1,220 +1,155 @@
-# DSPy Tutorial for UTTA
+# DSPy Tutorial
 
-This tutorial will guide you through using DSPy for prompt optimization in UTTA.
+This tutorial will guide you through using the DSPy framework with UTTA for optimizing language model prompts and building powerful educational applications.
 
 ## What is DSPy?
 
-[DSPy](https://github.com/stanfordnlp/dspy) is a framework for programming with foundation models, developed by Stanford AI Lab. In UTTA, we use DSPy for:
-
-1. Optimizing prompts for educational tasks
-2. Creating consistent response patterns
-3. Improving the quality and accuracy of model outputs
-
-## Prerequisites
-
-Before starting this tutorial, make sure you have:
-
-* Completed the [Environment Setup](Environment-Setup)
-* Basic understanding of prompt engineering
-* Basic knowledge of Python
+[DSPy](https://github.com/stanfordnlp/dspy) is a framework developed by Stanford NLP that provides a systematic way to optimize language model prompting. It treats prompt engineering as a programming problem rather than a trial-and-error process, allowing for more reliable and optimized prompts.
 
 ## Installation
 
-DSPy is included in the UTTA requirements, but if you need to install it separately:
+If you haven't already set up UTTA with DSPy support, run:
+
+```bash
+pip install utta[dspy]
+```
+
+Or install DSPy separately:
 
 ```bash
 pip install dspy-ai
 ```
 
-## Basic DSPy Usage in UTTA
+## Basic DSPy Concepts
 
-### 1. Simple DSPy Integration
+DSPy revolves around a few core concepts:
+- **Signatures**: Define the inputs and outputs of language model calls
+- **Modules**: Reusable components that implement specific functionalities
+- **Pipelines**: Sequences of modules that work together
+- **Teleprompters**: Optimize prompts automatically based on examples
 
-```python
-from utta import TeachingAssistant
-from utta.optimization import DSPyOptimizer
+## Using DSPy with UTTA
 
-# Initialize the teaching assistant
-assistant = TeachingAssistant(model="openai/gpt-3.5-turbo")
+UTTA provides integrations with DSPy to help create optimized educational assistants. Here's how to use them:
 
-# Create a DSPy optimizer
-optimizer = DSPyOptimizer()
-
-# Define a simple educational task
-task = {
-    "description": "Explain complex concepts to high school students",
-    "examples": [
-        {"input": "What is quantum computing?", "output": "Quantum computing uses quantum bits or 'qubits' that can exist in multiple states at once, unlike regular computer bits that are either 0 or 1. This allows quantum computers to solve certain problems much faster..."}
-    ]
-}
-
-# Optimize the assistant for the task
-optimizer.optimize(assistant, task)
-
-# Now use the optimized assistant
-response = assistant.ask("Can you explain black holes in simple terms?")
-print(response)
-```
-
-### 2. Creating a DSPy Module
-
-For more control, you can create custom DSPy modules:
+### Creating a Basic Educational Assistant with DSPy
 
 ```python
 import dspy
+from utta.dspy_integration import EducationalSignature, TeachingModule
 
-# Define a custom module for educational explanations
-class EducationalExplainer(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.gen = dspy.ChainOfThought("question -> explanation")
-    
-    def forward(self, question):
-        # Generate a thoughtful explanation
-        explanation = self.gen(question=question).explanation
-        return explanation
+# Configure DSPy with your preferred LM
+dspy.settings.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo"))
 
-# Use it in UTTA
-from utta import TeachingAssistant
-from utta.optimization import DSPyModuleIntegrator
+# Define a signature for explanations
+class ExplainConcept(EducationalSignature):
+    """Explain a concept at the appropriate educational level."""
+    concept = dspy.InputField()
+    educational_level = dspy.InputField(desc="The student's educational level (elementary, middle, high, undergraduate, graduate)")
+    explanation = dspy.OutputField()
 
-# Create and optimize the module
-explainer = EducationalExplainer()
-integrator = DSPyModuleIntegrator()
-integrator.integrate(assistant, explainer)
+# Create a teaching module
+explainer = TeachingModule(ExplainConcept)
 
-# Use the enhanced assistant
-response = assistant.ask("How does photosynthesis work?")
-print(response)
+# Use the module
+result = explainer(concept="Photosynthesis", educational_level="middle")
+print(result.explanation)
 ```
 
-## Advanced DSPy Optimization
-
-### Teleprompters for Educational Content
-
-DSPy's teleprompters are powerful tools for optimizing prompts based on example data:
+### Optimizing Prompts with Examples
 
 ```python
 import dspy
-from dspy.teleprompt import BootstrapFewShot
+from utta.dspy_integration import EducationalOptimizer
 
-# Prepare example data
+# Define some examples
 examples = [
-    dspy.Example(
-        question="What causes seasons on Earth?",
-        explanation="Seasons are caused by Earth's tilted axis as it orbits the Sun. This tilt makes different parts of Earth receive more direct sunlight at different times of the year, creating seasons."
-    ),
-    # Add more examples...
+    {"concept": "Gravity", "educational_level": "elementary", "explanation": "Gravity is what pulls things down to the Earth. It's like an invisible hand that pulls everything towards the ground. That's why when you drop something, it falls down instead of floating away."},
+    {"concept": "Gravity", "educational_level": "undergraduate", "explanation": "Gravity is a fundamental force described by Newton's law of universal gravitation and Einstein's theory of general relativity. It's the force that attracts objects with mass toward each other, proportional to the product of their masses and inversely proportional to the square of the distance between them."}
 ]
 
-# Create a teleprompter
-teleprompter = BootstrapFewShot(metric=dspy.metrics.Answer())
+# Create and train the optimizer
+optimizer = EducationalOptimizer(ExplainConcept, examples)
+optimized_explainer = optimizer.optimize()
 
-# Optimize your DSPy module
-optimized_explainer = teleprompter.compile(
-    EducationalExplainer(),
-    train_data=examples,
-    num_trials=10
+# Use the optimized module
+result = optimized_explainer(concept="Cellular Respiration", educational_level="high")
+print(result.explanation)
+```
+
+## Advanced DSPy Features for Education
+
+### Creating a Multi-Step Educational Pipeline
+
+```python
+import dspy
+from utta.dspy_integration import AssessmentSignature, FeedbackSignature
+
+# Define signatures for a complete teaching pipeline
+class GenerateQuestion(EducationalSignature):
+    """Generate a question to test understanding of a concept."""
+    concept = dspy.InputField()
+    difficulty = dspy.InputField(desc="easy, medium, or hard")
+    question = dspy.OutputField()
+    answer = dspy.OutputField()
+
+class ProvideFeedback(FeedbackSignature):
+    """Provide helpful feedback on a student's answer."""
+    question = dspy.InputField()
+    correct_answer = dspy.InputField()
+    student_answer = dspy.InputField()
+    feedback = dspy.OutputField()
+    
+# Create a complete pipeline
+class TeachingPipeline(dspy.Module):
+    def __init__(self):
+        super().__init__()
+        self.question_generator = dspy.Predict(GenerateQuestion)
+        self.feedback_provider = dspy.Predict(ProvideFeedback)
+    
+    def forward(self, concept, difficulty, student_answer):
+        # Generate a question and correct answer
+        qa_result = self.question_generator(concept=concept, difficulty=difficulty)
+        
+        # Provide feedback on the student's answer
+        feedback_result = self.feedback_provider(
+            question=qa_result.question,
+            correct_answer=qa_result.answer,
+            student_answer=student_answer
+        )
+        
+        return dspy.Prediction(
+            question=qa_result.question,
+            correct_answer=qa_result.answer,
+            feedback=feedback_result.feedback
+        )
+
+# Use the pipeline
+teaching_pipeline = TeachingPipeline()
+result = teaching_pipeline(
+    concept="Photosynthesis",
+    difficulty="medium",
+    student_answer="It's the process where plants make energy from sunlight."
 )
 
-# Integrate with UTTA
-assistant.integrate_dspy_module(optimized_explainer)
-```
-
-### Creating Multi-step Educational Workflows
-
-For complex educational tasks, you can create multi-step workflows:
-
-```python
-class EducationalWorkflow(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        # Assess the student's knowledge level
-        self.assess = dspy.Predict("question -> knowledge_level")
-        # Generate an appropriate explanation
-        self.explain = dspy.ChainOfThought("question, knowledge_level -> explanation")
-        # Create follow-up questions
-        self.follow_up = dspy.Predict("question, explanation -> follow_up_questions")
-    
-    def forward(self, question):
-        # Assess knowledge level
-        knowledge = self.assess(question=question).knowledge_level
-        # Generate explanation
-        explanation = self.explain(question=question, knowledge_level=knowledge).explanation
-        # Create follow-up questions
-        follow_ups = self.follow_up(question=question, explanation=explanation).follow_up_questions
-        
-        return {
-            "knowledge_level": knowledge,
-            "explanation": explanation,
-            "follow_up_questions": follow_ups
-        }
-```
-
-## Evaluation and Iteration
-
-To evaluate and improve your DSPy modules:
-
-```python
-# Create evaluation data
-eval_data = [
-    dspy.Example(question="How do vaccines work?"),
-    # Add more evaluation examples...
-]
-
-# Define evaluation metrics
-metrics = [
-    dspy.metrics.Accuracy(),
-    dspy.metrics.InformationRecall()
-]
-
-# Run evaluation
-results = dspy.evaluate(optimized_explainer, eval_data, metrics)
-print(results)
-```
-
-## Integration with UTTA's Evaluation System
-
-```python
-from utta.evaluation import Evaluator
-
-# Create an evaluator
-evaluator = Evaluator()
-
-# Add your DSPy-optimized assistant
-evaluator.add_model(assistant, name="DSPy-Optimized")
-
-# Add a baseline model for comparison
-baseline = TeachingAssistant(model="openai/gpt-3.5-turbo")
-evaluator.add_model(baseline, name="Baseline")
-
-# Run evaluation
-results = evaluator.evaluate(task="explanation", dataset="education_examples.jsonl")
-print(results)
+print(f"Question: {result.question}")
+print(f"Correct Answer: {result.correct_answer}")
+print(f"Feedback: {result.feedback}")
 ```
 
 ## Best Practices
 
-1. **Start Small**: Begin with simple modules before building complex workflows
-2. **Use Real Examples**: Collect real educational exchanges for training data
-3. **Iterate**: Continuously evaluate and refine your DSPy modules
-4. **Combine Approaches**: Mix DSPy optimization with other techniques like fine-tuning
-5. **Focus on Educational Goals**: Tailor your modules to specific learning objectives
+1. **Use domain-specific examples**: The quality of your optimization depends on the quality of examples
+2. **Educational levels matter**: Be explicit about educational levels in your signatures
+3. **Chain modules thoughtfully**: Break complex educational tasks into logical steps
+4. **Evaluate regularly**: Test your optimized prompts with real educational use cases
 
-## Common Issues and Solutions
+## Further Resources
 
-* **Overfitting**: If your module works well on training data but not new queries, add more diverse examples
-* **Inconsistent Output Format**: Use structured prediction modules like `dspy.TypedPredictor`
-* **Poor Performance**: Try different teleprompters or increase the number of optimization trials
+- [DSPy GitHub Repository](https://github.com/stanfordnlp/dspy)
+- [DSPy Documentation](https://dspy-docs.vercel.app/)
+- [UTTA DSPy Integration Reference](link-to-utta-dspy-docs)
 
-## Advanced Topics
-
-* [DSPy Compiler Options](https://github.com/stanfordnlp/dspy#advanced-compiler-options)
-* [Custom Metrics Development](https://github.com/stanfordnlp/dspy#metrics)
-* [Integration with Other LLM Frameworks](https://github.com/stanfordnlp/dspy#integrations)
-
-## Resources
-
-* [Official DSPy Documentation](https://github.com/stanfordnlp/dspy)
-* [Stanford AI Lab Research](https://ai.stanford.edu/research/)
-* [UTTA Documentation](Home) 
+For more information on how to use UTTA with various frameworks, check out our other tutorials:
+- [OpenAI Tutorial](OpenAI-Tutorial)
+- [HuggingFace Tutorial](HuggingFace-Tutorial) 
