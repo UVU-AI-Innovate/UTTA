@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Data
+data/vectors/
+*.index
+*.json
+
+# Logs
+*.log
+
+# Virtual Environment
+env/
+.env
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Alembic
+alembic/versions/*.py
+!alembic/versions/.gitkeep
+
+# Project specific
+chatbot.db
+chatbot_test.db
+
+# Node.js
+node_modules/
+.env
+dist/ knowledge_base/vector_db.sqlite
+knowledge_base_backup/
+
+# Large files - explicitly ignore
+knowledge_base/vector_db.sqlite
+
+# Model cache
+model_cache/models--*/blobs/*
+
+# Model files
+models/*.gguf
+*.gguf
+*.bin
+*.ggml
+*.pt

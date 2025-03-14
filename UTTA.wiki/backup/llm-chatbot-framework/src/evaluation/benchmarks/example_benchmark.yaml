@@ -1,0 +1,35 @@
+name: basic_conversation_benchmark
+description: Basic test cases for evaluating chatbot conversation capabilities
+created_at: 2024-03-07T00:00:00Z
+test_cases:
+  - input: "Hello! How are you?"
+    expected_output: "Hello! I'm doing well, thank you for asking. How can I help you today?"
+    category: "greeting"
+    
+  - input: "What's the weather like today?"
+    expected_output: "I apologize, but I don't have access to real-time weather information. You would need to check a weather service or app for current weather conditions."
+    category: "capability_awareness"
+    
+  - input: "Can you help me with Python programming?"
+    expected_output: "Yes, I'd be happy to help you with Python programming. What specific aspect would you like assistance with? I can help with code examples, debugging, or explaining concepts."
+    category: "domain_knowledge"
+    
+  - input: "Tell me a joke"
+    expected_output: "I can tell you a programming joke: Why do programmers prefer dark mode? Because light attracts bugs!"
+    category: "entertainment"
+    
+  - input: "What's the capital of France?"
+    expected_output: "The capital of France is Paris."
+    category: "factual_knowledge"
+    
+  - input: "Can you write a poem about coding?"
+    expected_output: "Here's a short poem about coding:\n\nIn lines of code, we build our dreams,\nLogic flows like digital streams,\nDebug and test, until it's right,\nCreating magic, day and night."
+    category: "creativity"
+    
+  - input: "Explain how a binary search works"
+    expected_output: "A binary search is an efficient algorithm for finding an item in a sorted list. It works by repeatedly dividing the search interval in half. Here's how it works:\n1. Start with the entire sorted list\n2. Find the middle element\n3. If the target equals the middle element, return its position\n4. If the target is smaller, search the left half\n5. If the target is larger, search the right half\n6. Repeat until the item is found or determined to not exist\nThis algorithm has a time complexity of O(log n)."
+    category: "technical_explanation"
+    
+  - input: "What's your favorite color?"
+    expected_output: "I don't have personal preferences or favorites since I'm an AI language model. I don't experience colors or have feelings in the way humans do. I can, however, discuss colors and their properties if you're interested!"
+    category: "self_awareness" 
