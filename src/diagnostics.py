@@ -36,6 +36,7 @@ class SystemDiagnostics:
         self.fixes_available = {
             "openai_key": self._fix_openai_key,
             "dspy_install": self._fix_dspy_install,
+            "openai_install": self._fix_openai_install,
             "spacy_model": self._fix_spacy_model,
             "torch_config": self._fix_torch_config
         }
@@ -86,7 +87,8 @@ class SystemDiagnostics:
             "dspy-ai": "2.0.4",
             "torch": "2.0.0",
             "spacy": "3.7.0",
-            "sentence-transformers": "2.2.2"
+            "sentence-transformers": "2.2.2",
+            "openai": "0.28.0"  # Add specific openai version that works with DSPy 2.0.4
         }
         
         missing = []
@@ -119,6 +121,23 @@ class SystemDiagnostics:
             status=True,
             message="All dependencies installed and up to date"
         )
+    
+    def check_openai_compatibility(self) -> DiagnosticResult:
+        """Check if OpenAI package is compatible with DSPy."""
+        try:
+            # Try to import the specific openai.error module needed by DSPy
+            import openai.error
+            return DiagnosticResult(
+                name="openai_compatibility",
+                status=True,
+                message="OpenAI package is compatible with DSPy"
+            )
+        except ImportError:
+            return DiagnosticResult(
+                name="openai_compatibility",
+                status=False,
+                message="OpenAI package version is incompatible with DSPy. Need version with 'openai.error' module."
+            )
 
     def check_spacy_model(self) -> DiagnosticResult:
         """Check spaCy model installation."""
@@ -251,6 +270,17 @@ class SystemDiagnostics:
         except Exception as e:
             logger.error(f"Failed to install DSPy: {e}")
         return False
+    
+    def _fix_openai_install(self) -> bool:
+        """Fix OpenAI installation to be compatible with DSPy."""
+        try:
+            import subprocess
+            # Install the specific version of openai that works with DSPy 2.0.4
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-U", "openai==0.28.0"])
+            return True
+        except Exception as e:
+            logger.error(f"Failed to install compatible OpenAI version: {e}")
+        return False
 
     def _fix_spacy_model(self) -> bool:
         """Fix spaCy model installation."""
@@ -294,13 +324,30 @@ class SystemDiagnostics:
                 env_result.fix_applied = True
                 env_result.fix_message = "Added OpenAI API key to environment"
         
+        # Run OpenAI compatibility check
+        openai_compat_result = self.check_openai_compatibility()
+        self.results.append(openai_compat_result)
+        if not openai_compat_result.status and auto_fix:
+            if self._fix_openai_install():
+                openai_compat_result.fix_applied = True
+                openai_compat_result.fix_message = "Installed compatible OpenAI version (0.28.0)"
+        
         # Run dependency checks
         dep_result = self.check_dependencies()
         self.results.append(dep_result)
         if not dep_result.status and auto_fix:
+            fixes_applied = False
+            
             if "dspy-ai" in dep_result.message and self._fix_dspy_install():
+                fixes_applied = True
+                dep_result.fix_message += "Installed/updated DSPy package. "
+                
+            if "openai" in dep_result.message and self._fix_openai_install():
+                fixes_applied = True
+                dep_result.fix_message += "Installed compatible OpenAI package. "
+                
+            if fixes_applied:
                 dep_result.fix_applied = True
-                dep_result.fix_message = "Installed/updated DSPy package"
         
         # Run spaCy model check
         spacy_result = self.check_spacy_model()

@@ -4,11 +4,10 @@ import os
 import sys
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
 import threading
-import torch
-import asyncio
+import traceback
 
 # Configure logging
 logging.basicConfig(
@@ -23,68 +22,92 @@ sys.path.append(str(src_dir))
 
 try:
     import streamlit as st
-    from dotenv import load_dotenv
-    import dspy
-    import spacy
+    HAS_STREAMLIT = True
 except ImportError as e:
-    logger.error(f"Failed to import required packages: {e}")
-    sys.exit(1)
+    logger.error(f"Streamlit not available: {e}")
+    HAS_STREAMLIT = False
+    
+try:
+    from dotenv import load_dotenv
+    # Load environment variables
+    load_dotenv()
+except ImportError as e:
+    logger.error(f"python-dotenv not available: {e}")
 
-# Load environment variables
-load_dotenv()
+try:
+    import torch
+    HAS_TORCH = True
+except ImportError as e:
+    logger.error(f"PyTorch not available: {e}")
+    HAS_TORCH = False
 
-# Import local modules
+try:
+    import spacy
+    HAS_SPACY = True
+    # Initialize spaCy model at module level
+    try:
+        if not spacy.util.is_package("en_core_web_sm"):
+            spacy.cli.download("en_core_web_sm")
+        nlp = spacy.load("en_core_web_sm")
+        logger.info("Successfully loaded spaCy model")
+    except Exception as e:
+        logger.error(f"Failed to load spaCy model: {e}")
+        nlp = None
+except ImportError as e:
+    logger.error(f"spaCy not available: {e}")
+    HAS_SPACY = False
+    nlp = None
+
+# Import local modules with error handling
 try:
     from llm.dspy.handler import EnhancedDSPyLLMInterface
-    from knowledge_base.document_indexer import DocumentIndexer
-    from metrics.automated_metrics import AutomatedMetricsEvaluator
+    HAS_LLM = True
 except ImportError as e:
-    logger.error(f"Failed to import local modules: {e}")
-    sys.exit(1)
-
-# Initialize spaCy model at module level
+    logger.error(f"DSPy handler not available: {e}")
+    HAS_LLM = False
+    
 try:
-    if not spacy.util.is_package("en_core_web_sm"):
-        spacy.cli.download("en_core_web_sm")
-    nlp = spacy.load("en_core_web_sm")
-    logger.info("Successfully loaded spaCy model")
-except Exception as e:
-    logger.error(f"Failed to load spaCy model: {e}")
-    nlp = None
+    from knowledge_base.document_indexer import DocumentIndexer
+    HAS_INDEXER = True
+except ImportError as e:
+    logger.error(f"Document indexer not available: {e}")
+    HAS_INDEXER = False
+    
+try:
+    from metrics.automated_metrics import AutomatedMetricsEvaluator
+    HAS_METRICS = True
+except ImportError as e:
+    logger.error(f"Metrics evaluator not available: {e}")
+    HAS_METRICS = False
 
 # Initialize components in the main thread
 _thread_local = threading.local()
 
 def init_torch():
     """Initialize PyTorch settings."""
+    if not HAS_TORCH:
+        logger.warning("PyTorch not available, skipping initialization")
+        return False
+        
     try:
         # Set PyTorch settings
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        torch.set_default_device(device)
-        torch.set_default_dtype(torch.float32)
+        logger.info(f"Use pytorch device_name: {device}")
         torch.set_num_threads(1)  # Prevent threading issues
-        logger.info(f"PyTorch initialized with device: {device}")
         return True
     except Exception as e:
         logger.error(f"Failed to initialize PyTorch: {e}")
         return False
 
-def setup_async_event_loop():
-    """Set up the asyncio event loop for the current thread."""
-    try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return True
-    except Exception as e:
-        logger.error(f"Failed to set up event loop: {e}")
-        return False
-
 @st.cache_resource(show_spinner=False)
 def get_llm():
     """Get or initialize LLM interface."""
+    if not HAS_LLM:
+        logger.warning("LLM interface not available")
+        return None
+        
     try:
         init_torch()
-        setup_async_event_loop()
         llm = EnhancedDSPyLLMInterface()
         logger.info("Initialized DSPy LLM interface")
         return llm
@@ -95,6 +118,10 @@ def get_llm():
 @st.cache_resource(show_spinner=False)
 def get_indexer():
     """Get or initialize document indexer."""
+    if not HAS_INDEXER:
+        logger.warning("Document indexer not available")
+        return None
+        
     try:
         init_torch()
         indexer = DocumentIndexer()
@@ -107,6 +134,10 @@ def get_indexer():
 @st.cache_resource(show_spinner=False)
 def get_evaluator():
     """Get or initialize metrics evaluator."""
+    if not HAS_METRICS:
+        logger.warning("Metrics evaluator not available")
+        return None
+        
     try:
         evaluator = AutomatedMetricsEvaluator()
         logger.info("Initialized AutomatedMetricsEvaluator")
@@ -123,63 +154,70 @@ def initialize_components():
         llm = get_llm()
         indexer = get_indexer()
         evaluator = get_evaluator()
-        return all([llm, indexer, evaluator])
+        
+        # We can continue even if some components aren't available
+        logger.info(f"Components initialized: LLM: {llm is not None}, Indexer: {indexer is not None}, Evaluator: {evaluator is not None}")
+        return True
     except Exception as e:
         logger.error(f"Failed to initialize components: {e}")
         return False
 
 # Page configuration
-st.set_page_config(
-    page_title="Teaching Assistant",
-    page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+if HAS_STREAMLIT:
+    st.set_page_config(
+        page_title="Teaching Assistant",
+        page_icon="📚",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
 
-# Custom CSS
-st.markdown("""
-<style>
-    .stMetric {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .feedback-box {
-        background-color: #e6f3ff;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    .chat-message {
-        padding: 15px;
-        border-radius: 10px;
-        margin: 5px 0;
-    }
-    .user-message {
-        background-color: #e6f3ff;
-        margin-left: 20%;
-    }
-    .assistant-message {
-        background-color: #f0f2f6;
-        margin-right: 20%;
-    }
-    .metrics-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    .error-message {
-        color: #ff4b4b;
-        padding: 10px;
-        border-radius: 5px;
-        background-color: #ffe5e5;
-        margin: 10px 0;
-    }
-</style>
-""", unsafe_allow_html=True)
+    # Custom CSS
+    st.markdown("""
+    <style>
+        .stMetric {
+            background-color: #f0f2f6;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .feedback-box {
+            background-color: #e6f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .chat-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .user-message {
+            background-color: #e6f3ff;
+            margin-left: 20%;
+        }
+        .assistant-message {
+            background-color: #f0f2f6;
+            margin-right: 20%;
+        }
+        .metrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .error-message {
+            color: #ff4b4b;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffe5e5;
+            margin: 10px 0;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 def initialize_session_state():
     """Initialize session state variables."""
+    if not HAS_STREAMLIT:
+        return False
+        
     if 'initialized' not in st.session_state:
         # Initialize chat history and settings
         st.session_state.messages = []
@@ -189,6 +227,7 @@ def initialize_session_state():
             "learning_style": "Visual"
         }
         st.session_state.initialized = True
+        st.session_state.error = None
         logger.info("Session state initialized successfully")
     return True
 
@@ -204,12 +243,13 @@ def save_uploaded_file(uploaded_file) -> Optional[str]:
         return str(file_path)
     except Exception as e:
         logger.error(f"Failed to save uploaded file: {e}")
-        st.error("Failed to save uploaded file")
+        if HAS_STREAMLIT:
+            st.error("Failed to save uploaded file")
         return None
 
 def display_metrics(metrics):
     """Display evaluation metrics in a organized layout."""
-    if not metrics:
+    if not HAS_STREAMLIT or not metrics:
         return
         
     st.markdown("#### Response Evaluation")
@@ -231,11 +271,13 @@ def display_metrics(metrics):
     
     if hasattr(metrics, 'feedback') and metrics.feedback:
         st.markdown("##### Detailed Feedback")
-        for item in metrics.feedback:
-            st.markdown(f"- {item}")
+        st.markdown("\n".join([f"- {item}" for item in metrics.feedback]))
 
 def display_chat_history():
     """Display chat history with metrics."""
+    if not HAS_STREAMLIT:
+        return
+        
     for msg in st.session_state.messages:
         role = msg["role"]
         content = msg["content"]
@@ -249,165 +291,202 @@ def display_chat_history():
                        unsafe_allow_html=True)
             
             # Display metrics if available
-            if "metrics" in msg:
-                with st.expander("View Response Evaluation", expanded=False):
+            if "metrics" in msg and msg["metrics"]:
+                with st.expander("View Response Metrics", expanded=False):
                     display_metrics(msg["metrics"])
 
-def sidebar_settings():
-    """Configure settings in the sidebar."""
-    st.sidebar.title("Teaching Assistant Settings")
-    
-    # Student Profile
-    st.sidebar.header("Student Profile")
-    grade_level = st.sidebar.slider("Grade Level", 1, 12, 
-                                  st.session_state.settings["grade_level"])
-    
-    subject = st.sidebar.selectbox("Subject",
-        ["General", "Mathematics", "Science", "Language Arts", "Social Studies"],
-        index=0 if st.session_state.settings["subject"] == "General" else None
-    )
-    
-    learning_style = st.sidebar.selectbox("Learning Style",
-        ["Visual", "Auditory", "Reading/Writing", "Kinesthetic"],
-        index=0 if st.session_state.settings["learning_style"] == "Visual" else None
-    )
-    
-    # Update settings
-    st.session_state.settings.update({
-        "grade_level": grade_level,
-        "subject": subject,
-        "learning_style": learning_style
-    })
-    
-    # Document Upload
-    st.sidebar.header("Knowledge Base")
-    uploaded_file = st.sidebar.file_uploader("Upload Teaching Material",
-                                           type=["txt", "md", "pdf"])
-    
-    if uploaded_file:
-        if st.sidebar.button("Add to Knowledge Base"):
-            file_path = save_uploaded_file(uploaded_file)
-            if file_path:
-                try:
-                    with open(file_path, "r") as f:
-                        content = f.read()
-                    
-                    indexer = get_indexer()
-                    if indexer:
-                        doc_id = indexer.add_document(
-                            content,
-                            metadata={
-                                "subject": subject,
-                                "grade_level": grade_level,
-                                "type": uploaded_file.type
-                            }
-                        )
-                        st.sidebar.success("Document added successfully!")
-                    else:
-                        st.sidebar.error("Document indexer not available")
-                except Exception as e:
-                    logger.error(f"Failed to process document: {e}")
-                    st.sidebar.error("Failed to process document")
+def handle_error(error_msg, exception=None):
+    """Handle errors gracefully."""
+    if exception:
+        logger.error(f"{error_msg}: {str(exception)}")
+        logger.error(traceback.format_exc())
+    else:
+        logger.error(error_msg)
+        
+    if HAS_STREAMLIT:
+        st.session_state.error = error_msg
+        st.error(error_msg)
+
+def process_user_query(query: str, context: Optional[List[str]] = None) -> Dict[str, Any]:
+    """Process user query and generate response with metrics."""
+    if not query:
+        return {"success": False, "message": "Empty query"}
+        
+    try:
+        # Get components
+        llm = get_llm()
+        evaluator = get_evaluator()
+        
+        if not llm:
+            return {"success": False, "message": "LLM interface not available"}
+        
+        # Extract settings
+        settings = st.session_state.settings if HAS_STREAMLIT else {"grade_level": 5}
+        grade_level = int(settings.get("grade_level", 5))
+        
+        # Generate response
+        response = llm.generate_response(
+            prompt=query,
+            context=context,
+            metadata=settings
+        )
+        
+        # Evaluate response if metrics available
+        metrics = None
+        if evaluator:
+            metrics = evaluator.evaluate_response(
+                response=response,
+                prompt=query,
+                grade_level=grade_level,
+                context=context
+            )
+        
+        return {
+            "success": True,
+            "response": response,
+            "metrics": metrics
+        }
+        
+    except Exception as e:
+        error_msg = f"Error processing query: {str(e)}"
+        handle_error(error_msg, e)
+        return {"success": False, "message": error_msg}
 
 def main():
-    """Main application."""
-    if not initialize_session_state():
+    """Main function for the Streamlit app."""
+    if not HAS_STREAMLIT:
+        logger.error("Streamlit not available, cannot run web interface")
         return
     
-    # Configure sidebar
-    sidebar_settings()
+    # Initialize
+    initialize_session_state()
+    initialize_components()
     
-    # Main content
-    st.title("📚 Teaching Assistant")
-    st.markdown("""
-    Welcome to the Teaching Assistant! I'm here to help you with your teaching needs.
-    Configure the settings in the sidebar and start chatting below.
-    """)
+    # Display title
+    st.title("💬 Teaching Assistant")
     
-    # Initialize components with caching
-    if not initialize_components():
-        st.error("Failed to initialize components. Please check the logs and try reloading the page.")
-        return
-    
-    # Get thread-local components
-    llm = get_llm()
-    indexer = get_indexer()
-    evaluator = get_evaluator()
-    
-    if not all([llm, indexer, evaluator]):
-        st.error("Some components are not available. Please check the logs and try reloading the page.")
-        if nlp is None:
-            st.error("SpaCy model is not available. Some features may be limited.")
-        return
-    
-    # Chat interface
-    chat_container = st.container()
-    
-    with chat_container:
-        display_chat_history()
+    # Sidebar for settings
+    with st.sidebar:
+        st.header("Teaching Context")
         
-        # Chat input
-        if prompt := st.chat_input("Ask a question or enter a topic..."):
-            # Add user message
-            st.session_state.messages.append({
-                "role": "user",
-                "content": prompt
-            })
-            
+        st.subheader("Student")
+        grade_level = st.slider("Grade Level", min_value=1, max_value=12, value=st.session_state.settings["grade_level"])
+        subject = st.selectbox(
+            "Subject", 
+            ["General", "Math", "Science", "History", "Language Arts", "Social Studies"],
+            index=0
+        )
+        learning_style = st.selectbox(
+            "Learning Style",
+            ["Visual", "Auditory", "Reading/Writing", "Kinesthetic", "Mixed"],
+            index=0
+        )
+        
+        # Update settings in session state
+        st.session_state.settings = {
+            "grade_level": grade_level,
+            "subject": subject,
+            "learning_style": learning_style
+        }
+        
+        # Document management
+        st.subheader("Knowledge Base")
+        uploaded_file = st.file_uploader("Add document", type=["txt", "pdf", "docx"])
+        if uploaded_file is not None:
+            if st.button("Add to Knowledge Base"):
+                # Save file and add to indexer
+                file_path = save_uploaded_file(uploaded_file)
+                if file_path:
+                    indexer = get_indexer()
+                    if indexer:
+                        try:
+                            with open(file_path, "r") as f:
+                                content = f.read()
+                            
+                            # Add to index
+                            doc_id = indexer.add_document(
+                                content=content,
+                                metadata={
+                                    "title": uploaded_file.name,
+                                    "subject": subject,
+                                    "grade_level": grade_level
+                                }
+                            )
+                            st.success(f"Document added with ID: {doc_id}")
+                        except Exception as e:
+                            handle_error(f"Failed to process document: {str(e)}", e)
+                    else:
+                        st.warning("Document indexer not available")
+        
+        # Status indicators
+        st.subheader("System Status")
+        llm_status = "✅ Available" if get_llm() else "❌ Unavailable"
+        indexer_status = "✅ Available" if get_indexer() else "❌ Unavailable"
+        metrics_status = "✅ Available" if get_evaluator() else "❌ Unavailable"
+        
+        st.text(f"LLM: {llm_status}")
+        st.text(f"Indexer: {indexer_status}")
+        st.text(f"Metrics: {metrics_status}")
+    
+    # Display chat history
+    display_chat_history()
+    
+    # Display error if any
+    if HAS_STREAMLIT and hasattr(st.session_state, 'error') and st.session_state.error:
+        st.error(st.session_state.error)
+    
+    # Chat input
+    if prompt := st.chat_input("Ask the teaching assistant..."):
+        # Add user message to chat
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # Clear any previous errors
+        st.session_state.error = None
+        
+        # Process query
+        indexer = get_indexer()
+        context = None
+        
+        # Search for relevant documents if indexer available
+        if indexer:
             try:
-                # Get context from knowledge base
-                context = []
-                try:
-                    results = indexer.search(
-                        prompt,
-                        filters={"subject": st.session_state.settings["subject"]}
-                    )
+                results = indexer.search(
+                    query=prompt, 
+                    filters={"subject": st.session_state.settings["subject"]}
+                )
+                if results:
                     context = [r["content"] for r in results]
-                except Exception as e:
-                    logger.warning(f"Failed to search knowledge base: {e}")
-                    st.warning("Could not search knowledge base. Proceeding without context.")
-                
-                # Generate response
-                with st.spinner("Generating response..."):
-                    try:
-                        response = llm.generate_response(
-                            prompt,
-                            context=context,
-                            metadata=st.session_state.settings
-                        )
-                    except Exception as e:
-                        logger.error(f"Failed to generate response: {e}")
-                        st.error("Failed to generate response. Please try again.")
-                        return
-                
-                # Evaluate response if evaluator is available
-                metrics = None
-                if evaluator:
-                    try:
-                        metrics = evaluator.evaluate_response(
-                            response,
-                            prompt,
-                            st.session_state.settings["grade_level"],
-                            context
-                        )
-                    except Exception as e:
-                        logger.warning(f"Failed to evaluate response: {e}")
-                        st.warning("Could not evaluate response. Proceeding without metrics.")
-                
-                # Add assistant message with metrics if available
-                message = {
-                    "role": "assistant",
-                    "content": response
-                }
-                if metrics:
-                    message["metrics"] = metrics
-                
-                st.session_state.messages.append(message)
-                st.rerun()
-                
             except Exception as e:
-                logger.error(f"Error in chat interaction: {e}")
-                st.error("An error occurred. Please try again.")
+                handle_error(f"Search error: {str(e)}", e)
+        
+        # Process the query
+        result = process_user_query(prompt, context)
+        
+        if result["success"]:
+            # Add assistant message to chat
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": result["response"],
+                "metrics": result["metrics"]
+            })
+        else:
+            # Handle error
+            error_msg = result.get("message", "Unknown error")
+            handle_error(error_msg)
+            
+            # Add fallback response
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": f"I'm sorry, I encountered an error: {error_msg}",
+                "metrics": None
+            })
+        
+        # Rerun to update the UI
+        st.rerun()
 
 if __name__ == "__main__":
-    main() 
+    if HAS_STREAMLIT:
+        main()
+    else:
+        print("ERROR: Streamlit not available, cannot run web interface")
+        sys.exit(1) 
