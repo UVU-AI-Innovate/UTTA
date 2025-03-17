@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTTA - Utah Teacher Training Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+         :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #ff6d00;
+            --dark-color: #333;
+            --light-color: #f4f4f4;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .badges {
+            margin: 1rem 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 15px;
+            margin: 0 0.3rem;
+            font-size: 0.8rem;
+            color: white;
+            background-color: var(--dark-color);
+        }
+        
+        .badge-blue {
+            background-color: var(--primary-color);
+        }
+        
+        .badge-yellow {
+            background-color: #ffc107;
+            color: #333;
+        }
+        
+        .badge-orange {
+            background-color: var(--secondary-color);
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .main-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul {
+            margin: 1rem 0 1rem 2rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        pre {
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .feature-box {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .approach-box {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #f0f7ff;
+        }
+        
+        .approach-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary-color);
+            transition: background-color 0.3s;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn:hover {
+            background-color: #1565c0;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e65100;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-robot"></i> <i class="fas fa-chalkboard-teacher"></i></div>
+        <h1>UTTA</h1>
+        <p class="tagline">Utah Teacher Training Assistant</p>
+        <p>A sophisticated chatbot framework designed for teacher training, leveraging advanced LLM capabilities with DSPy integration, knowledge base management, and automated evaluation metrics.</p>
+        <div class="badges">
+            <span class="badge badge-yellow">MIT License</span>
+            <span class="badge badge-blue">Version 0.1.0</span>
+            <span class="badge badge-orange">Alpha</span>
+            <span class="badge badge-blue">Python 3.10</span>
+        </div>
+        <div class="buttons" style="margin-top: 1rem;">
+            <a href="https://github.com/UVU-AI-Innovate/UTTA" class="btn"><i class="fab fa-github"></i> View on GitHub</a>
+            <a href="https://github.com/UVU-AI-Innovate/UTTA#installation" class="btn btn-secondary"><i class="fas fa-download"></i> Installation Guide</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <section class="section">
+                <h2>Project Overview</h2>
+                <p>UTTA is a specialized chatbot framework designed to assist in teacher training by providing interactive dialogues that model effective teaching strategies. Leveraging the power of Large Language Models (LLMs), UTTA aims to help educators
+                    develop their pedagogical skills through simulated student-teacher interactions.</p>
+
+                <div class="feature-box">
+                    <p class="feature-title">Key Features:</p>
+                    <ul>
+                        <li><strong>DSPy Integration</strong> - Optimized prompting for pedagogical responses</li>
+                        <li><strong>Knowledge Base Management</strong> - Grounding responses in educational content</li>
+                        <li><strong>Automated Evaluation Metrics</strong> - Measuring teaching effectiveness</li>
+                        <li><strong>Interactive Web Interface</strong> - User-friendly dialogue environment</li>
+                        <li><strong>Context-Aware Responses</strong> - Adaptive to student needs and grade levels</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Fine-Tuning Approaches</h2>
+                <p>UTTA demonstrates three different approaches to improving LLM performance for teacher-student dialogue interactions:</p>
+
+                <div class="approach-box">
+                    <p class="approach-title">DSPy: Prompt Optimization</p>
+                    <ul>
+                        <li>Optimizes prompts instead of changing model weights</li>
+                        <li>Works with smaller datasets (10-50 dialogues)</li>
+                        <li>Immediate results with simpler setup</li>
+                        <li>Uses Chain-of-Thought prompting for pedagogical reasoning</li>
+                    </ul>
+                </div>
+
+                <div class="approach-box">
+                    <p class="approach-title">OpenAI: Cloud Fine-Tuning</p>
+                    <ul>
+                        <li>Updates actual model weights through cloud service</li>
+                        <li>Requires medium-sized datasets (50-100+ dialogues)</li>
+                        <li>Balance of control and convenience</li>
+                        <li>Handles multi-turn conversations effectively</li>
+                    </ul>
+                </div>
+
+                <div class="approach-box">
+                    <p class="approach-title">HuggingFace: Local Fine-Tuning with LoRA</p>
+                    <ul>
+                        <li>Full local control over model and training process</li>
+                        <li>Works best with larger datasets (100-1000+ dialogues)</li>
+                        <li>Data privacy - all information stays on your machine</li>
+                        <li>Uses LoRA for efficient adaptation of model weights</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Getting Started</h2>
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Python 3.10</li>
+                    <li>Conda package manager</li>
+                    <li>CUDA-capable GPU (for full functionality)</li>
+                    <li>OpenAI API key</li>
+                </ul>
+
+                <h3>Quick Installation</h3>
+                <pre><code># Clone the repository
+git clone https://github.com/UVU-AI-Innovate/UTTA.git
+cd UTTA
+
+# Make the script executable
+chmod +x run_webapp.sh
+
+# Run the setup script
+./run_webapp.sh</code></pre>
+
+                <p>Visit the <a href="https://github.com/UVU-AI-Innovate/UTTA#readme">GitHub repository</a> for complete installation instructions and documentation.</p>
+            </section>
+        </main>
+
+        <aside class="sidebar">
+            <section class="section">
+                <h2>Documentation</h2>
+                <ul>
+                    <li><a href="https://github.com/UVU-AI-Innovate/UTTA/blob/main/examples/README.md">Example Usage</a></li>
+                    <li><a href="https://github.com/UVU-AI-Innovate/UTTA/blob/main/src/fine_tuning/README.md">Fine-Tuning Guide</a></li>
+                    <li><a href="https://github.com/UVU-AI-Innovate/UTTA/blob/main/src/evaluation/README.md">Evaluation Metrics</a></li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Evaluation Framework</h2>
+                <p>UTTA includes comprehensive evaluation across 4 key dimensions:</p>
+                <ul>
+                    <li><strong>Pedagogical Techniques</strong> - Use of evidence-based teaching strategies</li>
+                    <li><strong>Follow-up Questions</strong> - Prompts to check student understanding</li>
+                    <li><strong>Response Quality</strong> - Length, complexity, and specificity metrics</li>
+                    <li><strong>Adaptability</strong> - Adjustment to student's prior statements</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Implementation Details</h2>
+                <p>The project is structured into several key components:</p>
+                <ul>
+                    <li><strong>LLM Interfaces</strong> - Connections to various language models</li>
+                    <li><strong>Knowledge Base</strong> - Educational content management</li>
+                    <li><strong>Fine-Tuning</strong> - Model optimization for teaching</li>
+                    <li><strong>Evaluation</strong> - Metrics for assessing responses</li>
+                    <li><strong>Web Interface</strong> - Interactive dialogue environment</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+
+    <footer>
+        <p>UTTA - Utah Teacher Training Assistant | <a href="https://github.com/UVU-AI-Innovate/UTTA">GitHub Repository</a></p>
+        <p>Licensed under the MIT License</p>
+    </footer>
+</body>
+
+</html>
