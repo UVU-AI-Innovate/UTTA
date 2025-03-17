@@ -1,53 +1,18 @@
 # 🧠 LLM Fine-Tuning Examples
 
-This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering. These examples are provided under the terms of the LICENSE file included in the repository.
+This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering. 
 
 <div align="center">
   
   | 🔄 **DSPy** | ☁️ **OpenAI** | 🔧 **HuggingFace** |
   |------------|--------------|-------------------|
-  | Prompt optimization | Cloud fine-tuning | Local fine-tuning with LoRA |
+  | Prompt optimization | Cloud fine-tuning | Local fine-tuning |
   | Small datasets | Medium datasets | Large datasets |
   | Immediate results | Hours to train | Hours to train |
   | No model changes | Cloud model updates | Local model updates |
   | API costs only | API + training costs | One-time compute cost |
 
 </div>
-
-## 📋 Table of Contents
-
-- [🧠 LLM Fine-Tuning Examples](#-llm-fine-tuning-examples)
-  - [📋 Table of Contents](#-table-of-contents)
-  - [📚 Introduction](#-introduction)
-    - [Project Overview](#project-overview)
-    - [Key Comparison](#key-comparison)
-    - [Which Approach Is Right For You?](#which-approach-is-right-for-you)
-  - [🔍 Three Approaches Explained](#-three-approaches-explained)
-    - [DSPy: Prompt Optimization](#dspy-prompt-optimization)
-    - [OpenAI: Cloud Fine-Tuning](#openai-cloud-fine-tuning)
-    - [HuggingFace: Local Fine-Tuning with LoRA](#huggingface-local-fine-tuning-with-lora)
-  - [💡 Technical Deep Dive: LoRA](#-technical-deep-dive-lora)
-    - [How LoRA Works](#how-lora-works)
-    - [Benefits of LoRA](#benefits-of-lora)
-    - [Visual Explanation](#visual-explanation)
-  - [💰 Cost Analysis](#-cost-analysis)
-    - [Side-by-Side Comparison](#side-by-side-comparison)
-    - [Budget Considerations](#budget-considerations)
-  - [🤖 Alternative LLM Options](#-alternative-llm-options)
-    - [Mixtral 8x7B](#mixtral-8x7b)
-    - [Llama 2](#llama-2)
-    - [Claude Instant](#claude-instant)
-    - [LLM Comparison](#llm-comparison)
-  - [🛠️ Implementation Details](#️-implementation-details)
-    - [Getting Started](#getting-started)
-    - [Example Files](#example-files)
-    - [Datasets](#datasets)
-    - [Implementation Structure](#implementation-structure)
-  - [🧭 Decision Guide](#-decision-guide)
-    - [By Dataset Size](#by-dataset-size)
-    - [By Time Constraints](#by-time-constraints)
-    - [By Budget](#by-budget)
-    - [By Privacy Requirements](#by-privacy-requirements)
 
 ---
 
