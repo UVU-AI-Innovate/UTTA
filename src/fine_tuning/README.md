@@ -51,6 +51,29 @@ The system uses DSPy's prompt optimization approach rather than traditional weig
    - Evaluate each candidate prompt on pedagogical metrics
    - Save the optimized model for inference
 
+## Cost Considerations
+
+The current DSPy implementation uses paid OpenAI API calls:
+
+1. **API Costs**: Each optimization round requires multiple API calls to OpenAI's GPT-3.5 Turbo
+   - The default configuration makes calls through 4 parallel threads
+   - Each training example processed incurs API charges
+   - Running the full 3 optimization rounds multiplies these costs
+
+2. **Cost Factors**:
+   - Number of training examples in your dataset
+   - Length of context and responses in tokens
+   - Number of optimization rounds (currently set to 3)
+   - OpenAI's pricing (approximately $0.002 per 1K tokens for GPT-3.5 Turbo)
+
+3. **Optimization Tips**:
+   - Start with a small, high-quality training set (5-10 examples)
+   - Consider reducing max_rounds for initial experiments
+   - Monitor token usage during optimization
+   - Save and reuse successful optimized prompts
+
+**Note**: Each time you run the training process, you will incur OpenAI API charges based on the volume of tokens processed during optimization.
+
 ## Key Features
 
 - **DSPy Integration**: Uses DSPy's optimization frameworks to fine-tune models
