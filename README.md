@@ -44,7 +44,7 @@ The script will:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/majidmemari/UTTA.git
+git clone https://github.com/UVU-AI-Innovate/UTTA
 cd UTTA
 ```
 
