@@ -1,8 +1,8 @@
-# LLM Fine-Tuning Methods Assignment
+# LLM Fine-Tuning Methods Assignment: Teacher-Student Interaction Chatbot
 
 ## Introduction
 
-In this assignment, you will explore three different approaches to improving LLM performance on a specific task: educational question answering. You'll work with the provided examples to gain hands-on experience with prompt optimization, cloud-based fine-tuning, and local fine-tuning with parameter-efficient techniques.
+In this assignment, you will explore three different approaches to improving LLM performance on a specific task: creating a realistic teacher-student interaction chatbot. You'll work with the provided examples to gain hands-on experience with prompt optimization, cloud-based fine-tuning, and local fine-tuning with parameter-efficient techniques to create a chatbot that can simulate natural educational dialogues rather than just answering questions.
 
 All files needed for this assignment are available at: https://github.com/UVU-AI-Innovate/UTTA/tree/main/examples
 
@@ -10,6 +10,7 @@ All files needed for this assignment are available at: https://github.com/UVU-AI
 
 - Understand the key differences between prompt optimization, cloud fine-tuning, and local fine-tuning
 - Gain practical experience with DSPy, OpenAI fine-tuning, and HuggingFace LoRA
+- Create realistic teacher-student dialogue interactions that go beyond simple Q&A
 - Analyze tradeoffs in data requirements, computational resources, and model performance
 - Develop skills in evaluating which approach is most suitable for different scenarios
 
@@ -25,9 +26,9 @@ All files needed for this assignment are available at: https://github.com/UVU-AI
 
 This assignment is structured in three parts of increasing complexity:
 
-1. **Part 1: DSPy Prompt Optimization** - Modify and extend the DSPy example
-2. **Part 2: OpenAI Fine-Tuning** - Prepare data and set up an OpenAI fine-tuning job
-3. **Part 3: HuggingFace LoRA Fine-Tuning** - Run a parameter-efficient fine-tuning task locally
+1. **Part 1: DSPy Prompt Optimization** - Implement multi-turn teacher-student interactions using DSPy
+2. **Part 2: OpenAI Fine-Tuning** - Create and train on realistic teaching dialogues
+3. **Part 3: HuggingFace LoRA Fine-Tuning** - Build a local model for educational conversation
 
 ## Detailed Tasks
 
@@ -35,100 +36,106 @@ This assignment is structured in three parts of increasing complexity:
 
 1. **Setup and Exploration**
    - Run the DSPy example and analyze the outputs
-   - Identify where in the code the chain-of-thought reasoning is implemented
+   - Modify the example to handle multi-turn conversations instead of single Q&A pairs
 
-2. **Dataset Extension**
-   - Create 5 additional educational QA pairs on a topic of your choice
-   - Add them to the dataset and test their performance
+2. **Dialogue Dataset Creation**
+   - Create 5 educational dialogue sequences that demonstrate effective teacher-student interactions
+   - Include examples of Socratic questioning, scaffolding, and misconception handling
+   - Format the dialogues appropriately for DSPy processing
 
 3. **DSPy Module Enhancement**
-   - Modify the `EducationalQAModel` to incorporate one of the following:
-     - Retrieval-augmented generation
-     - Few-shot learning with examples
-     - Structured reasoning steps
+   - Modify the `EducationalQAModel` to create `TeacherStudentDialogueModel` that:
+     - Maintains conversation context across multiple turns
+     - Applies appropriate teaching strategies based on student questions
+     - Provides follow-up questions to check understanding
 
 4. **Evaluation**
-   - Develop a more sophisticated evaluation metric than the current simple word matching
-   - Test both the original and your enhanced model on the same test set
-   - Record performance differences
+   - Develop metrics that evaluate the pedagogical quality of responses
+   - Test both the original QA model and your enhanced dialogue model
+   - Compare how each handles complex educational scenarios
 
-**Deliverable**: Modified `dspy_enhanced.py` script with your improvements and a short report on performance changes.
+**Deliverable**: Modified `dspy_teacher_dialogue.py` script with your improvements and a short report on the conversational capabilities.
 
 ### Part 2: OpenAI Fine-Tuning (4-5 hours)
 
-1. **Dataset Preparation**
-   - Create a specialized dataset of 15-20 QA pairs focused on a single domain (e.g., biology, history)
-   - Format this dataset appropriately for OpenAI fine-tuning
+1. **Dialogue Dataset Preparation**
+   - Create 15-20 teacher-student conversation sequences in a single domain
+   - Include various teaching techniques: clarification requests, scaffolding, worked examples
+   - Format this dataset appropriately for OpenAI fine-tuning (messages format)
 
 2. **Fine-Tuning Setup**
-   - Uncomment and modify the fine-tuning section of the provided example
-   - Add proper error handling and status monitoring
+   - Modify the OpenAI example to work with multi-turn conversations
+   - Implement proper handling of conversation context and history
    - (Optional with instructor approval) Run a small fine-tuning job with OpenAI
 
-3. **Simulation and Testing**
-   - If not actually running the fine-tuning job, create a simulation component that mimics expected improvements
-   - Design a test set of questions that evaluates domain knowledge in your chosen field
+3. **Conversation Testing**
+   - Design test scenarios that evaluate the model's ability to:
+     - Ask clarifying questions when student queries are vague
+     - Provide appropriate levels of assistance based on student understanding
+     - Handle misconceptions tactfully
+     - Follow up to ensure comprehension
 
 4. **Cost-Benefit Analysis**
-   - Calculate the approximate cost of fine-tuning with your dataset
-   - Estimate the cost per query for both fine-tuned and non-fine-tuned models
-   - Determine at what usage volume fine-tuning becomes cost-effective
+   - Calculate the approximate cost of fine-tuning with your dialogue dataset
+   - Estimate the cost per conversation for both fine-tuned and non-fine-tuned models
+   - Determine when fine-tuning becomes cost-effective for educational dialogue applications
 
-**Deliverable**: Your `openai_domain_finetune.py` script, dataset file, and a cost-benefit analysis document.
+**Deliverable**: Your `openai_teacher_dialogue.py` script, conversation dataset file, and a cost-benefit analysis document.
 
 ### Part 3: HuggingFace LoRA Fine-Tuning (6-8 hours)
 
 1. **Environment Setup**
-   - Properly configure a Python environment for transformer-based models
+   - Properly configure a Python environment for transformer-based conversational models
    - Verify GPU availability and configuration for LoRA training
 
-2. **Model Selection and Optimization**
-   - Choose an appropriate base model from HuggingFace (smaller than the example if needed)
-   - Experiment with different LoRA hyperparameters (rank, alpha, target modules)
-   - Implement training with proper checkpointing and early stopping
+2. **Model and Dataset Preparation**
+   - Choose an appropriate base model from HuggingFace with good dialogue capabilities
+   - Structure your teacher-student conversation dataset for instruction tuning
+   - Include examples of complete teaching sequences with multiple exchanges
 
 3. **Training and Evaluation**
-   - Train your LoRA adapter on the educational QA dataset
-   - Evaluate performance before and after adaptation
-   - Measure inference speed and memory usage
+   - Implement a dialogue-specific training loop that preserves conversation context
+   - Evaluate the model's ability to maintain coherent educational conversations
+   - Compare performance on various pedagogical tasks (explanation, questioning, etc.)
 
-4. **Adapter Management**
-   - Implement proper saving and loading of your LoRA adapter
-   - Create a simple inference script that loads only the necessary components
+4. **Interactive Demo**
+   - Create a simple interactive demo that allows testing the dialogue capabilities
+   - Implement conversation history management
+   - Add ability to switch between different teaching approaches (directive vs. exploratory)
 
-**Deliverable**: Your `huggingface_custom_lora.py` script, trained adapter files, and performance metrics.
+**Deliverable**: Your `huggingface_teacher_dialogue.py` script, trained adapter files, and an interactive demo.
 
 ## Comparative Analysis (Required for all students)
 
 After completing at least two parts of the assignment, write a 2-3 page analysis comparing the approaches. Address:
 
-1. Development time and effort required
-2. Data preparation differences
-3. Performance on identical test questions
-4. Resource requirements (compute, API costs)
-5. Flexibility for adaptation to new domains
-6. Practical considerations for deployment
+1. Effectiveness in maintaining natural educational dialogues
+2. Ability to implement various teaching strategies (Socratic, directive, etc.)
+3. Context handling and conversation coherence
+4. Response to student confusion or misconceptions
+5. Implementation complexity and resource requirements
+6. Practical considerations for classroom deployment
 
 ## Bonus Challenges
 
-1. **Hybrid Approach**: Combine DSPy prompt optimization with one of the fine-tuning methods
-2. **Extended Evaluation**: Create a benchmark of 50+ questions and evaluate all three approaches
-3. **Model Distillation**: Use a fine-tuned model to generate training data for a smaller model
+1. **Pedagogical Variety**: Implement multiple teaching styles (Socratic, direct instruction, discovery-based)
+2. **Student Modeling**: Add capability to adapt to different student knowledge levels
+3. **Subject Specialization**: Fine-tune for a specific educational domain with specialized terminology
 
 ## Submission Requirements
 
 1. Code files for each part you completed
-2. Dataset files created or modified
+2. Dialogue dataset files created
 3. Comparative analysis document
-4. Brief reflection on what you learned (1 page)
+4. Brief reflection on educational implications (1 page)
 5. Any trained model artifacts or adapter files
 
 ## Evaluation Criteria
 
-- **Functionality** (40%): Does your code work as expected?
-- **Understanding** (30%): Does your analysis demonstrate comprehension of the key differences?
-- **Innovation** (15%): Have you added meaningful improvements to the base examples?
-- **Documentation** (15%): Is your code well-commented and your analysis clear?
+- **Dialogue Quality** (35%): Does your chatbot create natural, pedagogically sound interactions?
+- **Technical Implementation** (35%): Does your code effectively implement the required capabilities?
+- **Understanding** (20%): Does your analysis demonstrate comprehension of the key differences?
+- **Documentation** (10%): Is your code well-commented and your analysis clear?
 
 ## Resources
 
