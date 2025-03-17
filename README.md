@@ -7,6 +7,11 @@
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-31012/)
 
+## Documentation
+
+📚 **Project Website**: [https://uvu-ai-innovate.github.io/UTTA/](https://uvu-ai-innovate.github.io/UTTA/)
+
+Visit our GitHub Pages site for an overview of the project, fine-tuning approaches, and implementation details.
 
 ## Prerequisites
 
