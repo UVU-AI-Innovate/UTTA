@@ -1,7 +1,0 @@
-Break the project into four milestones:
-1️ Chatbot Development
-2️ Knowledge Base Integration
-3️ Fine-Tuning
-4️ Evaluation
-
-This repository is for teaching purposes, so structure and document it clearly for students. Avoid using Wiki pages—they've caused too many issues. Instead, use README files in each directory to keep everything simple and accessible for students.

@@ -1,4 +1,4 @@
-# UTTA (Universal Teacher Training Assistant)
+# UTTA (Utah Teacher Training Assistant)
 
 A sophisticated chatbot framework designed for teacher training, leveraging advanced LLM capabilities with DSPy integration, knowledge base management, and automated evaluation metrics.
 
@@ -9,23 +9,34 @@ A sophisticated chatbot framework designed for teacher training, leveraging adva
 - **Fine-Tuning Capabilities**: Specialized model training for educational contexts
 - **Automated Evaluation**: Comprehensive metrics for teaching responses
 - **Web Interface**: Interactive testing and development environment
+- **CLI Interface**: Command-line interface for testing and development
 - **Automated Debugging**: Comprehensive diagnostic tools for quick issue resolution
+- **Robust Fallbacks**: Graceful degradation when dependencies are unavailable
 
 ## Project Structure
 
 ```
 UTTA/
 ├── data/               # Training data and model storage
+│   ├── cache/         # Cache for embeddings and API responses
+│   ├── index/         # Document index storage
+│   ├── models/        # Trained and fine-tuned models
+│   ├── test/          # Test datasets
+│   └── uploads/       # User-uploaded documents
 ├── src/               # Source code
 │   ├── diagnostics.py # System diagnostics tool
-│   ├── evaluation/    # Response evaluation metrics
+│   ├── cli.py         # Command-line interface
+│   ├── web_app.py     # Web application interface
+│   ├── metrics/       # Response evaluation metrics
 │   ├── fine_tuning/   # Model fine-tuning components
 │   ├── knowledge_base/# Document indexing and retrieval
 │   └── llm/          # LLM interface and DSPy handlers
+├── tests/             # Test directory
+│   ├── unit/         # Unit tests
+│   └── integration/  # Integration tests
 ├── fix_openai_dep.py  # OpenAI dependency fix script  
 ├── run_webapp.sh      # Setup and launch script
-├── tests/             # Unit tests
-└── test_*.py         # Integration and component tests
+└── environment.yml    # Conda environment file
 ```
 
 ## Quick Start
@@ -68,6 +79,26 @@ python -m spacy download en_core_web_sm
 cp .env.example .env
 # Edit .env with your API keys and configurations
 ```
+
+## Running the Application
+
+### Web Interface
+```bash
+# Start the web application
+streamlit run src/web_app.py
+```
+
+### CLI Interface
+```bash
+# Start the command-line interface
+python src/cli.py
+```
+
+The CLI interface provides:
+- Interactive chat with the teaching assistant
+- Configuration of settings (grade level, subject, learning style)
+- Document management
+- Response evaluation with metrics
 
 ## Troubleshooting
 
@@ -133,6 +164,10 @@ For a complete list of dependencies, see `environment.yml`.
 - Age-appropriate content verification
 - Pedagogical elements analysis
 
+### Interfaces
+- **Web Interface**: Streamlit-based UI with visualization and metrics
+- **CLI Interface**: Command-line tool for testing and development
+
 ### Diagnostic Tools
 - System dependency checks
 - Component initialization verification
@@ -143,13 +178,25 @@ For a complete list of dependencies, see `environment.yml`.
 
 Run the test suite:
 ```bash
+# Navigate to the project root
+cd /path/to/UTTA
+
 # Run all tests
-pytest
+pytest tests/
+
+# Run unit tests
+pytest tests/unit/
+
+# Run integration tests
+pytest tests/integration/
 
 # Run specific test files
-pytest test_components.py
-pytest test_web_app.py
-pytest test_integration.py
+pytest tests/unit/test_components.py
+pytest tests/unit/test_web_app.py
+pytest tests/integration/test_integration.py
+
+# Run quick test script
+python tests/quick_test.py
 ```
 
 ## Development
@@ -168,10 +215,25 @@ flake8
 streamlit run src/web_app.py
 ```
 
-3. Running Diagnostics:
+3. Running the CLI Interface:
+```bash
+python src/cli.py
+```
+
+4. Running Diagnostics:
 ```bash
 python src/diagnostics.py
 ```
+
+## Recent Improvements
+
+- **CLI Interface**: Added a command-line interface for testing and development
+- **Robust Error Handling**: Improved error handling throughout the application
+- **Dependency Management**: Better handling of missing or incompatible dependencies
+- **Module Structure**: Reorganized code into proper Python packages
+- **Documentation**: Added comprehensive README files for each module
+- **Metrics Module**: Enhanced evaluation system with detailed metrics
+- **Testing Infrastructure**: Improved test organization and coverage
 
 ## Contributing
 
@@ -189,3 +251,4 @@ This project is licensed under the terms of the LICENSE file included in the rep
 
 - DSPy team for the foundational LLM framework
 - Contributors and testers
+
