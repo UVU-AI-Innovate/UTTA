@@ -15,11 +15,15 @@ This educational project demonstrates three different approaches to improving LL
 | Training data needed | Small (10-50 examples) | Medium (50-100+ examples) | Large (100-1000+ examples) |
 | Setup difficulty | Simple | Simple | Complex |
 | Control | Limited | Medium | Full |
-| Hardware required | None | None | GPU (16GB+ VRAM) |
+| Hardware required | None | None | GPU (16GB+ VRAM)* |
 | Deployment | API calls | API calls | Self-host |
 | Data privacy | Data shared with API | Data shared with API | Data stays local |
 | Time to results | Immediate | Hours | Hours (with GPU) |
 | Answer quality | Good | Better | Best |
+
+> **Note**: For educational purposes, these examples use much smaller datasets than would be required for production use. The dataset sizes in the table reflect realistic requirements for meaningful results in real-world applications.
+>
+> *Students in this project can use the provided GPU server for HuggingFace fine-tuning, eliminating the hardware requirement barrier.
 
 ### Which Approach Is Right For You?
 
@@ -91,6 +95,7 @@ A: The seasons on Earth are caused by the tilt of the Earth's axis
 - Uses LoRA for efficient adaptation of model weights
 - Works best with larger datasets (100-1000+ examples)
 - Data privacy - all information stays on your machine
+- **Access**: Students can use the provided GPU server for fine-tuning
 
 **How to Run:**
 ```bash
@@ -100,7 +105,7 @@ python huggingface_lora.py
 **Cost Considerations:**
 - One-time compute cost for GPU usage, no ongoing API fees
 - Can use smaller open-source models and lower precision (int8/int4)
-- For this project: No cloud costs needed as we have server GPU access
+- For this project: No cloud costs needed as students have access to the GPU server
 
 **Example Output:**
 ```
@@ -158,7 +163,7 @@ LoRA Adapter Weights ────────┘
 
 ### Budget Considerations
 
-- **With GPU Server Access**: HuggingFace approach is cheapest overall (as in this project)
+- **With GPU Server Access**: HuggingFace approach is cheapest overall (students in this project have access to the GPU server)
 - **Without GPU Access**: DSPy with budget-friendly models is most affordable
 - **For Production**: Calculate based on expected usage volume and frequency
 
