@@ -1,20 +1,7 @@
 # 🧠 LLM Fine-Tuning Examples
 
 This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering. 
-
-<div align="center">
-  
-  | 🔄 **DSPy** | ☁️ **OpenAI** | 🔧 **HuggingFace** |
-  |------------|--------------|-------------------|
-  | Prompt optimization | Cloud fine-tuning | Local fine-tuning |
-  | Small datasets | Medium datasets | Large datasets |
-  | Immediate results | Hours to train | Hours to train |
-  | No model changes | Cloud model updates | Local model updates |
-  | API costs only | API + training costs | One-time compute cost |
-
-</div>
-
----
+****
 
 ## 📚 Introduction
 
@@ -49,7 +36,7 @@ Each approach offers different tradeoffs in terms of cost, complexity, and perfo
 - 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
 
 ---
-
+****
 ## 🔍 Three Approaches Explained
 
 ### DSPy: Prompt Optimization
