@@ -22,6 +22,35 @@ The `PedagogicalTrainer` class (`trainer.py`) provides:
 - Custom evaluation metrics for teaching quality
 - Model persistence for trained models
 
+## How DSPy Fine-Tuning Works
+
+The system uses DSPy's prompt optimization approach rather than traditional weight-based fine-tuning:
+
+1. **Chain of Thought Optimization**: Uses `ChainOfThoughtOptimizer` to improve prompts through iterative testing
+   - Runs for 3 optimization rounds by default
+   - Tests multiple prompt variations to find the most effective pedagogical patterns
+   - Preserves the base model weights while significantly enhancing teaching quality
+
+2. **Teaching Signature Definition**: Creates a structured input/output signature:
+   ```python
+   class TeachingSignature(dspy.Signature):
+       query = dspy.InputField()  # Student question
+       context = dspy.InputField() # Reference material
+       metadata = dspy.InputField() # Teaching context
+       response = dspy.OutputField() # Teaching response
+   ```
+
+3. **Pedagogical Evaluation**: During optimization, responses are evaluated on:
+   - **Length Ratio**: Ensuring appropriate response length (30% of score)
+   - **Context Usage**: Measuring factual alignment with reference materials (40% of score)
+   - **Pedagogical Elements**: Counting teaching techniques like questions, examples, explanations (30% of score)
+
+4. **Optimization Process Flow**:
+   - Create training signatures from example dialogues
+   - Optimize prompts through multiple rounds of testing
+   - Evaluate each candidate prompt on pedagogical metrics
+   - Save the optimized model for inference
+
 ## Key Features
 
 - **DSPy Integration**: Uses DSPy's optimization frameworks to fine-tune models
@@ -60,4 +89,26 @@ The fine-tuning module uses:
 - DSPy ChainOfThoughtOptimizer for model optimization
 - Custom evaluation metrics for pedagogical quality
 - Structured training examples with context
-- Efficient model serialization for persistence 
+- Efficient model serialization for persistence
+
+## Evaluation During Training
+
+During the optimization process, candidate prompts are evaluated on:
+
+1. **Context Usage Evaluation**:
+   - Calculates word overlap between response and reference context
+   - Ensures factual accuracy and relevant information inclusion
+   - Weights this metric higher (40%) as factual correctness is critical
+
+2. **Pedagogical Elements Count**:
+   - Identifies key pedagogical markers:
+     - Questions: "?", "how", "what", "why"
+     - Examples: "for example", "like", "such as"
+     - Explanations: "because", "therefore"
+     - Engagement: "let's", "try", "imagine"
+   - Normalizes scores across categories
+
+3. **Combined Training Metrics**:
+   - Weighted average of individual metrics to guide optimization
+   - Ensures balance between factual accuracy and teaching quality
+   - Optimizes for maximum pedagogical effectiveness while preserving information accuracy 
