@@ -43,30 +43,11 @@ mkdir -p data/index
 mkdir -p data/cache
 mkdir -p data/uploads
 
-# Check if .env file exists, create it if not
+# Check if .env file exists
 if [ ! -f .env ]; then
-    echo "Creating .env file..."
-    cp .env.example .env 2>/dev/null || echo "# API Keys
-OPENAI_API_KEY=your_api_key_here
-
-# Model Configuration
-DEFAULT_MODEL=gpt-3.5-turbo
-TEMPERATURE=0.7
-MAX_TOKENS=1000
-
-# Storage Paths
-CACHE_DIR=data/cache
-INDEX_DIR=data/index
-MODEL_DIR=data/models
-
-# Logging
-LOG_LEVEL=INFO
-LOG_FILE=data/app.log
-
-# Web Interface
-STREAMLIT_PORT=8501
-STREAMLIT_THEME=light" > .env
-    echo "Please edit .env file to add your OpenAI API key"
+    echo "Warning: .env file not found. Please ensure you have a valid .env file with your OpenAI API key."
+    echo "You can create one by copying .env.example and updating the API key."
+    exit 1
 fi
 
 # Run diagnostics

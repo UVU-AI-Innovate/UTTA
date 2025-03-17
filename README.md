@@ -36,7 +36,7 @@ The script will:
 - Create and configure the conda environment
 - Install all required dependencies
 - Set up necessary directories
-- Create a default .env file
+- Use existing .env configuration
 - Run system diagnostics
 - Optionally start the web application
 
@@ -62,15 +62,15 @@ conda activate utta
 mkdir -p data/index data/cache data/uploads
 ```
 
-4. Set up environment variables:
-```bash
-# Copy example env file (or create new if doesn't exist)
-cp .env.example .env
-# Edit .env with your configurations, especially:
-# - OPENAI_API_KEY
-# - DEFAULT_MODEL
-# - TEMPERATURE
-```
+4. Environment Configuration:
+   - The `.env` file is already configured with your OpenAI API key
+   - Current configuration includes:
+     - OpenAI API key
+     - Model settings (gpt-3.5-turbo)
+     - Temperature and token settings
+     - Storage paths
+     - Logging configuration
+     - Web interface settings
 
 5. Verify the installation:
 ```bash
