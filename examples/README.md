@@ -34,6 +34,34 @@ conda activate utta
 | Time to results | Immediate | Hours | Hours (with GPU) |
 | Answer quality | Good | Better | Best |
 
+## Understanding LoRA (Low-Rank Adaptation)
+
+LoRA is a parameter-efficient fine-tuning technique that significantly reduces the computational and memory requirements for fine-tuning large language models.
+
+### How LoRA Works
+1. **Traditional fine-tuning** updates all model weights (often billions of parameters)
+2. **LoRA** instead:
+   - Freezes the original model weights
+   - Adds small trainable "adapter" matrices using low-rank decomposition
+   - Only trains these adapter parameters (typically <1% of original model parameters)
+
+### Benefits of LoRA
+- **Memory efficient**: Requires much less GPU VRAM than full fine-tuning
+- **Training efficient**: Trains faster with fewer resources
+- **Storage efficient**: The resulting fine-tuned model is much smaller
+- **Adaptable**: Can create multiple different adaptations for the same base model
+- **Performance comparable**: Often achieves results similar to full fine-tuning
+
+### LoRA Visualization
+```
+Original Model Weights ──────┐
+                             │
+                             ├──► Combined for inference
+                             │
+LoRA Adapter Weights ────────┘
+   (trained)
+```
+
 ## Cost Considerations
 
 ### DSPy
@@ -136,6 +164,7 @@ The HuggingFace example demonstrates:
 - Requires GPU for actual training (currently simulation only)
 - **Note**: Requires one-time compute cost (GPU usage) but no ongoing API costs
 - **Cost saving option**: Can use smaller open-source models and lower precision (int8/int4)
+- **LoRA advantage**: Reduces memory requirements by up to 70% vs full fine-tuning
 
 Expected Results:
 - Most technically precise answers
@@ -185,6 +214,7 @@ These examples demonstrate the key differences between:
    - Advantage: Complete control, data privacy
    - Limitation: Complex setup, hardware requirements
    - **Cost structure**: One-time compute cost, no ongoing API fees
+   - **Technical approach**: Uses LoRA to efficiently adapt pre-trained models with minimal resources
 
 ## Choosing an Approach
 
