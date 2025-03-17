@@ -3,16 +3,36 @@
 This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering. These examples are provided under the terms of the LICENSE file included in the repository.
 
 ## 📋 Table of Contents
-- [Overview](#overview)
-- [Getting Started](#getting-started)
-- [Three Approaches to LLM Improvement](#three-approaches-to-llm-improvement)
-  - [DSPy: Prompt Optimization](#dspy-prompt-optimization)
-  - [OpenAI: Cloud Fine-Tuning](#openai-cloud-fine-tuning)
-  - [HuggingFace: Local Fine-Tuning with LoRA](#huggingface-local-fine-tuning-with-lora)
-- [Technical Deep Dive: Understanding LoRA](#technical-deep-dive-understanding-lora)
-- [Cost Analysis](#cost-analysis)
-- [Example Implementation Details](#example-implementation-details)
-- [Decision Guide: Choosing the Right Approach](#decision-guide-choosing-the-right-approach)
+- [LLM Fine-Tuning Examples](#llm-fine-tuning-examples)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [Overview](#overview)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Example Files](#example-files)
+    - [Datasets](#datasets)
+  - [Three Approaches to LLM Improvement](#three-approaches-to-llm-improvement)
+    - [DSPy: Prompt Optimization](#dspy-prompt-optimization)
+    - [OpenAI: Cloud Fine-Tuning](#openai-cloud-fine-tuning)
+    - [HuggingFace: Local Fine-Tuning with LoRA](#huggingface-local-fine-tuning-with-lora)
+  - [Technical Deep Dive: Understanding LoRA](#technical-deep-dive-understanding-lora)
+    - [How LoRA Works](#how-lora-works)
+    - [Benefits of LoRA](#benefits-of-lora)
+    - [LoRA Visualization](#lora-visualization)
+  - [Cost Analysis](#cost-analysis)
+    - [Side-by-Side Comparison](#side-by-side-comparison)
+  - [Alternative LLM Options](#alternative-llm-options)
+    - [Mixtral 8x7B](#mixtral-8x7b)
+    - [Llama 2](#llama-2)
+    - [Claude Instant](#claude-instant)
+    - [Choosing the Right Alternative](#choosing-the-right-alternative)
+  - [Example Implementation Details](#example-implementation-details)
+  - [Decision Guide: Choosing the Right Approach](#decision-guide-choosing-the-right-approach)
+    - [At-a-Glance Comparison](#at-a-glance-comparison)
+    - [Choose Based On Your Needs](#choose-based-on-your-needs)
+      - [Dataset Size:](#dataset-size)
+      - [Time Constraints:](#time-constraints)
+      - [Budget:](#budget)
+      - [Privacy Requirements:](#privacy-requirements)
 
 ## Overview
 
@@ -171,6 +191,48 @@ LoRA Adapter Weights ────────┘
 | Pricing model | Pay-per-request | Training + pay-per-request | One-time compute |
 | Best for budget | Small, quick experiments | Medium-term projects | Long-term, high-volume usage |
 | With GPU server access | Still requires API costs | Still requires API costs | Cheapest overall option |
+
+## Alternative LLM Options
+
+When working with these approaches, you can use different LLMs to optimize for cost, performance, and other factors. Here are details on some recommended alternatives to GPT-4:
+
+### Mixtral 8x7B
+- **What it is**: An open-weights mixture-of-experts model developed by Mistral AI
+- **Architecture**: Uses a sparse mixture-of-experts approach where only a subset of parameters activate for each token
+- **Performance**: Competitive with much larger models while being more efficient
+- **Cost**: Can be used via Mistral API (~$0.0002/1K tokens) or self-hosted
+- **Best for**: DSPy or HuggingFace approaches where you need strong reasoning at lower cost
+- **Availability**: Commercial use allowed
+
+### Llama 2
+- **What it is**: Meta's open-source model family available in multiple sizes (7B, 13B, 70B parameters)
+- **Architecture**: Traditional transformer architecture with improvements from the original Llama
+- **Performance**: The 70B variant approaches GPT-3.5 performance for many tasks
+- **Cost**: Free for self-hosting; also available through various APIs
+- **Best for**: HuggingFace approach where you can fine-tune locally
+- **Sizes**: 
+  - 7B: Fastest, lowest memory requirements (16GB VRAM)
+  - 13B: Better quality, moderate requirements (24GB VRAM)
+  - 70B: Best quality, high requirements (80GB+ VRAM or quantized)
+- **Availability**: Commercial use allowed with a license
+
+### Claude Instant
+- **What it is**: Anthropic's faster, more cost-effective version of their Claude model
+- **Architecture**: Proprietary architecture with constitutional AI alignment
+- **Performance**: Good balance of reasoning capabilities and speed
+- **Cost**: ~$0.008/1K tokens (input), ~$0.024/1K tokens (output)
+- **Best for**: DSPy approach when you need strong reasoning but GPT-4 is too expensive
+- **Availability**: Only available through Anthropic's API
+
+### Choosing the Right Alternative
+
+| Factor | Mixtral 8x7B | Llama 2 | Claude Instant |
+|--------|-------------|---------|----------------|
+| API Cost | Low | Very low/Free | Medium |
+| Self-hostable | Yes | Yes | No |
+| Reasoning ability | High | Medium-High | High |
+| Context length | 32K tokens | 4K tokens | 100K tokens |
+| Best paired with | DSPy/HuggingFace | HuggingFace | DSPy |
 
 ## Example Implementation Details
 
