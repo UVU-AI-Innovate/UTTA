@@ -9,14 +9,6 @@ This directory contains examples of different approaches to fine-tuning large la
 
 This educational project demonstrates three different approaches to improving LLM performance for question-answering tasks:
 
-1. **DSPy**: Prompt optimization without model changes
-2. **OpenAI**: Cloud-based fine-tuning
-3. **HuggingFace**: Local fine-tuning with LoRA
-
-Each approach offers different tradeoffs in terms of cost, complexity, and performance.
-
-### Key Comparison
-
 | Feature | DSPy | OpenAI | HuggingFace |
 |---------|------|--------|-------------|
 | What changes | Prompts | Model weights (cloud) | Model weights (local) |
