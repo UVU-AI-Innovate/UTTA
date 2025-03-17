@@ -22,9 +22,7 @@ The `PedagogicalTrainer` class (`trainer.py`) provides:
 - Custom evaluation metrics for teaching quality
 - Model persistence for trained models
 
-## Detailed DSPy Fine-Tuning Explanation
-
-### What is DSPy Fine-Tuning?
+## What is DSPy Fine-Tuning?
 
 DSPy fine-tuning represents a fundamentally different approach from traditional model fine-tuning:
 
@@ -34,7 +32,20 @@ DSPy fine-tuning represents a fundamentally different approach from traditional 
 
 DSPy is a framework that enables building LLM applications with sophisticated prompting patterns, including chains of thought, multi-step reasoning, and self-refinement. The framework treats these patterns as programmatic modules that can be optimized through search rather than static templates.
 
-### Technical Architecture
+## Comparing DSPy to Other Fine-Tuning Approaches
+
+| Feature | DSPy | OpenAI Fine-Tuning | HuggingFace LoRA |
+|---------|------|-------------------|------------------|
+| **What changes** | Prompts | Model weights (cloud) | Model weights (local) |
+| **Training data needed** | Small (10-50 examples) | Medium (50-100+ examples) | Large (100-1000+ examples) |
+| **Cost structure** | Pay per API call | Training fee + inference | One-time compute |
+| **Technical complexity** | Low | Medium | High |
+| **Control** | Limited | Medium | Full |
+| **Data privacy** | Shared with API | Shared with API | Stays local |
+| **Time to results** | Minutes | Hours | Hours to days |
+| **Typical use case** | Quick experiments, limited data | Production with moderate data | Full control, large data |
+
+## Technical Architecture
 
 DSPy's architecture has several key components:
 
@@ -71,38 +82,38 @@ DSPy's architecture has several key components:
    - Evaluate outcomes using custom metrics
    - Select the best performing prompt variations
 
-### Optimization Process In-Depth
+## Optimization Process
 
-Our implementation uses DSPy's `ChainOfThoughtOptimizer`, which works as follows:
+Our implementation uses DSPy's `ChainOfThoughtOptimizer` with a systematic workflow:
 
 1. **Initialization Phase**:
-   - We define a teaching signature with structured inputs and outputs
-   - We create a ChainOfThought module using this signature
-   - We prepare a dataset of exemplar question-context-response triples
+   - Define a teaching signature with structured inputs and outputs
+   - Create a ChainOfThought module using this signature
+   - Prepare a dataset of exemplar question-context-response triples
 
 2. **Prompt Generation Phase**:
-   - The optimizer generates multiple candidate prompts for each template position
-   - These prompts emphasize different aspects of teaching (engagement, examples, explanations)
-   - The optimizer explores prompt space methodically, not randomly
+   - Generate multiple candidate prompts for each template position
+   - Emphasize different aspects of teaching (engagement, examples, explanations)
+   - Explore prompt space methodically, not randomly
 
 3. **Evaluation Phase**:
-   - Each candidate prompt is tested on the training examples
-   - The pedagogical metrics evaluate generated responses
-   - A weighted score determines prompt quality
+   - Test each candidate prompt on the training examples
+   - Evaluate generated responses using pedagogical metrics
+   - Calculate a weighted score to determine prompt quality
 
 4. **Selection and Refinement Phase**:
-   - The best performing prompts are selected for the next round
-   - The optimizer learns from successful patterns and refines them
-   - This process repeats for the specified number of rounds (default: 3)
+   - Select the best performing prompts for the next round
+   - Learn from successful patterns and refine them
+   - Repeat for the specified number of rounds (default: 3)
 
 5. **Compilation Phase**:
-   - The final optimal prompts are compiled into the LLM interaction template
-   - These compiled prompts encode pedagogical knowledge and teaching strategies
-   - The compiled template is saved for inference
+   - Compile the final optimal prompts into the LLM interaction template
+   - Encode pedagogical knowledge and teaching strategies in the prompts
+   - Save the compiled template for inference
 
-### Detailed Optimization Algorithm
+### Optimization Algorithm
 
-The DSPy optimizer uses a sophisticated approach to improve prompts:
+The DSPy optimizer uses a sophisticated evolutionary approach to improve prompts:
 
 ```
 ALGORITHM OptimizeTeachingPrompts:
@@ -122,42 +133,13 @@ ALGORITHM OptimizeTeachingPrompts:
     11. Return best candidate M' from C
 ```
 
-This evolutionary approach allows DSPy to discover prompts that encode pedagogical expertise without changing model weights.
+This approach allows DSPy to discover prompts that encode pedagogical expertise without changing model weights.
 
-## How DSPy Fine-Tuning Works
+## Evaluation Metrics
 
-The system uses DSPy's prompt optimization approach rather than traditional weight-based fine-tuning:
+Our implementation uses several metrics to assess teaching quality during optimization:
 
-1. **Chain of Thought Optimization**: Uses `ChainOfThoughtOptimizer` to improve prompts through iterative testing
-   - Runs for 3 optimization rounds by default
-   - Tests multiple prompt variations to find the most effective pedagogical patterns
-   - Preserves the base model weights while significantly enhancing teaching quality
-
-2. **Teaching Signature Definition**: Creates a structured input/output signature:
-   ```python
-   class TeachingSignature(dspy.Signature):
-       query = dspy.InputField()  # Student question
-       context = dspy.InputField() # Reference material
-       metadata = dspy.InputField() # Teaching context
-       response = dspy.OutputField() # Teaching response
-   ```
-
-3. **Pedagogical Evaluation**: During optimization, responses are evaluated on:
-   - **Length Ratio**: Ensuring appropriate response length (30% of score)
-   - **Context Usage**: Measuring factual alignment with reference materials (40% of score)
-   - **Pedagogical Elements**: Counting teaching techniques like questions, examples, explanations (30% of score)
-
-4. **Optimization Process Flow**:
-   - Create training signatures from example dialogues
-   - Optimize prompts through multiple rounds of testing
-   - Evaluate each candidate prompt on pedagogical metrics
-   - Save the optimized model for inference
-
-## Advanced Evaluation Metrics
-
-Our implementation uses several metrics to assess teaching quality:
-
-### Context Usage Evaluation
+### 1. Context Usage Evaluation (40% of Score)
 
 This metric measures how effectively the model incorporates reference materials:
 
@@ -176,7 +158,7 @@ def _evaluate_context_usage(self, response: str, context: str) -> float:
 
 This word overlap approach ensures the model uses information from the reference materials while generating responses.
 
-### Pedagogical Elements Detection
+### 2. Pedagogical Elements Detection (30% of Score)
 
 This metric identifies specific teaching techniques:
 
@@ -204,6 +186,19 @@ def _count_pedagogical_elements(self, response: str) -> float:
 
 By recognizing these teaching patterns, we can optimize for responses that employ pedagogically sound techniques.
 
+### 3. Length Ratio (30% of Score)
+
+Ensures appropriate response length by comparing the generated response to the target response length:
+
+```python
+length_ratio = min(
+    len(predicted.response) / len(target.response),
+    len(target.response) / len(predicted.response)
+)
+```
+
+This ratio helps prevent responses that are too brief or excessively lengthy.
+
 ## Cost Considerations
 
 The current DSPy implementation uses paid OpenAI API calls:
@@ -227,28 +222,15 @@ The current DSPy implementation uses paid OpenAI API calls:
 
 **Note**: Each time you run the training process, you will incur OpenAI API charges based on the volume of tokens processed during optimization.
 
-## Comparing DSPy to Other Fine-Tuning Approaches
+## Implementation Details
 
-| Feature | DSPy | OpenAI Fine-Tuning | HuggingFace LoRA |
-|---------|------|-------------------|------------------|
-| **What changes** | Prompts | Model weights (cloud) | Model weights (local) |
-| **Training data needed** | Small (10-50 examples) | Medium (50-100+ examples) | Large (100-1000+ examples) |
-| **Cost structure** | Pay per API call | Training fee + inference | One-time compute |
-| **Technical complexity** | Low | Medium | High |
-| **Control** | Limited | Medium | Full |
-| **Data privacy** | Shared with API | Shared with API | Stays local |
-| **Time to results** | Minutes | Hours | Hours to days |
-| **Typical use case** | Quick experiments, limited data | Production with moderate data | Full control, large data |
+The fine-tuning module uses:
+- DSPy ChainOfThoughtOptimizer for model optimization
+- Custom evaluation metrics for pedagogical quality
+- Structured training examples with context
+- Efficient model serialization for persistence
 
-## Key Features
-
-- **DSPy Integration**: Uses DSPy's optimization frameworks to fine-tune models
-- **Training Data Management**: Prepares and processes training examples
-- **Pedagogical Evaluation**: Custom metrics focused on teaching effectiveness
-- **Context Integration**: Training examples include relevant context materials
-- **Custom Signatures**: DSPy signatures optimized for pedagogical tasks
-
-### Usage Example
+## Usage Example
 
 ```python
 from fine_tuning.trainer import PedagogicalTrainer
@@ -271,36 +253,6 @@ response = optimized_model.generate(
     context=["Photosynthesis is how plants make food using sunlight."]
 )
 ```
-
-## Implementation Details
-
-The fine-tuning module uses:
-- DSPy ChainOfThoughtOptimizer for model optimization
-- Custom evaluation metrics for pedagogical quality
-- Structured training examples with context
-- Efficient model serialization for persistence
-
-## Evaluation During Training
-
-During the optimization process, candidate prompts are evaluated on:
-
-1. **Context Usage Evaluation**:
-   - Calculates word overlap between response and reference context
-   - Ensures factual accuracy and relevant information inclusion
-   - Weights this metric higher (40%) as factual correctness is critical
-
-2. **Pedagogical Elements Count**:
-   - Identifies key pedagogical markers:
-     - Questions: "?", "how", "what", "why"
-     - Examples: "for example", "like", "such as"
-     - Explanations: "because", "therefore"
-     - Engagement: "let's", "try", "imagine"
-   - Normalizes scores across categories
-
-3. **Combined Training Metrics**:
-   - Weighted average of individual metrics to guide optimization
-   - Ensures balance between factual accuracy and teaching quality
-   - Optimizes for maximum pedagogical effectiveness while preserving information accuracy
 
 ## Best Practices for DSPy Fine-Tuning
 
