@@ -152,35 +152,157 @@ if y = sin(x²), what would be its derivative?
 
 ---
 
-## 💡 Technical Deep Dive: Fine-Tuning Evaluation
+## 📊 Input, Output, and Evaluation Framework
 
-Each example now includes comprehensive evaluation metrics to assess the quality of teacher-student interactions:
+### Input Datasets Overview
 
-### Evaluation Metrics Explained
+Each fine-tuning approach uses teacher-student dialogue data but with specific format requirements:
 
-1. **Pedagogical Techniques**: Measures the percentage of responses that include effective teaching techniques like Socratic questioning, scaffolding, and guided inquiry
-2. **Follow-up Questions**: Tracks how often the model asks questions to check student understanding or guide their thinking
-3. **Response Length**: Evaluates the level of detail and thoroughness in explanations
-4. **Adaptability**: Assesses the model's ability to adjust explanations based on student's previous statements
+| Aspect | DSPy | OpenAI | HuggingFace |
+|--------|------|--------|-------------|
+| **Format** | JSONL with dialogue arrays | JSONL with messages arrays | JSONL/CSV with input/output pairs |
+| **Minimum examples** | 5-10 high-quality dialogues | 15-20 diverse dialogues | 30+ diverse dialogues |
+| **Conversation turns** | Multi-turn (2-4 exchanges) | Multi-turn (2-6 exchanges) | Usually single-turn or dual-turn |
+| **Essential fields** | role, content | role (system, user, assistant), content | input, output |
+| **System message** | Not required | Required for context | Embedded in input |
+| **Special features** | Focus on pedagogical techniques | Include teaching style variations | Include detailed explanations |
 
-### Evaluation Implementation
+### Input → Processing → Output Flow
 
-Both DSPy and OpenAI examples include built-in evaluation that:
-- Tests on standardized scenarios across different subjects
-- Provides side-by-side comparisons of performance before and after fine-tuning
-- Calculates quantitative improvements across all metrics
-- Includes interactive demonstration mode for testing custom queries
+Here's how the data flows through each system:
 
-Example evaluation output:
 ```
---- Evaluation Results Comparison ---
-Metric                    Unoptimized      Optimized        Improvement     
-----------------------------------------------------------------------
-pedagogical_techniques    45.00            75.00            +30.00         
-follow_up_questions       50.00            83.33            +33.33         
-response_length           215.67           268.50           +52.83         
-adaptability              16.67            33.33            +16.66
+┌─── DSPy ───────────────────────────┐
+│                                    │
+│  [Teacher-Student Dialogues]       │
+│          │                         │
+│          ▼                         │
+│  [DSPy Optimization Process]       │
+│          │                         │
+│          ▼                         │
+│  [Improved Prompting]              │
+│          │                         │
+│          ▼                         │
+│  [Enhanced Teacher Responses]      │
+│                                    │
+└────────────────────────────────────┘
+
+┌─── OpenAI ─────────────────────────┐
+│                                    │
+│  [Teacher-Student Dialogues]       │
+│          │                         │
+│          ▼                         │
+│  [Cloud Fine-Tuning]               │
+│          │                         │
+│          ▼                         │
+│  [Updated Model Weights]           │
+│          │                         │
+│          ▼                         │
+│  [Customized Teacher Responses]    │
+│                                    │
+└────────────────────────────────────┘
+
+┌─── HuggingFace ──────────────────────┐
+│                                      │
+│  [Teacher-Student Dialogues]         │
+│          │                           │
+│          ▼                           │
+│  [LoRA Parameter-Efficient Training] │
+│          │                           │
+│          ▼                           │
+│  [Adapter Weights]                   │
+│          │                           │
+│          ▼                           │
+│  [Self-Hosted Teacher AI]            │
+│                                      │
+└──────────────────────────────────────┘
 ```
+
+### Expected Outputs
+
+Each approach aims to produce teacher responses with specific qualities:
+
+| Quality | Description | Example |
+|---------|-------------|---------|
+| **Pedagogical techniques** | Uses educational strategies like Socratic questioning | "What do you think might happen if we increase the temperature?" |
+| **Scaffolding** | Building understanding in steps | "Let's start with the basics before tackling the complex concept." |
+| **Knowledge checks** | Verifying student understanding | "Does that explanation make sense to you? Can you summarize what we just discussed?" |
+| **Misconception handling** | Tactfully addressing incorrect ideas | "That's a common misunderstanding. Let me clarify why..." |
+| **Personalization** | Adapting to the student's level | "Since you're familiar with X, we can connect this new concept to it." |
+
+### Comprehensive Evaluation Metrics
+
+Our examples include standardized evaluation across 4 key dimensions:
+
+#### 1. Pedagogical Techniques Score (0-100%)
+Measures the percentage of responses employing evidence-based teaching strategies:
+- Socratic questioning
+- Scaffolding concepts
+- Guided discovery
+- Analogies and metaphors
+- Examples and counterexamples
+
+**Calculation:** `(responses using techniques / total responses) × 100%`
+
+#### 2. Follow-up Questions Rate (0-100%)
+Tracks how often the model asks questions to check understanding:
+- Comprehension checks
+- Application questions
+- Analysis prompts
+- Reflection questions
+
+**Calculation:** `(responses containing questions / total responses) × 100%`
+
+#### 3. Response Quality Metrics
+Quantitative measures of response characteristics:
+- **Length:** Average character count (optimal range: 200-500 characters)
+- **Complexity:** Flesch-Kincaid readability score (optimal range varies by grade level)
+- **Specificity:** Use of subject-specific terminology (higher is better)
+
+#### 4. Adaptability Score (0-100%)
+Assesses the model's ability to adjust to the student's prior statements:
+- References to student's previous comments
+- Adjustment of explanation level
+- Responsiveness to confusion signals
+
+**Calculation:** `(responses showing adaptation / total responses) × 100%`
+
+### Sample Evaluation Output
+
+```
+--- Detailed Evaluation Results ---
+Subject: Physics
+Total dialogues evaluated: 5
+Total turns evaluated: 15
+
+Pedagogical Metrics:
+┌────────────────────────┬─────────────┬────────────┬─────────────┐
+│ Metric                 │ Before      │ After      │ Change      │
+├────────────────────────┼─────────────┼────────────┼─────────────┤
+│ Pedagogical techniques │ 45.0%       │ 75.0%      │ +30.0%      │
+│ Follow-up questions    │ 50.0%       │ 83.3%      │ +33.3%      │
+│ Response length        │ 215.7 chars │ 268.5 chars│ +52.8 chars │
+│ Adaptability           │ 16.7%       │ 33.3%      │ +16.6%      │
+└────────────────────────┴─────────────┴────────────┴─────────────┘
+
+Performance by Subject:
+┌────────────┬─────────────────┬────────────────┐
+│ Subject    │ Pre-Optimization│ Post-Optimizat.│
+├────────────┼─────────────────┼────────────────┤
+│ Biology    │ 42.5%           │ 72.5%          │
+│ Physics    │ 44.0%           │ 78.0%          │
+│ Mathematics│ 48.5%           │ 77.5%          │
+└────────────┴─────────────────┴────────────────┘
+```
+
+### Interpreting Evaluation Results
+
+- **Strong Results**: Overall scores >70% indicate effective teaching interactions
+- **Areas for Improvement**: 
+  - Low follow-up question rates (<50%) suggest insufficient engagement
+  - Short responses (<150 chars) may lack necessary detail
+  - Low adaptability (<30%) indicates generic rather than personalized responses
+- **Subject Variations**: Performance differences across subjects help identify knowledge gaps
 
 ---
 
