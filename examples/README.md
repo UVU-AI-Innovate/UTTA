@@ -53,6 +53,7 @@ conda activate utta
 - **Deployment costs**: Only if self-hosting (server/cloud costs)
 - **Cost reduction**: Can use smaller open-source models like Llama 2 7B instead of larger variants
 - **Typical cost range**: $5-$15 for cloud GPU rental during training, or free if using existing hardware
+- **Note for this project**: No cloud costs needed as we have access to a server with GPU
 
 ## Example Files & Datasets
 
@@ -201,7 +202,7 @@ Consider these factors when choosing an approach:
    - Minimal budget → DSPy (still requires paying for API calls)
    - Medium budget → OpenAI
    - One-time compute cost → HuggingFace
-   - **Cheapest overall**: HuggingFace with existing GPU and small open-source models
+   - **Cheapest overall**: HuggingFace with existing GPU and small open-source models (recommended for this project since we have GPU server access)
    - **Cheapest without GPU**: DSPy with budget-friendly models like Mixtral or Claude Instant
 
 4. **Privacy Requirements**:
