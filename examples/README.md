@@ -27,6 +27,13 @@ This educational project demonstrates three different approaches to improving LL
 - 👉 **OpenAI**: Best for production deployment, balanced control/convenience
 - 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
 
+> **Note on Dataset Sizes**: For educational purposes, these examples use very small datasets (5-20 examples). In real-world applications, you would typically need much larger datasets:
+> - **DSPy**: 10-50 examples for meaningful prompt optimization
+> - **OpenAI**: 50-100 examples minimum, hundreds recommended for production use
+> - **HuggingFace/LoRA**: 100-1000+ examples depending on task complexity
+>
+> The smaller datasets in our examples allow for faster experimentation and learning without significant resource requirements.
+
 ---
 ****
 ## 🔍 Three Approaches Explained
