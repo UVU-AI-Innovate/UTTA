@@ -44,7 +44,9 @@ UTTA/
 └── environment.yml    # Conda environment file
 ```
 
-## 🚀 Quick Start
+## Installation
+
+### Option 1: Quick Start (Recommended)
 
 The easiest way to get started is to use our setup script:
 
@@ -56,34 +58,59 @@ chmod +x run_webapp.sh
 ./run_webapp.sh
 ```
 
-## Manual Setup
+### Option 2: Conda Environment (Manual Setup)
 
-1. Create and activate a conda environment:
+1. Clone the repository:
 ```bash
-conda create -n utta python=3.10
+git clone https://github.com/UVU-AI-Innovate/UTTA.git
+cd UTTA
+```
+
+2. Create and activate the conda environment:
+```bash
+# Create environment from yml file
+conda env create -f environment.yml
+
+# Activate the environment
 conda activate utta
 ```
 
-2. Install dependencies in the correct order:
+3. Verify the installation:
 ```bash
-# Install base dependencies
-pip install python-dotenv streamlit==1.32.0 textstat sentence-transformers==2.2.2 faiss-gpu spacy
-
-# Install specific OpenAI version (critical for DSPy compatibility)
-pip install openai==0.28.0
-
-# Install DSPy after OpenAI
-pip install dspy-ai==2.0.4
-
-# Download spaCy model
-python -m spacy download en_core_web_sm
+# Check if all major components are installed correctly
+python -c "import dspy, torch, spacy; print(f'Python {torch.__version__}, DSPy {dspy.__version__}, SpaCy {spacy.__version__}')"
 ```
 
-3. Set up environment variables:
+4. Set up environment variables:
 ```bash
 cp .env.example .env
 # Edit .env with your API keys and configurations
 ```
+
+### Environment Details
+
+The project uses a conda environment with the following key components:
+
+- **Python Version**: 3.10
+- **Deep Learning**:
+  - PyTorch 2.2.0
+  - CUDA Toolkit 11.8
+  - torchvision
+
+- **Core Dependencies**:
+  - streamlit==1.32.0
+  - openai==0.28.0 (specific version required for DSPy)
+  - dspy-ai==2.0.4
+  - sentence-transformers==2.2.2
+  - faiss-gpu>=1.7.4
+  - spacy>=3.7.0
+
+- **Development Tools**:
+  - pytest>=7.0.0
+  - black>=23.0.0
+  - flake8>=6.0.0
+
+For a complete list of dependencies, see `environment.yml`.
 
 ## Running the Application
 
