@@ -99,7 +99,8 @@ UTTA/
 ├── environment.yml   # Conda environment specification
 ├── requirements.txt  # Pip requirements (alternative to conda)
 ├── run_webapp.sh    # Setup and launch script
-└── .env             # Configuration file
+├── .env             # Configuration file
+└── LICENSE          # MIT License file
 ```
 
 ## Running the Application
@@ -185,4 +186,101 @@ For major changes, please open an issue first to discuss what you would like to 
 
 - DSPy team for the foundational LLM framework
 - Contributors and testers
+
+## Examples Directory
+
+The `examples/` directory contains educational examples and tutorials to help you understand and work with different aspects of the UTTA project:
+
+### DSPy Examples (`examples/dspy/`)
+- `optimize_educational_qa.py`: Demonstrates how to optimize educational Q&A using DSPy
+- `custom_teleprompter.py`: Shows how to create custom teleprompters for educational content
+
+### OpenAI Examples (`examples/openai/`)
+- `finetune_educational_qa.py`: Example of fine-tuning OpenAI models for educational Q&A
+- `chat_completion_examples.py`: Various chat completion examples with different parameters
+
+### Hugging Face Examples (`examples/huggingface/`)
+- `finetune_educational_qa.py`: Example of fine-tuning Hugging Face models
+- `model_inference.py`: Demonstrates model inference with different Hugging Face models
+
+Each example includes detailed comments and documentation to help you understand:
+- How to set up the environment
+- Required dependencies
+- Usage examples
+- Best practices
+- Common pitfalls to avoid
+
+## Environment Configuration
+
+The `.env` file contains the following configuration:
+
+```
+# API Keys
+OPENAI_API_KEY=your_openai_api_key
+
+# Model Configuration
+DEFAULT_MODEL=gpt-3.5-turbo
+TEMPERATURE=0.7
+MAX_TOKENS=1000
+
+# Storage Paths
+CACHE_DIR=data/cache
+INDEX_DIR=data/index
+MODEL_DIR=data/models
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=data/app.log
+
+# Web Interface
+STREAMLIT_PORT=8501
+STREAMLIT_THEME=light
+```
+
+## Usage
+
+1. Start the web interface:
+```bash
+./run_webapp.sh
+```
+
+2. Open your browser and navigate to:
+```
+http://localhost:8501
+```
+
+## Features
+
+- Interactive educational conversations
+- Adaptive learning paths
+- Multi-modal content support
+- Progress tracking
+- Customizable teaching styles
+- Knowledge base integration
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Environment Setup**
+   - Ensure conda is installed and initialized
+   - Check Python version compatibility
+   - Verify all dependencies are installed
+
+2. **API Key Issues**
+   - Verify OPENAI_API_KEY is set in `.env`
+   - Check API key validity
+   - Ensure proper permissions
+
+3. **Directory Structure**
+   - Verify all required directories exist
+   - Check directory permissions
+   - Ensure proper path configuration
+
+### Getting Help
+
+- Check the documentation
+- Review example code
+- Open an issue for bugs
+- Contact maintainers for support
 
