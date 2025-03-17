@@ -1,6 +1,11 @@
 # UTTA (Utah Teacher Training Assistant)
 
-A sophisticated chatbot framework designed for teacher training, leveraging advanced LLM capabilities with DSPy integration, knowledge base management, and automated evaluation metrics.
+> A sophisticated chatbot framework designed for teacher training, leveraging advanced LLM capabilities with DSPy integration, knowledge base management, and automated evaluation metrics.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Status](https://img.shields.io/badge/status-alpha-orange)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 ## Features
 
@@ -39,7 +44,7 @@ UTTA/
 └── environment.yml    # Conda environment file
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 The easiest way to get started is to use our setup script:
 
@@ -227,6 +232,13 @@ python src/diagnostics.py
 
 ## Recent Improvements
 
+- **Initial Release (v0.1.0)**:
+  - Basic framework implementation
+  - DSPy integration for pedagogical interactions
+  - Knowledge base management system
+  - Web and CLI interfaces
+  - Comprehensive documentation
+  - Example implementations
 - **CLI Interface**: Added a command-line interface for testing and development
 - **Robust Error Handling**: Improved error handling throughout the application
 - **Dependency Management**: Better handling of missing or incompatible dependencies
@@ -234,6 +246,14 @@ python src/diagnostics.py
 - **Documentation**: Added comprehensive README files for each module
 - **Metrics Module**: Enhanced evaluation system with detailed metrics
 - **Testing Infrastructure**: Improved test organization and coverage
+
+## Version History
+
+- **0.1.0** (Initial Release - March 2024)
+  - Basic framework implementation
+  - Core functionality and interfaces
+  - Documentation and examples
+  - Testing infrastructure
 
 ## Contributing
 
@@ -243,13 +263,15 @@ python src/diagnostics.py
 4. Run tests and diagnostics
 5. Submit a pull request
 
+For major changes, please open an issue first to discuss what you would like to change.
+
 ## License
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Copyright (c) 2025 Utah Teacher Training Assistant (UTTA)
 
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
