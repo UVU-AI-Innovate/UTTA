@@ -12,7 +12,7 @@ This educational project demonstrates three different approaches to improving LL
 | Feature | DSPy | OpenAI | HuggingFace |
 |---------|------|--------|-------------|
 | What changes | Prompts | Model weights (cloud) | Model weights (local) |
-| Training data needed | Small (5 examples)* | Medium (10+ examples)* | Large (20+ examples)* |
+| Training data needed | Small (10-50 examples) | Medium (50-100+ examples) | Large (100-1000+ examples) |
 | Setup difficulty | Simple | Simple | Complex |
 | Control | Limited | Medium | Full |
 | Hardware required | None | None | GPU (16GB+ VRAM) |
@@ -27,12 +27,7 @@ This educational project demonstrates three different approaches to improving LL
 - 👉 **OpenAI**: Best for production deployment, balanced control/convenience
 - 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
 
-> **Note on Dataset Sizes**: For educational purposes, these examples use very small datasets (5-20 examples) marked with *. In real-world applications, you would typically need much larger datasets:
-> - **DSPy**: 10-50 examples for meaningful prompt optimization
-> - **OpenAI**: 50-100 examples minimum, hundreds recommended for production use
-> - **HuggingFace/LoRA**: 100-1000+ examples depending on task complexity
->
-> The smaller datasets in our examples allow for faster experimentation and learning without significant resource requirements.
+> **Note**: For educational purposes, these examples use much smaller datasets than would be required for production use. The dataset sizes in the table reflect realistic requirements for meaningful results in real-world applications.
 
 ---
 ****
@@ -42,7 +37,7 @@ This educational project demonstrates three different approaches to improving LL
 
 **Key Features:**
 - No model weight changes - only better prompting
-- Works with very small datasets (5 examples)
+- Works with smaller datasets (10-50 examples)
 - Uses Chain-of-Thought prompting technique
 - API-based approach with immediate results
 
@@ -67,7 +62,7 @@ A: The changing angle of sunlight due to the Earth's tilted axis
 
 **Key Features:**
 - Updates actual model weights through cloud service
-- Requires medium-sized datasets (10+ examples)
+- Requires medium-sized datasets (50-100+ examples)
 - Balance of control and convenience
 - Handles complex questions with more detailed answers
 
@@ -96,7 +91,7 @@ A: The seasons on Earth are caused by the tilt of the Earth's axis
 **Key Features:**
 - Full local control over model and training process
 - Uses LoRA for efficient adaptation of model weights
-- Works best with larger datasets (20+ examples)
+- Works best with larger datasets (100-1000+ examples)
 - Data privacy - all information stays on your machine
 
 **How to Run:**
@@ -261,9 +256,9 @@ Use this guide to quickly identify which approach best fits your specific needs:
 
 ### By Dataset Size
 
-- **Small (5-10 examples)** → DSPy
-- **Medium (10-50 examples)** → OpenAI
-- **Large (50+ examples)** → HuggingFace
+- **Small (10-50 examples)** → DSPy
+- **Medium (50-100+ examples)** → OpenAI
+- **Large (100-1000+ examples)** → HuggingFace
 
 ### By Time Constraints
 
