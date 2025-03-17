@@ -9,6 +9,16 @@ This educational project demonstrates three different approaches to improving LL
 - **OpenAI**: Cloud-based fine-tuning
 - **HuggingFace**: Local fine-tuning with LoRA
 
+## Requirements
+
+All dependencies for these examples are included in the main project's `environment.yml` file. Make sure you have set up the conda environment as described in the main README:
+
+```bash
+# Create and activate conda environment from the project root
+conda env create -f environment.yml
+conda activate utta
+```
+
 ## Comparison of Fine-Tuning Approaches
 
 | Feature | DSPy | OpenAI | HuggingFace |
@@ -123,34 +133,6 @@ Each example follows the same educational structure:
 4. **Fine-Tuning Implementation**: The actual training process
 5. **Inference and Demonstration**: Using the model to answer questions
 6. **Comparison**: Direct comparison with other methods
-
-## Technical Requirements
-
-Different requirements depending on which example you're running:
-
-- For DSPy:
-  * OpenAI API key
-  * dspy library
-  * Python 3.8+
-  * Internet connection
-
-- For OpenAI:
-  * OpenAI API key
-  * openai library
-  * Python 3.8+
-  * Internet connection
-  * OpenAI account with billing enabled
-
-- For HuggingFace:
-  * GPU with 16GB+ VRAM
-  * CUDA support
-  * transformers library
-  * peft library
-  * bitsandbytes library
-  * Python 3.8+
-  * ~10GB disk space for models
-
-See the main requirements.txt file for specific versions.
 
 ## Educational Purpose
 

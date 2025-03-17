@@ -97,7 +97,6 @@ UTTA/
 ├── examples/          # Example implementations
 ├── tests/            # Test directory
 ├── environment.yml   # Conda environment specification
-├── requirements.txt  # Pip requirements (alternative to conda)
 ├── run_webapp.sh    # Setup and launch script
 ├── .env             # Configuration file
 └── LICENSE          # MIT License file

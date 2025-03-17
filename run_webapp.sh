@@ -16,26 +16,15 @@ if conda info --envs | grep -q "utta"; then
     eval "$(conda shell.bash hook)"
     conda activate utta
 else
-    echo "Creating new conda environment 'utta'..."
-    conda create -y -n utta python=3.10
+    echo "Creating new conda environment from environment.yml..."
+    conda env create -f environment.yml
     eval "$(conda shell.bash hook)"
     conda activate utta
+    
+    # Download spaCy model if needed
+    echo "Ensuring spaCy model is available..."
+    python -c "import spacy; spacy.load('en_core_web_sm')" || python -m spacy download en_core_web_sm
 fi
-
-# Install core dependencies
-echo "Installing core dependencies..."
-pip install --no-cache-dir streamlit==1.32.0 python-dotenv textstat
-pip install --no-cache-dir sentence-transformers==2.2.2 faiss-gpu
-pip install --no-cache-dir spacy
-python -m spacy download en_core_web_sm
-
-# Critical dependency: Install specific version of OpenAI that works with DSPy
-echo "Installing OpenAI version compatible with DSPy..."
-pip install --no-cache-dir openai==0.28.0
-
-# Install DSPy (after OpenAI)
-echo "Installing DSPy..."
-pip install --no-cache-dir dspy-ai==2.0.4
 
 # Create required directories
 echo "Creating data directories..."
