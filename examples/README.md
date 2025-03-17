@@ -12,7 +12,7 @@ This educational project demonstrates three different approaches to improving LL
 | Feature | DSPy | OpenAI | HuggingFace |
 |---------|------|--------|-------------|
 | What changes | Prompts | Model weights (cloud) | Model weights (local) |
-| Training data needed | Small (5 examples) | Medium (10+ examples) | Large (20+ examples) |
+| Training data needed | Small (5 examples)* | Medium (10+ examples)* | Large (20+ examples)* |
 | Setup difficulty | Simple | Simple | Complex |
 | Control | Limited | Medium | Full |
 | Hardware required | None | None | GPU (16GB+ VRAM) |
@@ -27,7 +27,7 @@ This educational project demonstrates three different approaches to improving LL
 - 👉 **OpenAI**: Best for production deployment, balanced control/convenience
 - 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
 
-> **Note on Dataset Sizes**: For educational purposes, these examples use very small datasets (5-20 examples). In real-world applications, you would typically need much larger datasets:
+> **Note on Dataset Sizes**: For educational purposes, these examples use very small datasets (5-20 examples) marked with *. In real-world applications, you would typically need much larger datasets:
 > - **DSPy**: 10-50 examples for meaningful prompt optimization
 > - **OpenAI**: 50-100 examples minimum, hundreds recommended for production use
 > - **HuggingFace/LoRA**: 100-1000+ examples depending on task complexity
