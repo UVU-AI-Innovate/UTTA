@@ -256,6 +256,60 @@ All examples use consistent datasets for fair comparison:
   - DSPy uses [small_edu_qa.jsonl](small_edu_qa.jsonl) (created on first run)
   - OpenAI uses [openai_edu_qa_training.jsonl](openai_edu_qa_training.jsonl)
 
+### Dataset Formats & Creation
+
+Each approach requires datasets in specific formats. Here's how to prepare data for each method:
+
+#### DSPy Dataset Format
+
+DSPy datasets are typically stored in JSONL format, with each line containing a JSON object representing a single example:
+
+```json
+{"question": "What causes the seasons on Earth?", "answer": "The tilt of Earth's axis as it orbits around the Sun."}
+```
+
+**Creating a DSPy Dataset**:
+1. Collect pairs of questions and their correct answers
+2. Format each pair as a JSON object with "question" and "answer" keys
+3. Combine multiple examples into a JSONL file (one JSON object per line)
+4. For best results, include diverse questions that represent the types of queries you expect
+
+DSPy works best with clean, concise answers. You don't need a large dataset – even 5-10 high-quality examples can produce meaningful improvements.
+
+#### OpenAI Fine-Tuning Dataset Format
+
+OpenAI requires a specific JSONL format with "messages" containing user and assistant interactions:
+
+```json
+{"messages": [{"role": "user", "content": "What causes the seasons on Earth?"}, {"role": "assistant", "content": "The seasons on Earth are caused by the tilt of the Earth's axis as it orbits around the Sun. This tilt changes the angle at which sunlight hits different parts of the Earth throughout the year, creating seasonal variations in temperature and daylight hours."}]}
+```
+
+**Creating an OpenAI Dataset**:
+1. Format your data as conversational pairs (user question, assistant answer)
+2. Structure each example as shown above with "messages" containing role/content pairs
+3. Combine examples into a JSONL file
+4. Validate using OpenAI's CLI tool: `openai tools fine_tunes.prepare_data -f your_data.jsonl`
+5. For question-answering tasks, aim for detailed, informative answers
+
+OpenAI recommends at least 50-100 examples for meaningful fine-tuning, though our educational example uses fewer to demonstrate the process.
+
+#### HuggingFace/LoRA Dataset Format
+
+HuggingFace typically uses datasets in either JSON or CSV format, with clear input/output pairs:
+
+```json
+{"input": "What causes the seasons on Earth?", "output": "The seasons on Earth are caused by the tilt of Earth's axis relative to its orbit around the Sun. As Earth orbits the Sun, different parts of the planet receive sunlight at different angles, creating seasonal variations in temperature and daylight hours."}
+```
+
+**Creating a HuggingFace Dataset**:
+1. Format your data with consistent input/output fields
+2. For instruction-tuning, include clear instructions in the input
+3. Save as a JSON/JSONL or CSV file
+4. Consider using the Hugging Face Datasets library for processing and formatting
+5. For better results, include longer, more detailed responses in the training data
+
+In production, you would typically need hundreds to thousands of examples for effective LoRA fine-tuning.
+
 ### Implementation Structure
 
 All examples follow the same educational structure:
