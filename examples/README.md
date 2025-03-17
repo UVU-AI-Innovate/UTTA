@@ -34,6 +34,26 @@ conda activate utta
 | Time to results | Immediate | Hours | Hours (with GPU) |
 | Answer quality | Good | Better | Best |
 
+## Cost Considerations
+
+### DSPy
+- **API costs**: Requires payment for each API call to the underlying LLM service
+- **Usage pattern**: Every optimization and inference request incurs API costs
+- **Cost reduction**: Can use cheaper LLMs like Mixtral, Llama 2, or Claude Instant instead of GPT-4
+- **Typical cost range**: $0.01-$0.20 per optimization cycle, depending on chosen model
+
+### OpenAI
+- **Training costs**: One-time fee for fine-tuning ($0.03-$0.80 per 1K training tokens)
+- **Inference costs**: Ongoing API costs for every request ($0.01-$0.12 per 1K tokens)
+- **Model options**: GPT-3.5 Turbo is significantly cheaper than GPT-4 for both training and inference
+- **Typical cost range**: $5-$50 for training + ongoing inference costs
+
+### HuggingFace
+- **One-time compute**: GPU costs for training (either cloud GPU rental or local hardware)
+- **Deployment costs**: Only if self-hosting (server/cloud costs)
+- **Cost reduction**: Can use smaller open-source models like Llama 2 7B instead of larger variants
+- **Typical cost range**: $5-$15 for cloud GPU rental during training, or free if using existing hardware
+
 ## Example Files & Datasets
 
 ### Files
@@ -62,6 +82,8 @@ The DSPy example demonstrates:
 - Using Chain-of-Thought prompting rather than model fine-tuning
 - Working with very small datasets (as few as 5 examples)
 - No model weight updates (only better prompting)
+- **Note**: Still requires payment for underlying LLM API calls
+- **Cost saving option**: Can configure to use cheaper models like Mixtral or Llama 2
 
 Expected Results:
 - Direct, concise answers with logical reasoning
@@ -84,6 +106,8 @@ The OpenAI example demonstrates:
 - Cloud-based fine-tuning through OpenAI's API
 - More examples required than DSPy (10+ examples recommended)
 - Actual model weight updates (currently simulation only)
+- **Note**: Incurs both one-time training costs and ongoing API call costs
+- **Cost saving option**: Can use GPT-3.5 Turbo instead of GPT-4 for significant cost reduction
 
 Expected Results:
 - More detailed and domain-specific answers
@@ -109,6 +133,8 @@ The HuggingFace example demonstrates:
 - Full control over the training process
 - Data stays on your local machine
 - Requires GPU for actual training (currently simulation only)
+- **Note**: Requires one-time compute cost (GPU usage) but no ongoing API costs
+- **Cost saving option**: Can use smaller open-source models and lower precision (int8/int4)
 
 Expected Results:
 - Most technically precise answers
@@ -143,18 +169,21 @@ These examples demonstrate the key differences between:
    - Best for: Quick prototyping, small datasets
    - Advantage: Immediate results, lowest cost
    - Limitation: Bound by base model capabilities
+   - **Cost structure**: Requires payment for each API call to the underlying LLM service
 
 2. **Cloud fine-tuning** (OpenAI):
    - Updating model weights through a service
    - Best for: Production deployment, medium datasets
    - Advantage: Balance of control and convenience
    - Limitation: Cost and data privacy
+   - **Cost structure**: One-time training fee plus ongoing API costs for inference
 
 3. **Local fine-tuning** (HuggingFace):
    - Full control with your own infrastructure
    - Best for: Full customization, large datasets
    - Advantage: Complete control, data privacy
    - Limitation: Complex setup, hardware requirements
+   - **Cost structure**: One-time compute cost, no ongoing API fees
 
 ## Choosing an Approach
 
@@ -169,9 +198,11 @@ Consider these factors when choosing an approach:
    - Can wait hours → OpenAI/HuggingFace
 
 3. **Budget**:
-   - Minimal budget → DSPy
+   - Minimal budget → DSPy (still requires paying for API calls)
    - Medium budget → OpenAI
    - One-time compute cost → HuggingFace
+   - **Cheapest overall**: HuggingFace with existing GPU and small open-source models
+   - **Cheapest without GPU**: DSPy with budget-friendly models like Mixtral or Claude Instant
 
 4. **Privacy Requirements**:
    - Standard → DSPy/OpenAI
