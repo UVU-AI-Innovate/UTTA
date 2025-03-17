@@ -43,6 +43,24 @@ This educational project demonstrates three different approaches to improving LL
 - Uses Chain-of-Thought prompting technique
 - API-based approach with immediate results
 
+**How DSPy Works:**
+
+DSPy is not traditional fine-tuning but rather a framework for optimizing prompts through a systematic approach:
+
+1. **Modular Architecture**: DSPy defines reusable modules (like `ChainOfThought` or `Predict`) that can be composed into programs
+2. **Optimization Process**:
+   - Define a task as a DSPy program (e.g., question answering with reasoning steps)
+   - Provide a small set of labeled examples
+   - The DSPy optimizer (Teleprompter) learns to generate better prompts by:
+     - Testing different prompt variations
+     - Analyzing what works and what doesn't
+     - Refining prompts based on performance
+     - Optimizing for the specific LLM being used
+3. **Prompt Compilation**: The optimized prompts are "compiled" for the target LLM, improving performance without changing model weights
+4. **Zero-Shot Transfer**: The optimized prompts often generalize well to similar questions not seen during optimization
+
+DSPy leverages structured approaches like Chain-of-Thought (CoT) prompting, which asks the model to show its reasoning before giving the final answer, significantly improving accuracy on complex tasks.
+
 **How to Run:**
 ```bash
 python dspy_example.py
