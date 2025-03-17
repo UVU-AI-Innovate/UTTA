@@ -5,27 +5,25 @@ channels:
   - defaults
 dependencies:
   - python=3.10
-  - pip
-  - pytorch>=2.0.0
+  - pip=23.3.1
+  - pytorch=2.2.0
   - torchvision
-  - torchaudio
-  - cudatoolkit
-  - numpy
-  - pandas
-  - scikit-learn
-  - spacy
-  - matplotlib
-  - plotly
+  - cudatoolkit=11.8
+  - numpy>=1.24.0
+  - pandas>=2.0.0
+  - pytest>=7.0.0
+  - black>=23.0.0
+  - flake8>=6.0.0
   - pip:
-    - streamlit>=1.32.0
+    - python-dotenv>=1.0.0
+    - streamlit==1.32.0
+    - textstat>=0.7.3
+    - sentence-transformers==2.2.2
+    - faiss-gpu>=1.7.4
+    - spacy>=3.7.0
+    - openai==0.28.0
     - dspy-ai==2.0.4
-    - sentence-transformers>=2.2.2
-    - python-dotenv
-    - textstat
-    - faiss-gpu
-    - gensim>=4.3.3
-    - nltk>=3.9.1
-    - transformers
-    - openai
-    - backoff
-    - jupyter
+    - pytest-cov>=4.1.0
+    - black>=23.0.0
+    - flake8>=6.0.0
+    - en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl
