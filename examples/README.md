@@ -27,10 +27,8 @@ This educational project demonstrates three different approaches to improving LL
 - 👉 **OpenAI**: Best for production deployment, balanced control/convenience
 - 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
 
-> **Note**: For educational purposes, these examples use much smaller datasets than would be required for production use. The dataset sizes in the table reflect realistic requirements for meaningful results in real-world applications.
 
----
-****
+
 ## 🔍 Three Approaches Explained
 
 ### DSPy: Prompt Optimization
