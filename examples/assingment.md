@@ -4,6 +4,8 @@
 
 In this assignment, you will explore three different approaches to improving LLM performance on a specific task: educational question answering. You'll work with the provided examples to gain hands-on experience with prompt optimization, cloud-based fine-tuning, and local fine-tuning with parameter-efficient techniques.
 
+All files needed for this assignment are available at: https://github.com/UVU-AI-Innovate/UTTA/tree/main/examples
+
 ## Learning Objectives
 
 - Understand the key differences between prompt optimization, cloud fine-tuning, and local fine-tuning
@@ -131,6 +133,7 @@ After completing at least two parts of the assignment, write a 2-3 page analysis
 ## Resources
 
 - Example files in the repository
+- All assignment files: https://github.com/UVU-AI-Innovate/UTTA/tree/main/examples
 - DSPy documentation: https://dspy-docs.vercel.app/
 - OpenAI fine-tuning guide: https://platform.openai.com/docs/guides/fine-tuning
 - HuggingFace PEFT documentation: https://huggingface.co/docs/peft/index
