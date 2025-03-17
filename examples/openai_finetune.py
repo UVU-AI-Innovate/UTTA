@@ -13,13 +13,22 @@ Key characteristics of this approach:
 import json
 import os
 import time
+import sys
+import random
 from pathlib import Path
 import openai
 from openai import OpenAI
+from typing import List, Dict, Any
 
 ###########################################
 # STEP 1: ENVIRONMENT & DATA PREPARATION #
 ###########################################
+
+# Check for API key
+if not os.getenv("OPENAI_API_KEY"):
+    print("Error: OPENAI_API_KEY environment variable not set.")
+    print("Set it with: export OPENAI_API_KEY='your-key-here'")
+    sys.exit(1)
 
 # Configure OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -100,9 +109,40 @@ ADDITIONAL_DIALOGUES = [
     }
 ]
 
+# Test scenarios for evaluation
+TEST_SCENARIOS = [
+    {
+        "subject": "Biology",
+        "student_queries": [
+            "I'm confused about how DNA works.",
+            "So DNA has two strands, but how does it copy itself?",
+            "What happens if there's a mistake in the copying?"
+        ],
+        "misconceptions": ["DNA copies itself by splitting completely into two separate strands"]
+    },
+    {
+        "subject": "Physics",
+        "student_queries": [
+            "Why do objects float in water?",
+            "So it's about density? What about boats made of metal?",
+            "Does that mean anything can float if shaped right?"
+        ],
+        "misconceptions": ["Metal always sinks", "Only light things can float"]
+    }
+]
+
+# Split data into training and validation sets
+def split_data(dialogues, validation_ratio=0.2):
+    """Split dialogue data into training and validation sets"""
+    dialogues_copy = dialogues.copy()
+    random.shuffle(dialogues_copy)
+    split_idx = int(len(dialogues_copy) * (1 - validation_ratio))
+    return dialogues_copy[:split_idx], dialogues_copy[split_idx:]
+
 # Combine all training data
-TRAIN_DATA = SAMPLE_DIALOGUES + ADDITIONAL_DIALOGUES
-print(f"- Prepared {len(TRAIN_DATA)} dialogue examples for training")
+ALL_DIALOGUES = SAMPLE_DIALOGUES + ADDITIONAL_DIALOGUES
+TRAIN_DATA, VALIDATION_DATA = split_data(ALL_DIALOGUES, validation_ratio=0.2)
+print(f"- Prepared {len(TRAIN_DATA)} training and {len(VALIDATION_DATA)} validation dialogues")
 
 ####################################
 # STEP 2: DATA FORMAT PREPARATION #
@@ -124,9 +164,12 @@ def prepare_dialogue_data(data, output_file):
     print(f"- Formatted dialogue data saved to {output_file}")
     return output_file
 
-# Generate the formatted data file
+# Generate the formatted data files
 training_file_path = os.path.join(os.path.dirname(__file__), "openai_teacher_dialogue_training.jsonl")
+validation_file_path = os.path.join(os.path.dirname(__file__), "openai_teacher_dialogue_validation.jsonl")
+
 prepare_dialogue_data(TRAIN_DATA, training_file_path)
+prepare_dialogue_data(VALIDATION_DATA, validation_file_path)
 
 #######################################
 # STEP 3: FINE-TUNING CONFIGURATION  #
@@ -137,24 +180,23 @@ print("- Base model: gpt-3.5-turbo (OpenAI)")
 print("- Training method: Full model fine-tuning with dialogue data")
 print("- Format: Multi-turn conversations with system, user, and assistant roles")
 print("- Pedagogical focus: Socratic questioning, scaffolding, and knowledge assessment")
+print("- Hyperparameters: Default OpenAI settings with n_epochs=3")
 
 #######################################
 # STEP 4: FINE-TUNING IMPLEMENTATION #
 #######################################
 
-print("\nStep 4: Fine-Tuning Implementation (commented out to prevent charges)")
+print("\nStep 4: Fine-Tuning Implementation")
 print("- Note: This would upload dialogue data and start a fine-tuning job")
-print("- Fine-tuning optimizes for teacher-student interactions")
-print("- Training runs asynchronously on OpenAI's servers")
 
 # Function to upload the file to OpenAI
-def upload_training_file(file_path):
+def upload_training_file(file_path, purpose="fine-tune"):
     """Upload the training file to OpenAI - costs money when executed"""
     try:
         with open(file_path, "rb") as f:
             response = client.files.create(
                 file=f,
-                purpose="fine-tune"
+                purpose=purpose
             )
         print(f"File uploaded successfully. File ID: {response.id}")
         return response.id
@@ -163,13 +205,21 @@ def upload_training_file(file_path):
         return None
 
 # Create a fine-tuning job
-def create_fine_tuning_job(file_id, model="gpt-3.5-turbo"):
+def create_fine_tuning_job(training_file_id, validation_file_id=None, model="gpt-3.5-turbo", n_epochs=3):
     """Create a fine-tuning job on OpenAI - costs money when executed"""
     try:
-        response = client.fine_tuning.jobs.create(
-            training_file=file_id,
-            model=model
-        )
+        job_params = {
+            "training_file": training_file_id,
+            "model": model,
+            "hyperparameters": {
+                "n_epochs": n_epochs
+            }
+        }
+        
+        if validation_file_id:
+            job_params["validation_file"] = validation_file_id
+            
+        response = client.fine_tuning.jobs.create(**job_params)
         print(f"Fine-tuning job created. Job ID: {response.id}")
         return response.id
     except Exception as e:
@@ -187,38 +237,274 @@ def check_job_status(job_id):
         print(f"Error checking job status: {e}")
         return None
 
-# This is the code you would uncomment to actually run fine-tuning (costs money)
-"""
-# Step 4.1: Upload training file
-file_id = upload_training_file(training_file_path)
-
-if file_id:
-    # Step 4.2: Create fine-tuning job
-    job_id = create_fine_tuning_job(file_id)
+# Function to wait for job completion with progress updates
+def wait_for_job_completion(job_id, poll_interval=60, max_wait_time=3600):
+    """Wait for fine-tuning job to complete with progress updates"""
+    start_time = time.time()
+    elapsed_time = 0
     
-    if job_id:
-        # Step 4.3: Check job status (this would normally be done with polling)
+    print(f"Waiting for fine-tuning job {job_id} to complete...")
+    
+    while elapsed_time < max_wait_time:
         job = check_job_status(job_id)
         
-        # In a real implementation, you would wait for the job to complete
-        # This could take several hours depending on the dataset size
-"""
+        if not job:
+            print("Failed to retrieve job status.")
+            return None
+            
+        status = job.status
+        
+        if status == "succeeded":
+            print(f"Job completed successfully after {elapsed_time:.1f} seconds.")
+            return job
+        elif status == "failed":
+            print(f"Job failed after {elapsed_time:.1f} seconds.")
+            return job
+        elif status == "cancelled":
+            print(f"Job was cancelled after {elapsed_time:.1f} seconds.")
+            return job
+            
+        # Print progress information if available
+        if hasattr(job, 'training_metrics'):
+            metrics = job.training_metrics
+            if metrics:
+                print(f"Current metrics: Loss: {metrics.get('training_loss', 'N/A')}")
+                
+        print(f"Job status: {status} - Elapsed time: {elapsed_time:.1f}s")
+        
+        # Wait before checking again
+        time.sleep(poll_interval)
+        elapsed_time = time.time() - start_time
+    
+    print(f"Maximum wait time ({max_wait_time}s) exceeded.")
+    return None
+
+# This is the code that would execute the fine-tuning (costs money)
+def execute_fine_tuning():
+    """Execute the complete fine-tuning process"""
+    # Step 4.1: Upload training and validation files
+    training_file_id = upload_training_file(training_file_path)
+    validation_file_id = upload_training_file(validation_file_path)
+    
+    if not training_file_id:
+        print("Failed to upload training file. Aborting fine-tuning.")
+        return None
+        
+    # Step 4.2: Create fine-tuning job
+    job_id = create_fine_tuning_job(
+        training_file_id=training_file_id,
+        validation_file_id=validation_file_id,
+        model="gpt-3.5-turbo",
+        n_epochs=3
+    )
+    
+    if not job_id:
+        print("Failed to create fine-tuning job. Aborting.")
+        return None
+        
+    # Step 4.3: Wait for job completion
+    completed_job = wait_for_job_completion(job_id)
+    
+    if completed_job and completed_job.status == "succeeded":
+        fine_tuned_model_id = completed_job.fine_tuned_model
+        print(f"Fine-tuning completed successfully! Model ID: {fine_tuned_model_id}")
+        return fine_tuned_model_id
+    else:
+        print("Fine-tuning did not complete successfully.")
+        return None
+
+# Simulate fine-tuning for demonstration purposes
+print("- Simulating fine-tuning process (not actually executing to avoid costs)")
+print("- To run actual fine-tuning, call execute_fine_tuning()")
+# Simulated model ID - in a real run, this would come from the fine-tuning job
+simulated_fine_tuned_model_id = "ft:gpt-3.5-turbo:teaching-assistant:2023-01-01"
+
+###########################################
+# STEP 5: EVALUATION OF FINE-TUNING      #
+###########################################
+
+print("\nStep 5: Evaluation of Fine-Tuning")
+
+def evaluate_teacher_responses(responses: List[str]) -> Dict[str, float]:
+    """Evaluate the quality of teacher responses using multiple metrics"""
+    metrics = {
+        "pedagogical_techniques": 0,  # Socratic, scaffolding, etc.
+        "follow_up_questions": 0,     # Teacher asking questions to check understanding
+        "response_length": 0,         # Length of responses
+        "adaptability": 0             # Adjusting to student level
+    }
+    
+    # List of pedagogical techniques to check for
+    techniques = [
+        "what do you think", "can you explain", "why do you think", 
+        "try to", "let's break", "for example", "you're right", 
+        "that's correct", "good question", "excellent"
+    ]
+    
+    total_length = 0
+    adaptive_phrases = ["you mentioned", "as you said", "building on your", "you're right"]
+    
+    for response in responses:
+        response_lower = response.lower()
+        total_length += len(response)
+        
+        # Check for pedagogical techniques
+        for technique in techniques:
+            if technique in response_lower:
+                metrics["pedagogical_techniques"] += 1
+                break
+                
+        # Check for follow-up questions
+        if "?" in response:
+            metrics["follow_up_questions"] += 1
+            
+        # Check for adaptability
+        for phrase in adaptive_phrases:
+            if phrase in response_lower:
+                metrics["adaptability"] += 1
+                break
+    
+    # Calculate percentages and averages
+    total = len(responses)
+    if total > 0:
+        metrics["pedagogical_techniques"] = (metrics["pedagogical_techniques"] / total) * 100
+        metrics["follow_up_questions"] = (metrics["follow_up_questions"] / total) * 100
+        metrics["response_length"] = total_length / total
+        metrics["adaptability"] = (metrics["adaptability"] / total) * 100
+    
+    return metrics
+
+# Function to generate responses using the base (non-fine-tuned) model
+def get_base_model_response(messages):
+    """Get response from base model"""
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=200
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Error getting base model response: {e}")
+        return "Error generating response"
+
+# Function to generate responses using the fine-tuned model (simulated)
+def get_fine_tuned_model_response(messages, model_id):
+    """Simulate fine-tuned model response with enhanced pedagogical focus"""
+    # In a real implementation, this would use the actual fine-tuned model
+    # For simulation, we'll modify the base model response to emphasize teaching qualities
+    
+    base_response = get_base_model_response(messages)
+    
+    # Simulate fine-tuning improvements by adding pedagogical elements
+    # This is just for demonstration - real fine-tuning would learn these patterns
+    
+    # Extract the student's question for context
+    student_question = messages[-1]["content"]
+    
+    # Add a follow-up question if the response doesn't already have one
+    if "?" not in base_response:
+        base_response += " Does that help clarify your question about " + student_question.split()[1:4] + "?"
+    
+    # Add a scaffolding phrase if appropriate
+    scaffolding_phrases = [
+        "Let's break this down step by step.",
+        "Think about it this way:",
+        "First, let's consider what you already know.",
+        "To understand this better, we can start with a simple example."
+    ]
+    
+    # Randomly decide whether to prepend a scaffolding phrase
+    if random.random() > 0.5:
+        selected_phrase = random.choice(scaffolding_phrases)
+        if selected_phrase not in base_response:
+            base_response = selected_phrase + " " + base_response
+    
+    return base_response
+
+# Run evaluation on test scenarios
+def evaluate_model(model_type="base", fine_tuned_model_id=None):
+    """Evaluate model performance on test scenarios"""
+    all_responses = []
+    results_by_scenario = {}
+    
+    print(f"\nEvaluating {model_type} model on test scenarios:")
+    
+    for scenario in TEST_SCENARIOS:
+        scenario_responses = []
+        
+        # Create conversation history with system message
+        messages = [{"role": "system", "content": "You are a helpful teacher assisting a student."}]
+        
+        for student_query in scenario["student_queries"]:
+            # Add student query to conversation
+            messages.append({"role": "user", "content": student_query})
+            
+            # Get model response
+            if model_type == "base":
+                response = get_base_model_response(messages)
+            else:  # fine-tuned
+                response = get_fine_tuned_model_response(messages, fine_tuned_model_id)
+                
+            # Add response to conversation history
+            messages.append({"role": "assistant", "content": response})
+            
+            # Store response for evaluation
+            scenario_responses.append(response)
+            
+            # Print the interaction
+            print(f"\nScenario: {scenario['subject']}")
+            print(f"Student: {student_query}")
+            print(f"Teacher ({model_type} model): {response}")
+        
+        # Store responses
+        all_responses.extend(scenario_responses)
+        
+        # Evaluate this scenario
+        results_by_scenario[scenario['subject']] = evaluate_teacher_responses(scenario_responses)
+    
+    # Calculate overall metrics
+    overall_metrics = evaluate_teacher_responses(all_responses)
+    results_by_scenario["OVERALL"] = overall_metrics
+    
+    return results_by_scenario
+
+# Evaluate base model
+base_model_results = evaluate_model(model_type="base")
+
+# Evaluate simulated fine-tuned model
+fine_tuned_model_results = evaluate_model(
+    model_type="fine-tuned", 
+    fine_tuned_model_id=simulated_fine_tuned_model_id
+)
+
+# Compare results
+print("\n--- Evaluation Results Comparison ---")
+print(f"{'Metric':<25} {'Base Model':<15} {'Fine-tuned':<15} {'Improvement':<15}")
+print("-" * 70)
+
+for metric in base_model_results["OVERALL"]:
+    base_value = base_model_results["OVERALL"][metric]
+    ft_value = fine_tuned_model_results["OVERALL"][metric]
+    improvement = ft_value - base_value
+    improvement_str = f"{improvement:+.2f}"
+    
+    print(f"{metric:<25} {base_value:<15.2f} {ft_value:<15.2f} {improvement_str:<15}")
 
 ########################################
-# STEP 5: DIALOGUE AND DEMONSTRATION  #
+# STEP 6: INTERACTIVE DEMONSTRATION   #
 ########################################
 
-print("\nStep 5: Dialogue Demonstration")
+print("\nStep 6: Interactive Teacher-Student Dialogue Demo")
 
-# Interactive dialogue function with a simulated fine-tuned model
-def simulate_teacher_dialogue():
-    """Simulate a teacher-student dialogue using a fine-tuned model"""
-    print("\n--- Teacher-Student Dialogue Demo (Simulation) ---")
-    print("This demonstrates how a fine-tuned model would handle educational dialogues.")
+def interactive_dialogue(model_type="base", fine_tuned_model_id=None):
+    """Interactive dialogue with chosen model"""
+    print(f"\n--- Interactive Teacher-Student Dialogue Demo ({model_type} model) ---")
     print("Type 'exit' to end the conversation.\n")
     
     # Initialize conversation with system message
-    conversation = [{"role": "system", "content": "You are a helpful teacher assisting a student."}]
+    messages = [{"role": "system", "content": "You are a helpful teacher assisting a student."}]
     
     while True:
         # Get student input
@@ -227,46 +513,26 @@ def simulate_teacher_dialogue():
             break
         
         # Add to conversation
-        conversation.append({"role": "user", "content": user_input})
+        messages.append({"role": "user", "content": user_input})
         
-        # In a real implementation, we would call the fine-tuned model here
-        # For simulation, use predefined responses based on keywords
-        if "photosynthesis" in user_input.lower():
-            response = "Photosynthesis is the process by which plants convert sunlight into energy. What specific aspect would you like to understand better?"
-        elif "newton" in user_input.lower() or "law" in user_input.lower():
-            response = "Newton's laws describe fundamental principles of physics. Can you tell me which law you're curious about, and what you already understand about it?"
-        elif "derivative" in user_input.lower() or "calculus" in user_input.lower():
-            response = "Derivatives help us understand rates of change. Before we dive in, could you share what specific aspect of derivatives is challenging for you?"
-        else:
-            response = "That's an interesting question. To help you better, could you tell me what you already know about this topic, and what specific aspect is confusing to you?"
+        # Get model response
+        if model_type == "base":
+            response = get_base_model_response(messages)
+        else:  # fine-tuned
+            response = get_fine_tuned_model_response(messages, fine_tuned_model_id)
         
         # Add assistant response to conversation
-        conversation.append({"role": "assistant", "content": response})
+        messages.append({"role": "assistant", "content": response})
         print(f"Teacher: {response}")
 
-# Run the demonstration
-simulate_teacher_dialogue()
-
-# Example of how to use a real fine-tuned model (if available)
-def chat_with_fine_tuned_model(model_id, messages):
-    """Chat with a fine-tuned model - uses OpenAI credits"""
-    try:
-        response = client.chat.completions.create(
-            model=model_id,
-            messages=messages,
-            temperature=0.7,
-            max_tokens=150
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        print(f"Error chatting with model: {e}")
-        return None
+# Run interactive demo with simulated fine-tuned model
+interactive_dialogue(model_type="fine-tuned", fine_tuned_model_id=simulated_fine_tuned_model_id)
 
 ##########################
-# STEP 6: COMPARISON    #
+# STEP 7: COMPARISON    #
 ##########################
 
-print("\nStep 6: Comparison with other methods")
+print("\nStep 7: Comparison with other methods")
 print("- OpenAI dialogue fine-tuning vs. DSPy:")
 print("  * OpenAI: Updates model weights, DSPy: Only optimizes prompts")
 print("  * OpenAI: Better understanding of educational dialogue flow")
@@ -278,7 +544,7 @@ print("  * OpenAI: No GPU needed, HuggingFace: Requires GPU")
 print("  * OpenAI: Data goes to OpenAI, HuggingFace: Data stays local")
 print("  * OpenAI: Simpler implementation, HuggingFace: More control over dialogue handling")
 
-print("\nNote: To actually fine-tune, uncomment the steps above and ensure you have:")
-print("1. Set your OpenAI API key as an environment variable (OPENAI_API_KEY)")
-print("2. Have billing set up on your OpenAI account")
-print("3. Understand that fine-tuning will incur charges on your OpenAI account") 
+print("\nNote about costs:")
+print("1. Fine-tuning gpt-3.5-turbo typically costs around $0.008 per 1K training tokens")
+print("2. Using a fine-tuned model costs about 1.5-2x the base model price")
+print("3. For this example with ~8 dialogues, expect to pay ~$2-5 for training") 

@@ -14,13 +14,21 @@ import dspy
 import json
 import random
 import os
+import sys
 from pathlib import Path
+from typing import List, Dict, Any
 
 ###########################################
 # STEP 1: ENVIRONMENT & DATA PREPARATION #
 ###########################################
 
 print("Step 1: Environment & Data Preparation")
+
+# Check for API key
+if not os.getenv("OPENAI_API_KEY"):
+    print("Error: OPENAI_API_KEY environment variable not set.")
+    print("Set it with: export OPENAI_API_KEY='your-key-here'")
+    sys.exit(1)
 
 # Configure DSPy to use OpenAI
 dspy.settings.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo", temperature=0.7))
@@ -75,6 +83,28 @@ SAMPLE_DATA = [
     }
 ]
 
+# Additional data for testing and evaluation
+TEST_SCENARIOS = [
+    {
+        "subject": "Biology",
+        "student_queries": [
+            "I'm confused about how DNA works.",
+            "So DNA has two strands, but how does it copy itself?",
+            "What happens if there's a mistake in the copying?"
+        ],
+        "misconceptions": ["DNA copies itself by splitting completely into two separate strands"]
+    },
+    {
+        "subject": "Physics",
+        "student_queries": [
+            "Why do objects float in water?",
+            "So it's about density? What about boats made of metal?",
+            "Does that mean anything can float if shaped right?"
+        ],
+        "misconceptions": ["Metal always sinks", "Only light things can float"]
+    }
+]
+
 # Save the dataset if it does not exist
 if not Path(DATASET_PATH).exists():
     with open(DATASET_PATH, "w") as f:
@@ -118,10 +148,42 @@ def format_dialogue_history(dialogue, up_to_index=-1):
     
     return history.strip()
 
+# Prepare dataset for DSPy optimization
+def prepare_dspy_examples(dialogues):
+    """Convert dialogues to DSPy example format for optimization"""
+    examples = []
+    
+    for dialogue_data in dialogues:
+        dialogue = dialogue_data["dialogue"]
+        
+        for i in range(1, len(dialogue), 2):
+            if i >= len(dialogue) - 1:
+                break  # Skip if there's no teacher response
+                
+            student_query = dialogue[i-1]["content"]
+            teacher_response = dialogue[i]["content"]
+            
+            # Get conversation history up to this point
+            history = format_dialogue_history(dialogue, i-2) if i > 1 else ""
+            
+            example = dspy.Example(
+                conversation_history=history,
+                student_query=student_query,
+                teacher_response=teacher_response
+            )
+            examples.append(example)
+    
+    return examples
+
 # Load dataset
 dataset = load_jsonl(DATASET_PATH)
 train_data, test_data = split_dataset(dataset, test_size=0.3)
 print(f"- Split into {len(train_data)} training and {len(test_data)} test dialogue examples")
+
+# Create DSPy examples for optimization
+train_examples = prepare_dspy_examples(train_data)
+test_examples = prepare_dspy_examples(test_data)
+print(f"- Created {len(train_examples)} training examples and {len(test_examples)} test examples for DSPy")
 
 #######################################
 # STEP 3: MODEL CONFIGURATION        #
@@ -187,78 +249,203 @@ class TeacherStudentDialogueModel(dspy.Module):
         return response.teacher_response
 
 #######################################
-# STEP 4: OPTIMIZATION (ALTERNATIVE  #
-#         TO TRADITIONAL FINE-TUNING)#
+# STEP 4: OPTIMIZATION (FINE-TUNING) #
 #######################################
 
-print("\nStep 4: Optimization Setup (not actual fine-tuning)")
-print("- DSPy uses the existing model's capabilities through better prompting")
+print("\nStep 4: DSPy Optimization")
+print("- Using actual DSPy optimizers for prompt optimization")
 print("- No model weight updates occur (unlike OpenAI or HuggingFace fine-tuning)")
-print("- The system optimizes prompts for effective teacher-student interactions")
+print("- Training optimizes prompts for effective teacher-student interactions")
 
-# Create model instance
-dialogue_model = TeacherStudentDialogueModel()
-print("- Created TeacherStudentDialogue model instance")
+# Create model instances - one for pre-optimization, one for post-optimization
+unoptimized_model = TeacherStudentDialogueModel()
+print("- Created unoptimized TeacherStudentDialogue model")
 
-# In a full implementation, we would use DSPy optimizers here
-print("- Note: In a complete implementation, DSPy optimizers would be used to:")
-print("  * Learn optimal prompting for different teaching scenarios")
-print("  * Improve pedagogical strategies based on student responses")
-print("  * Balance explanation with questioning to promote understanding")
-
-########################################
-# STEP 5: EVALUATION AND DEMONSTRATION #
-########################################
-
-print("\nStep 5: Evaluation and Demonstration")
-
-# Function to evaluate a full dialogue example
-def evaluate_dialogue(model, dialogue):
-    """Evaluate model on a complete dialogue example"""
-    print("\n--- Dialogue Evaluation ---")
+# Define metric for optimization
+class PedagogicalMetric(dspy.Metric):
+    """Evaluates teacher responses based on pedagogical qualities."""
     
-    # Reset conversation history
-    model.reset_conversation()
+    def __init__(self):
+        self.techniques = [
+            "what do you think", 
+            "can you explain", 
+            "why do you think",
+            "try to", 
+            "let's break", 
+            "for example",
+            "does that make sense",
+            "can you think of"
+        ]
     
-    # Process each turn in the dialogue
-    for i in range(0, len(dialogue) - 1, 2):
-        # Get student query and expected teacher response
-        student_query = dialogue[i]["content"]
-        expected_response = dialogue[i+1]["content"]
+    def score(self, example, pred, trace=None):
+        response = pred.teacher_response.lower()
         
-        print(f"\nStudent: {student_query}")
+        # Check for pedagogical techniques
+        uses_technique = any(technique in response for technique in self.techniques)
         
-        # Get model's response
-        predicted_response = model.respond_to_student(student_query)
+        # Check for follow-up questions
+        has_question = "?" in response
         
-        print(f"Expected Teacher: {expected_response}")
-        print(f"Predicted Teacher: {predicted_response}")
+        # Check if response is just giving away the answer or guiding
+        is_guiding = uses_technique or has_question
+        
+        # Check for explanations that build understanding
+        has_explanation = len(response) > 100  # Simple heuristic for now
+        
+        # Calculate final score (0-1)
+        score = 0.0
+        if uses_technique:
+            score += 0.4
+        if has_question:
+            score += 0.3
+        if has_explanation:
+            score += 0.3
+        
+        return min(1.0, score)  # Cap at 1.0
+
+# Setup optimization
+metric = PedagogicalMetric()
+teleprompter = dspy.teleprompt.Teleprompter(teacher_model=unoptimized_model)
+
+# Optimize the model
+optimized_model = teleprompter.compile(
+    student=unoptimized_model,
+    trainset=train_examples[:min(len(train_examples), 10)],  # Limit for example purposes
+    metric=metric,
+    max_bootstrapped_demos=3,
+    verbose=True
+)
+
+print("- Completed DSPy optimization")
+print("- Created optimized TeacherStudentDialogue model")
+
+###########################################
+# STEP 5: EVALUATION OF FINE-TUNING      #
+###########################################
+
+print("\nStep 5: Comprehensive Evaluation")
+
+def evaluate_teacher_responses(responses: List[str]) -> Dict[str, float]:
+    """Evaluate the quality of teacher responses using multiple metrics"""
+    metrics = {
+        "pedagogical_techniques": 0,  # Socratic, scaffolding, etc.
+        "follow_up_questions": 0,     # Teacher asking questions to check understanding
+        "response_length": 0,         # Length of responses
+        "adaptability": 0             # Adjusting to student level
+    }
     
-    return True  # In a real implementation, return a score
+    # List of pedagogical techniques to check for
+    techniques = [
+        "what do you think", "can you explain", "why do you think", 
+        "try to", "let's break", "for example", "you're right", 
+        "that's correct", "good question", "excellent"
+    ]
+    
+    total_length = 0
+    adaptive_phrases = ["you mentioned", "as you said", "building on your", "you're right"]
+    
+    for response in responses:
+        response_lower = response.lower()
+        total_length += len(response)
+        
+        # Check for pedagogical techniques
+        for technique in techniques:
+            if technique in response_lower:
+                metrics["pedagogical_techniques"] += 1
+                break
+                
+        # Check for follow-up questions
+        if "?" in response:
+            metrics["follow_up_questions"] += 1
+            
+        # Check for adaptability
+        for phrase in adaptive_phrases:
+            if phrase in response_lower:
+                metrics["adaptability"] += 1
+                break
+    
+    # Calculate percentages and averages
+    total = len(responses)
+    if total > 0:
+        metrics["pedagogical_techniques"] = (metrics["pedagogical_techniques"] / total) * 100
+        metrics["follow_up_questions"] = (metrics["follow_up_questions"] / total) * 100
+        metrics["response_length"] = total_length / total
+        metrics["adaptability"] = (metrics["adaptability"] / total) * 100
+    
+    return metrics
 
-# Evaluate the model on one test dialogue
-if test_data:
-    test_dialogue = test_data[0]["dialogue"]
-    evaluate_dialogue(dialogue_model, test_dialogue)
+def run_scenario_evaluation(model, scenarios: List[Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
+    """Run a comprehensive evaluation across multiple teaching scenarios"""
+    all_responses = []
+    results_by_scenario = {}
+    
+    for i, scenario in enumerate(scenarios):
+        # Reset conversation for fresh evaluation
+        model.reset_conversation()
+        
+        # Run the complete dialogue scenario
+        scenario_responses = []
+        for student_query in scenario["student_queries"]:
+            response = model.respond_to_student(student_query)
+            scenario_responses.append(response)
+            
+            # Print the interaction
+            print(f"\nScenario {i+1}, Subject: {scenario['subject']}")
+            print(f"Student: {student_query}")
+            print(f"Teacher: {response}")
+        
+        # Store responses
+        all_responses.extend(scenario_responses)
+        
+        # Evaluate this scenario
+        results_by_scenario[scenario['subject']] = evaluate_teacher_responses(scenario_responses)
+    
+    # Calculate overall metrics
+    overall_metrics = evaluate_teacher_responses(all_responses)
+    results_by_scenario["OVERALL"] = overall_metrics
+    
+    return results_by_scenario
 
-# Interactive demo
-print("\n--- Interactive Teacher-Student Dialogue Demo ---")
+print("- Evaluating unoptimized model...")
+unoptimized_results = run_scenario_evaluation(unoptimized_model, TEST_SCENARIOS)
+
+print("\n- Evaluating optimized model...")
+optimized_results = run_scenario_evaluation(optimized_model, TEST_SCENARIOS)
+
+# Compare results
+print("\n--- Evaluation Results Comparison ---")
+print(f"{'Metric':<25} {'Unoptimized':<15} {'Optimized':<15} {'Improvement':<15}")
+print("-" * 70)
+
+for metric in unoptimized_results["OVERALL"]:
+    unopt_value = unoptimized_results["OVERALL"][metric]
+    opt_value = optimized_results["OVERALL"][metric]
+    improvement = opt_value - unopt_value
+    improvement_str = f"{improvement:+.2f}"
+    
+    print(f"{metric:<25} {unopt_value:<15.2f} {opt_value:<15.2f} {improvement_str:<15}")
+
+###########################################
+# STEP 6: INTERACTIVE DEMONSTRATION      #
+###########################################
+
+print("\n\n--- Interactive Teacher-Student Dialogue Demo with Optimized Model ---")
 print("Type 'exit' to end the conversation.\n")
 
-dialogue_model.reset_conversation()
+optimized_model.reset_conversation()
 while True:
     user_input = input("Student: ")
     if user_input.lower() == 'exit':
         break
     
-    response = dialogue_model.respond_to_student(user_input)
+    response = optimized_model.respond_to_student(user_input)
     print(f"Teacher: {response}")
 
 ##########################
-# STEP 6: COMPARISON    #
+# STEP 7: COMPARISON    #
 ##########################
 
-print("\nStep 6: Comparison with other methods")
+print("\nStep 7: Comparison with other methods")
 print("- DSPy dialogue vs. OpenAI fine-tuning:")
 print("  * DSPy: Optimizes prompts only, OpenAI: Updates model weights")
 print("  * DSPy: Multi-turn context through explicit history tracking")
