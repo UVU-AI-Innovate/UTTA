@@ -7,33 +7,6 @@
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-31012/)
 
-## Table of Contents
-- [UTTA (Utah Teacher Training Assistant)](#utta-utah-teacher-training-assistant)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-    - [Option 1: Automated Setup (Recommended)](#option-1-automated-setup-recommended)
-    - [Option 2: Manual Setup](#option-2-manual-setup)
-  - [Project Structure](#project-structure)
-  - [Usage](#usage)
-    - [Web Interface](#web-interface)
-    - [CLI Interface](#cli-interface)
-  - [Features](#features)
-  - [Environment Configuration](#environment-configuration)
-    - [Environment Details](#environment-details)
-  - [Examples Directory](#examples-directory)
-    - [Example Categories](#example-categories)
-      - [DSPy Examples (`examples/dspy/`)](#dspy-examples-examplesdspy)
-      - [OpenAI Examples (`examples/openai/`)](#openai-examples-examplesopenai)
-      - [Hugging Face Examples (`examples/huggingface/`)](#hugging-face-examples-exampleshuggingface)
-    - [Learning Focus](#learning-focus)
-  - [Troubleshooting](#troubleshooting)
-    - [Common Issues](#common-issues)
-    - [Diagnostics](#diagnostics)
-    - [Getting Help](#getting-help)
-  - [License](#license)
-  - [Contributing](#contributing)
-  - [Acknowledgments](#acknowledgments)
 
 ## Prerequisites
 
