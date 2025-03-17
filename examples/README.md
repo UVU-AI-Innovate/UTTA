@@ -1,6 +1,13 @@
 # LLM Fine-Tuning Examples
 
-This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering.
+This directory contains examples of different approaches to fine-tuning large language models (LLMs) for educational question answering. These examples are provided under the terms of the LICENSE file included in the repository.
+
+## Overview
+
+This educational project demonstrates three different approaches to improving LLM performance:
+- **DSPy**: Prompt optimization without model changes
+- **OpenAI**: Cloud-based fine-tuning
+- **HuggingFace**: Local fine-tuning with LoRA
 
 ## Comparison of Fine-Tuning Approaches
 
@@ -17,15 +24,15 @@ This directory contains examples of different approaches to fine-tuning large la
 | Time to results | Immediate | Hours | Hours (with GPU) |
 | Answer quality | Good | Better | Best |
 
-## Example Files
+## Example Files & Datasets
 
+### Files
 - **DSPy Optimization**: [dspy_example.py](dspy_example.py)
 - **OpenAI Fine-Tuning**: [openai_finetune.py](openai_finetune.py)
 - **HuggingFace LoRA**: [huggingface_lora.py](huggingface_lora.py)
 
-## Datasets
-
-These examples use the same basic educational QA dataset for consistency and comparison:
+### Datasets
+These examples use consistent datasets for comparison:
 - Base dataset: 5 educational QA pairs (used in all examples)
 - Extended dataset: 10-20 educational QA pairs (used in OpenAI and HuggingFace examples)
 - The OpenAI formatted dataset is saved as [openai_edu_qa_training.jsonl](openai_edu_qa_training.jsonl)
@@ -33,7 +40,7 @@ These examples use the same basic educational QA dataset for consistency and com
 
 ## Running the Examples
 
-All examples are designed to be educational and include safety measures to prevent accidental execution that might incur costs or require significant computing resources.
+All examples include safety measures to prevent accidental execution that might incur costs or require significant computing resources.
 
 ### DSPy Example
 
@@ -106,9 +113,9 @@ Expected Results:
      creating seasonal variations in temperature and daylight hours.
   ```
 
-## Step-by-Step Structure
+## Implementation Structure
 
-Each example follows the same educational structure for easy comparison:
+Each example follows the same educational structure:
 
 1. **Environment & Data Preparation**: Setup and dataset preparation
 2. **Data Format Preparation**: Converting data to the required format
@@ -117,7 +124,7 @@ Each example follows the same educational structure for easy comparison:
 5. **Inference and Demonstration**: Using the model to answer questions
 6. **Comparison**: Direct comparison with other methods
 
-## Requirements
+## Technical Requirements
 
 Different requirements depending on which example you're running:
 
@@ -147,7 +154,7 @@ See the main requirements.txt file for specific versions.
 
 ## Educational Purpose
 
-These examples are designed for educational comparison and should not be run in production without further development. They demonstrate the key differences between:
+These examples demonstrate the key differences between:
 
 1. **Prompt optimization** (DSPy):
    - No model changes, just better instructions
@@ -190,4 +197,12 @@ Consider these factors when choosing an approach:
 
 ## Contributing
 
-Feel free to contribute additional examples or improvements to existing ones. Please ensure any additions follow the same educational structure and include appropriate safety measures.
+Feel free to contribute additional examples or improvements to existing ones. Please ensure any additions follow the same educational structure and include appropriate safety measures. All contributions must comply with the terms of the MIT License.
+
+## License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Copyright (c) 2025 Utah Teacher Training Assistant (UTTA)
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.

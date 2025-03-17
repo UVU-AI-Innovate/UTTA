@@ -245,7 +245,11 @@ python src/diagnostics.py
 
 ## License
 
-This project is licensed under the terms of the LICENSE file included in the repository.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Copyright (c) 2025 Utah Teacher Training Assistant (UTTA)
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
 
 ## Acknowledgments
 
