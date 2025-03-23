@@ -13,7 +13,7 @@ All files needed for this assignment are available at: [https://github.com/UVU-A
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.10 (required by the conda environment)
 - Access to the example files: `dspy_example.py`, `openai_finetune.py`, `huggingface_lora.py`, and `simple_example.py`
 - OpenAI API key (for Parts 1 and 2)
 - Conda environment manager
