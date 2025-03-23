@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 """
-Fine-Tuning Methods Comparison for Teacher-Student Dialogues
+Fine-Tuning Methods Comparison for Student Simulation
 
 This script provides a clear overview of the three fine-tuning approaches
 demonstrated in the examples directory, showing their characteristics,
-sample dialogues, and key differences.
+sample dialogues, and key differences for student simulation.
 """
 
 def print_header():
     """Print the header and introduction."""
     print("\n" + "=" * 70)
-    print(" 🧠 LLM FINE-TUNING METHODS FOR TEACHER-STUDENT DIALOGUES")
+    print(" 🧠 LLM FINE-TUNING METHODS FOR STUDENT SIMULATION")
     print("=" * 70)
     print("\nThis example demonstrates three different approaches to fine-tuning")
-    print("large language models for educational dialogue interactions.")
+    print("large language models to simulate realistic student behavior.")
     print("\nEach approach offers different tradeoffs in terms of:")
     print("- Data requirements")
     print("- Infrastructure needs")
@@ -34,17 +34,17 @@ def show_dspy_example():
     print("- Time to results: Immediate")
     
     print("\n💬 EXAMPLE DIALOGUE:")
-    print("Student: I'm confused about photosynthesis.")
-    print("Teacher: What specific part of photosynthesis is confusing you?")
-    print("Student: How do plants convert sunlight to energy?")
-    print("Teacher: Plants capture sunlight with chlorophyll in their chloroplasts. This")
-    print("         energy is used to convert CO2 and water into glucose and oxygen")
-    print("         through a series of chemical reactions. Does that help clarify?")
+    print("Teacher: Can you explain what you know about photosynthesis?")
+    print("Student: I know it's how plants make food using sunlight, but I'm not")
+    print("         sure about the details. I think it involves chlorophyll?")
+    print("Teacher: Yes, chlorophyll plays a key role. Can you tell me what else is needed?")
+    print("Student: I think plants need water and carbon dioxide too. The sun's energy")
+    print("         helps convert these into oxygen and sugar that the plant uses as food.")
     
     print("\n✅ BEST FOR:")
     print("- Quick experiments with minimal data")
     print("- When you need immediate results")
-    print("- Testing different pedagogical strategies")
+    print("- Testing different student knowledge levels and learning patterns")
     print("- Working with any LLM through an API")
 
 def show_openai_example():
@@ -61,20 +61,19 @@ def show_openai_example():
     print("- Time to results: Hours for training")
     
     print("\n💬 EXAMPLE DIALOGUE:")
-    print("Student: I don't understand Newton's third law.")
-    print("Teacher: Newton's third law states that for every action, there's an equal")
-    print("         and opposite reaction. Can you think of any examples where you")
-    print("         might have experienced this in everyday life?")
-    print("Student: Maybe when I push against a wall?")
-    print("Teacher: Exactly! When you push against a wall, you're applying a force to")
-    print("         the wall, but at the same time, the wall is pushing back against")
-    print("         your hand with equal force. That's why your hand doesn't go through.")
+    print("Teacher: Can you explain Newton's third law of motion?")
+    print("Student: I think it's something about actions and reactions? Like")
+    print("         every action has an equal and opposite reaction?")
+    print("Teacher: That's right. Can you give me an example from everyday life?")
+    print("Student: When I push against a wall, the wall actually pushes back")
+    print("         with the same force. That's why my hand doesn't go through")
+    print("         the wall, right?")
     
     print("\n✅ BEST FOR:")
     print("- Production deployment with balanced control")
     print("- When you need better performance than prompt engineering")
     print("- No infrastructure management concerns")
-    print("- Multi-turn educational conversations")
+    print("- Multi-turn educational conversations with consistent student behavior")
 
 def show_huggingface_example():
     """Display the HuggingFace approach information."""
@@ -90,15 +89,13 @@ def show_huggingface_example():
     print("- Time to results: Hours for training (with GPU)")
     
     print("\n💬 EXAMPLE DIALOGUE:")
-    print("Student: I'm struggling with calculating derivatives.")
-    print("Teacher: I understand derivatives can be challenging. Could you tell me")
-    print("         which specific aspect you're finding difficult?")
-    print("Student: I don't understand the chain rule.")
-    print("Teacher: The chain rule helps us find the derivative of composite functions.")
-    print("         If y = f(g(x)), then dy/dx = f'(g(x)) × g'(x). Let's work through")
-    print("         an example: if y = sin(x²), what would be its derivative?")
-    print("Student: I think it would be cos(x²) × 2x?")
-    print("Teacher: Excellent! That's correct. You've applied the chain rule perfectly.")
+    print("Teacher: I'd like to discuss derivatives in calculus. What parts do you find challenging?")
+    print("Student: I'm having trouble understanding the chain rule. I get confused")
+    print("         when functions are nested inside each other.")
+    print("Teacher: Let's work through a simple example. What would be the derivative of sin(x²)?")
+    print("Student: Let me think... So I need to use the chain rule because I have")
+    print("         a function inside another function. The derivative of sin(x) is")
+    print("         cos(x), and the derivative of x² is 2x, so it would be cos(x²) × 2x?")
     
     print("\n✅ BEST FOR:")
     print("- Complete control over the training process")
@@ -139,7 +136,7 @@ def show_next_steps():
     print("./run_all_examples.sh")
     
     print("\nFor assignment details:")
-    print("See assingment.md for detailed instructions")
+    print("See assignment.md for detailed instructions")
 
 if __name__ == "__main__":
     print_header()

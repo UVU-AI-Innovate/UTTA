@@ -12,6 +12,9 @@ echo -e "${BLUE}==================================================="
 echo -e "   🧠 Fine-Tuning Examples for Educational QA"
 echo -e "===================================================${NC}"
 
+echo -e "${GREEN}All examples can run in simulation mode! No GPU required!${NC}"
+echo -e "${GREEN}Learn the concepts without needing specialized hardware or API costs.${NC}"
+
 # Ensure we're in the examples directory
 cd "$(dirname "$0")"
 
@@ -28,6 +31,7 @@ check_dependencies() {
     echo -e "${YELLOW}Warning: No .env file found in the parent directory.${NC}"
     echo -e "         You might need API keys for some examples."
     echo -e "         Create a .env file with OPENAI_API_KEY=your_key"
+    echo -e "         Note: Examples will still run in simulation mode without API keys."
   else
     echo -e "${GREEN}Found .env file for environment variables${NC}"
   fi
@@ -38,7 +42,7 @@ check_dependencies() {
 # Simple example that just shows concepts
 run_simple_example() {
   echo -e "\n\n${BLUE}==================================================="
-  echo -e "RUNNING SIMPLE OVERVIEW EXAMPLE (NO API KEYS NEEDED)"
+  echo -e "RUNNING SIMPLE OVERVIEW EXAMPLE (NO DEPENDENCIES NEEDED)"
   echo -e "===================================================${NC}"
   python simple_example.py
   
@@ -51,13 +55,13 @@ run_dspy_example() {
   echo -e "\n\n${BLUE}==================================================="
   echo -e "RUNNING DSPY PROMPT OPTIMIZATION EXAMPLE"
   echo -e "===================================================${NC}"
-  echo -e "${YELLOW}Note: This example requires an OpenAI API key in your .env file${NC}"
-  echo -e "${YELLOW}If you don't have an API key, it will fail gracefully${NC}"
+  echo -e "${YELLOW}Note: This example works best with an OpenAI API key in your .env file${NC}"
+  echo -e "${YELLOW}Without an API key, it will run in simulation mode${NC}"
   echo -e "${YELLOW}Run this example? (y/n)${NC}"
   read -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    python dspy_example.py
+    python dspy_example.py || echo -e "${YELLOW}Example failed, but you can still learn from the code structure${NC}"
   else
     echo -e "${YELLOW}Skipping DSPy example${NC}"
   fi
@@ -68,13 +72,14 @@ run_openai_example() {
   echo -e "\n\n${BLUE}==================================================="
   echo -e "RUNNING OPENAI FINE-TUNING EXAMPLE"
   echo -e "===================================================${NC}"
-  echo -e "${YELLOW}Note: This example requires an OpenAI API key in your .env file${NC}"
-  echo -e "${YELLOW}Running this with actual fine-tuning would incur costs${NC}"
+  echo -e "${YELLOW}Note: This example demonstrates OpenAI's fine-tuning workflow${NC}"
+  echo -e "${YELLOW}With an API key, it shows the setup process (no actual fine-tuning)${NC}"
+  echo -e "${YELLOW}Without an API key, it runs in simulation mode${NC}"
   echo -e "${YELLOW}Run this example? (y/n)${NC}"
   read -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    python openai_finetune.py
+    python openai_finetune.py || echo -e "${YELLOW}Example failed, but you can still learn from the code structure${NC}"
   else
     echo -e "${YELLOW}Skipping OpenAI example${NC}"
   fi
@@ -85,13 +90,14 @@ run_huggingface_example() {
   echo -e "\n\n${BLUE}==================================================="
   echo -e "RUNNING HUGGINGFACE LORA FINE-TUNING EXAMPLE"
   echo -e "===================================================${NC}"
-  echo -e "${YELLOW}Note: This example requires a GPU and HuggingFace libraries${NC}"
-  echo -e "${YELLOW}It may take significant time and resources to run${NC}"
+  echo -e "${GREEN}Note: This example now runs in simulation mode on any computer${NC}"
+  echo -e "${GREEN}No GPU required! The example will demonstrate the LoRA workflow${NC}"
+  echo -e "${GREEN}You'll learn the key concepts without needing specialized hardware${NC}"
   echo -e "${YELLOW}Run this example? (y/n)${NC}"
   read -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    python huggingface_lora.py
+    python huggingface_lora.py || echo -e "${YELLOW}Example failed, but you can still learn from the code structure${NC}"
   else
     echo -e "${YELLOW}Skipping HuggingFace example${NC}"
   fi

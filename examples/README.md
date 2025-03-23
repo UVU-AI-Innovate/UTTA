@@ -34,7 +34,7 @@ This directory contains examples of three different approaches to fine-tuning la
 - `simple_example.py` - Quick overview of the three fine-tuning approaches
 
 ### Assignment
-- `assingment.md` - Detailed assignment instructions for students
+- `assignment.md` - Detailed assignment instructions for students
 
 ## 🚀 Quick Start
 

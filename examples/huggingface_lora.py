@@ -13,8 +13,7 @@ Key characteristics of this approach:
 """
 import json
 import os
-import torch
-import numpy as np
+import sys
 from pathlib import Path
 
 # Load environment variables from .env file
@@ -31,21 +30,40 @@ try:
 except ImportError:
     print("Warning: dotenv package not found. Environment variables must be set manually.")
 
-from datasets import Dataset
-from transformers import (
-    AutoModelForCausalLM, 
-    AutoTokenizer, 
-    BitsAndBytesConfig, 
-    TrainingArguments, 
-    Trainer,
-    DataCollatorForLanguageModeling
-)
-from peft import (
-    LoraConfig, 
-    get_peft_model, 
-    prepare_model_for_kbit_training,
-    TaskType
-)
+# Check if we should run in simulation mode (no GPU/compatibility issues)
+SIMULATION_MODE = False
+try:
+    import torch
+    # Check if GPU is available or if we have compatibility issues
+    if not torch.cuda.is_available():
+        print("WARNING: GPU not available. Running in simulation mode.")
+        SIMULATION_MODE = True
+except (ImportError, Exception) as e:
+    print(f"WARNING: Error importing PyTorch or checking GPU: {e}")
+    print("Running in simulation mode.")
+    SIMULATION_MODE = True
+
+if not SIMULATION_MODE:
+    try:
+        from datasets import Dataset
+        from transformers import (
+            AutoModelForCausalLM, 
+            AutoTokenizer, 
+            BitsAndBytesConfig, 
+            TrainingArguments, 
+            Trainer,
+            DataCollatorForLanguageModeling
+        )
+        from peft import (
+            LoraConfig, 
+            get_peft_model, 
+            prepare_model_for_kbit_training,
+            TaskType
+        )
+    except ImportError as e:
+        print(f"WARNING: Error importing required libraries: {e}")
+        print("Running in simulation mode.")
+        SIMULATION_MODE = True
 
 ###########################################
 # STEP 1: ENVIRONMENT & DATA PREPARATION #
@@ -54,13 +72,19 @@ from peft import (
 print("Step 1: Environment & Data Preparation")
 
 # Check for GPU availability
-if torch.cuda.is_available():
-    print(f"- GPU available: {torch.cuda.get_device_name(0)}")
-    print(f"- CUDA capability: {torch.cuda.get_device_capability(0)}")
-    print(f"- VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+if not SIMULATION_MODE:
+    if torch.cuda.is_available():
+        print(f"- GPU available: {torch.cuda.get_device_name(0)}")
+        print(f"- CUDA capability: {torch.cuda.get_device_capability(0)}")
+        print(f"- VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+    else:
+        print("- No GPU detected. This script requires a GPU to run efficiently.")
+        print("- Training would be extremely slow on CPU and may run out of memory.")
+        print("- Switching to simulation mode.")
+        SIMULATION_MODE = True
 else:
-    print("- No GPU detected. This script requires a GPU to run efficiently.")
-    print("- Training would be extremely slow on CPU and may run out of memory.")
+    print("- Running in simulation mode (no GPU required)")
+    print("- This will demonstrate the workflow without actual model training")
 
 # Sample data for educational QA - same across all examples for comparison
 SAMPLE_DATA = [
@@ -127,6 +151,10 @@ Question: {example['question']} [/INST]
 
 def prepare_dataset():
     """Prepare the dataset for training with the appropriate formatting"""
+    if SIMULATION_MODE:
+        print("- Simulation: Dataset preparation step skipped")
+        return None
+        
     # Create a HuggingFace dataset object
     ds = Dataset.from_list(TRAIN_DATA)
     
@@ -196,6 +224,10 @@ def setup_model_and_tokenizer():
     """
     print("- Loading model and tokenizer (would download ~4GB)...")
     
+    if SIMULATION_MODE:
+        print("- Simulation: Model and tokenizer loading skipped")
+        return None, None
+    
     # Configure 4-bit quantization to reduce memory requirements
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -243,6 +275,19 @@ def train():
     print("  * Applying LoRA configuration")
     print("  * Training for 1 epoch (~1-2 hours on a good GPU)")
     print("  * Saving LoRA adapter (~15MB)")
+    
+    # Simulate adapter saving in simulation mode
+    if SIMULATION_MODE:
+        with open(os.path.join(OUTPUT_DIR, "adapter_config.json"), "w") as f:
+            json.dump({
+                "r": LORA_R,
+                "lora_alpha": LORA_ALPHA,
+                "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+                "lora_dropout": LORA_DROPOUT,
+                "bias": "none",
+                "task_type": "CAUSAL_LM"
+            }, f, indent=2)
+        print(f"- Created simulated adapter configuration file")
     
     print("\n- Training complete! (simulation)")
 

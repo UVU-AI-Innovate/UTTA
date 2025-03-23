@@ -17,7 +17,6 @@ import sys
 import random
 from pathlib import Path
 import openai
-from openai import OpenAI
 from typing import List, Dict, Any
 
 # Load environment variables from .env file
@@ -419,7 +418,10 @@ def get_fine_tuned_model_response(messages, model_id):
     
     # Add a follow-up question if the response doesn't already have one
     if "?" not in base_response:
-        base_response += " Does that help clarify your question about " + student_question.split()[1:4] + "?"
+        # Get the first few words of the question as context
+        question_words = student_question.split()
+        question_context = " ".join(question_words[1:4]) if len(question_words) > 3 else student_question
+        base_response += f" Does that help clarify your question about {question_context}?"
     
     # Add a scaffolding phrase if appropriate
     scaffolding_phrases = [
