@@ -17,22 +17,33 @@ import sys
 from pathlib import Path
 from typing import List, Dict, Any
 
+# Import utility functions
+try:
+    from utils import load_api_key, check_dspy_installation
+except ImportError:
+    print("Warning: Could not import from utils.py. Make sure it exists in the same directory.")
+    # Define minimal versions of the utility functions
+    def load_api_key():
+        return os.getenv("OPENAI_API_KEY") is not None
+    def check_dspy_installation():
+        try:
+            import dspy
+            return True
+        except ImportError:
+            return False
+
 # Set simulation mode flag
 SIMULATION_MODE = False
 
-# Load environment variables from .env file
-try:
-    from dotenv import load_dotenv
-    # Load from parent directory if this is in examples/
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-    if os.path.exists(env_path):
-        load_dotenv(env_path)
-        print(f"Loaded environment variables from {env_path}")
-    else:
-        load_dotenv()  # Try default locations
-        print("Loaded environment variables from default locations")
-except ImportError:
-    print("Warning: dotenv package not found. Environment variables must be set manually.")
+# Load environment variables and check API key
+if not load_api_key():
+    print("Warning: OPENAI_API_KEY not available. Running in simulation mode.")
+    SIMULATION_MODE = True
+
+# Check DSPy installation
+if not check_dspy_installation() and not SIMULATION_MODE:
+    print("Warning: DSPy not properly installed. Running in simulation mode.")
+    SIMULATION_MODE = True
 
 ###########################################
 # STEP 1: ENVIRONMENT & DATA PREPARATION #
@@ -40,23 +51,18 @@ except ImportError:
 
 print("Step 1: Environment & Data Preparation")
 
-# Check for API key
-if not os.getenv("OPENAI_API_KEY"):
-    print("Warning: OPENAI_API_KEY environment variable not set.")
-    print("Running in simulation mode without API calls.")
-    SIMULATION_MODE = True
-else:
+# Configure DSPy if not in simulation mode
+if not SIMULATION_MODE:
     try:
         import dspy
         # Configure DSPy to use OpenAI
         dspy.settings.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo", temperature=0.7))
         print("- LLM: OpenAI GPT-3.5-Turbo")
-    except (ImportError, Exception) as e:
+    except Exception as e:
         print(f"Error configuring DSPy with OpenAI: {e}")
         print("Running in simulation mode.")
         SIMULATION_MODE = True
-
-if SIMULATION_MODE:
+else:
     print("- Running in simulation mode (no API calls will be made)")
     # Import DSPy anyway for data structures, even if we can't use the API
     try:
