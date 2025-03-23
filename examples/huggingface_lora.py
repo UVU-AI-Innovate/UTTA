@@ -16,6 +16,21 @@ import os
 import torch
 import numpy as np
 from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load from parent directory if this is in examples/
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        print(f"Loaded environment variables from {env_path}")
+    else:
+        load_dotenv()  # Try default locations
+        print("Loaded environment variables from default locations")
+except ImportError:
+    print("Warning: dotenv package not found. Environment variables must be set manually.")
+
 from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM, 

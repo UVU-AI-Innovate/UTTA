@@ -3,6 +3,7 @@
 import os
 import logging
 import importlib.util
+import openai
 from typing import Dict, Any, List, Optional
 
 # Configure logging
@@ -18,44 +19,28 @@ try:
     logger.info("Successfully imported dspy")
 except ImportError as e:
     logger.error(f"DSPy import error: {e}")
-    # Try to find the package another way
-    try:
-        spec = importlib.util.find_spec("dspy")
-        if spec is not None:
-            dspy = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(dspy)
-            HAVE_DSPY = True
-            logger.info("Successfully imported dspy via importlib")
-    except Exception as e2:
-        logger.error(f"Failed to import DSPy via importlib: {e2}")
-        # Create a fallback module for graceful degradation
-        class FakeDSPy:
-            def __init__(self):
-                class FakeField:
-                    def __call__(self, *args, **kwargs):
-                        return None
-                self.InputField = FakeField()
-                self.OutputField = FakeField()
-                
-                class FakeSignature:
-                    pass
-                self.Signature = FakeSignature
-                
-                class FakePredict:
-                    def __call__(self, *args, **kwargs):
-                        class Result:
-                            response = "I'm sorry, but the DSPy module is not available. Please install dspy-ai package."
-                        return Result()
-                self.Predict = FakePredict()
-                
-            def configure(self, **kwargs):
+    # Create a fallback module for graceful degradation
+    class FakeDSPy:
+        def __init__(self):
+            class FakeField:
+                def __call__(self, *args, **kwargs):
+                    return None
+            self.InputField = FakeField()
+            self.OutputField = FakeField()
+            
+            class FakeSignature:
                 pass
-                
-            def LM(self, **kwargs):
-                return None
-        
-        dspy = FakeDSPy()
-        logger.warning("Using fake DSPy implementation for graceful degradation")
+            self.Signature = FakeSignature
+            
+            class FakePredict:
+                def __call__(self, *args, **kwargs):
+                    class Result:
+                        response = "I'm sorry, but the DSPy module is not available. Please install dspy-ai package."
+                    return Result()
+            self.Predict = FakePredict()
+    
+    dspy = FakeDSPy()
+    logger.warning("Using fake DSPy implementation for graceful degradation")
 
 class EnhancedDSPyLLMInterface:
     """Enhanced DSPy interface for teaching responses."""
@@ -63,25 +48,25 @@ class EnhancedDSPyLLMInterface:
     def __init__(self):
         """Initialize the DSPy interface."""
         self.initialized = False
+        
         try:
-            # Initialize DSPy with OpenAI
+            # Get API key from environment
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 raise ValueError("OpenAI API key not found in environment")
             
+            # Initialize OpenAI client directly
+            openai.api_key = api_key
+            
+            # Set up teaching signature
             if HAVE_DSPY:
-                # Configure DSPy with GPT-4
-                self.lm = dspy.LM(model="gpt-4", api_key=api_key)
-                dspy.configure(lm=self.lm)
-                logger.info("Initialized DSPy with GPT-4")
-                
-                # Initialize signatures
                 self._create_signatures()
                 self.initialized = True
+                logger.info("Initialized DSPy LLM interface with OpenAI")
             else:
                 logger.warning("DSPy not available, using fallback mode")
                 self._create_fallback_signatures()
-            
+                
         except Exception as e:
             logger.error(f"Failed to initialize DSPy interface: {e}")
             self._create_fallback_signatures()
@@ -116,11 +101,11 @@ class EnhancedDSPyLLMInterface:
         }
         logger.warning("Using fallback signatures")
 
-    def generate_response(self,
+    def generate_response(self, 
                        prompt: str,
                        context: Optional[List[str]] = None,
                        metadata: Optional[Dict[str, Any]] = None) -> str:
-        """Generate a teaching response using DSPy.
+        """Generate a teaching response using DSPy or direct OpenAI API.
         
         Args:
             prompt: The teaching prompt/question
@@ -130,21 +115,37 @@ class EnhancedDSPyLLMInterface:
         Returns:
             Generated teaching response
         """
+        if not self.initialized:
+            return "I'm sorry, but the teaching assistant is not fully initialized. Please check the logs for more information."
+        
         try:
-            if not self.initialized:
-                return "I'm sorry, but the teaching assistant is not fully initialized. Please check the logs for more information."
+            # If DSPy is not working properly, fall back to direct OpenAI API call
+            model = os.getenv("DEFAULT_MODEL", "gpt-3.5-turbo")
+            max_tokens = int(os.getenv("MAX_TOKENS", "1000"))
+            temperature = float(os.getenv("TEMPERATURE", "0.7"))
             
-            # Create predictor with teaching signature
-            predictor = dspy.Predict(self.signatures["teaching"])
+            # Create a system message with the context if available
+            system_content = "You are a helpful teaching assistant, providing thorough and educational responses."
+            if context:
+                context_str = "\n\n".join(context)
+                system_content += f"\n\nUse the following information as reference:\n{context_str}"
             
-            # Generate response
-            result = predictor(
-                query=prompt,
-                context=context if context else [],
-                metadata=metadata if metadata else {}
+            if metadata:
+                meta_str = "\n".join([f"{k}: {v}" for k, v in metadata.items()])
+                system_content += f"\n\nTeaching context:\n{meta_str}"
+            
+            # Call OpenAI API directly
+            response = openai.ChatCompletion.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_content},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=max_tokens,
+                temperature=temperature
             )
             
-            return result.response
+            return response.choices[0].message.content
             
         except Exception as e:
             logger.error(f"Failed to generate response: {e}")

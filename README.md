@@ -282,3 +282,151 @@ For major changes, please open an issue first to discuss what you would like to 
 - DSPy team for the foundational LLM framework
 - Contributors and testers
 
+# 🧠 LLM Fine-Tuning Examples for Teacher-Student Dialogues
+
+This directory contains examples of three different approaches to fine-tuning large language models (LLMs) for realistic teacher-student dialogue interactions.
+
+## 📚 Quick Start Guide
+
+For the best learning experience, follow these steps:
+
+1. **Start with the overview**: Run the simple example to understand the concepts
+   ```bash
+   python simple_example.py
+   ```
+   This script works without any special dependencies and gives you a clear understanding of all three approaches.
+
+2. **Explore the detailed examples**: The main example files provide in-depth implementations
+   ```bash
+   # View the code to understand the implementation details
+   cat dspy_example.py
+   cat openai_finetune.py
+   cat huggingface_lora.py
+   ```
+
+3. **Review the assignment**: Check `assignment.md` for detailed instructions on how to implement these approaches in your own projects.
+
+## 🔍 Three Fine-Tuning Approaches
+
+| Feature | DSPy | OpenAI | HuggingFace |
+|---------|------|--------|-------------|
+| What changes | Prompts | Model weights (cloud) | Model weights (local) |
+| Training data needed | Small (10-50 dialogues) | Medium (50-100+ dialogues) | Large (100-1000+ dialogues) |
+| Setup difficulty | Simple | Simple | Complex |
+| Control | Limited | Medium | Full |
+| Hardware required | None | None | GPU (16GB+ VRAM) |
+| Deployment | API calls | API calls | Self-host |
+| Data privacy | Data shared with API | Data shared with API | Data stays local |
+| Time to results | Immediate | Hours | Hours (with GPU) |
+
+## 📝 Environment Setup
+
+To run the complete examples (beyond the simple overview), you'll need:
+
+### DSPy Example
+```bash
+pip install dspy-ai==0.11.0  # The example requires a specific version with Metric support
+```
+
+### OpenAI Example
+```bash
+pip install openai==0.28.0  # The example is compatible with this version
+```
+
+### HuggingFace Example
+```bash
+pip install transformers==4.30.0 peft==0.4.0 bitsandbytes==0.40.0
+# A GPU with 8GB+ VRAM is recommended
+```
+
+## 📁 Example Files
+
+### Core Example Files
+- `simple_example.py` - Works with minimal dependencies, provides overview of all approaches
+- `dspy_example.py` - DSPy prompt optimization for teacher-student dialogue
+- `openai_finetune.py` - OpenAI fine-tuning for educational dialogues
+- `huggingface_lora.py` - HuggingFace LoRA fine-tuning with local models
+
+### Data Files
+- `teacher_student_dialogues.jsonl` - Sample dialogue data for DSPy
+- `small_edu_qa.jsonl` - Sample Q&A pairs for simple examples
+- `openai_edu_qa_training.jsonl` - Sample training data for OpenAI fine-tuning
+
+### Utility Scripts
+- `run_all_examples.sh` - Script to run examples with helpful guidance
+
+## 🔍 Detailed Approach Explanations
+
+### DSPy: Prompt Optimization
+
+DSPy optimizes the prompts used with LLMs without changing the model weights:
+- Requires minimal training data (10-50 examples)
+- Gives immediate results
+- Works with any LLM through APIs
+- Uses Chain-of-Thought prompting for improved pedagogical responses
+
+Key implementation features:
+```python
+# Define the teacher response signature 
+class TeacherResponse(dspy.Signature):
+    student_question = dspy.InputField()
+    teacher_response = dspy.OutputField()
+
+# Use Chain-of-Thought for pedagogical reasoning
+generator = dspy.ChainOfThought(TeacherResponse)
+```
+
+### OpenAI: Cloud Fine-Tuning
+
+OpenAI fine-tuning updates model weights through their cloud service:
+- Requires more training data than DSPy (50-100+ examples)
+- Creates a specialized model variant
+- Handles multi-turn conversations well
+- Needs no local GPU infrastructure
+
+Key implementation features:
+```python
+# Format data for fine-tuning
+formatted_data = [
+    {"messages": [
+        {"role": "system", "content": "You are a helpful teacher."},
+        {"role": "user", "content": "How does photosynthesis work?"},
+        {"role": "assistant", "content": "Let me explain photosynthesis..."}
+    ]}
+]
+
+# Create fine-tuning job
+job = openai.FineTuningJob.create(
+    training_file=file_id,
+    model="gpt-3.5-turbo"
+)
+```
+
+### HuggingFace: Local LoRA Fine-Tuning
+
+HuggingFace's LoRA approach:
+- Updates model weights locally with Low-Rank Adaptation
+- Keeps all data private on your hardware
+- Requires GPU for efficient training
+- Gives complete control over the training process
+
+Key implementation features:
+```python
+# Configure LoRA parameters
+lora_config = LoraConfig(
+    r=8,              # Rank of adapter matrices
+    lora_alpha=16,    # Alpha parameter for LoRA scaling
+    target_modules=["q_proj", "v_proj"],
+    bias="none"
+)
+
+# Apply LoRA to base model
+model = get_peft_model(base_model, lora_config)
+```
+
+## 🔧 Which Approach Is Right For You?
+
+- **DSPy**: Best for quick experiments, small datasets, immediate results
+- **OpenAI**: Best for production deployment, balanced control/convenience
+- **HuggingFace**: Best for complete control, data privacy, long-term usage
+

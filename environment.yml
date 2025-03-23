@@ -8,7 +8,6 @@ dependencies:
   - pip=23.3.1
   - pytorch=2.2.0
   - torchvision
-  - cudatoolkit=11.8
   - numpy>=1.24.0
   - pandas>=2.0.0
   - pytest>=7.0.0
@@ -19,7 +18,7 @@ dependencies:
     - streamlit==1.32.0
     - textstat>=0.7.3
     - sentence-transformers==2.2.2
-    - faiss-gpu>=1.7.4
+    - faiss-cpu>=1.7.4
     - spacy>=3.7.0
     - openai==0.28.0
     - dspy-ai==2.0.4

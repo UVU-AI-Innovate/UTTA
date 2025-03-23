@@ -1,92 +1,56 @@
-#!/usr/bin/env python3
-"""
-Fix script for OpenAI dependency issues with DSPy.
-This script will install the correct version of OpenAI that's compatible with DSPy 2.0.4.
-"""
+#!/usr/bin/env python
+# Fix DSPy and OpenAI compatibility issues
 
+import os
 import sys
 import subprocess
-import importlib
-import logging
+import importlib.util
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-def check_openai_compatibility():
-    """Check if OpenAI package is compatible with DSPy."""
+def check_package_installed(package_name):
+    """Check if a package is installed."""
     try:
-        # Try to import the specific openai.error module needed by DSPy
-        import openai.error
-        logger.info("✅ OpenAI package is compatible with DSPy")
+        importlib.util.find_spec(package_name)
         return True
     except ImportError:
-        logger.error("❌ OpenAI package is incompatible with DSPy (missing openai.error module)")
         return False
 
-def fix_openai_installation():
-    """Install the correct version of OpenAI that works with DSPy 2.0.4."""
-    logger.info("Installing OpenAI v0.28.0 (compatible with DSPy 2.0.4)...")
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", "openai==0.28.0"])
-        logger.info("✅ Successfully installed OpenAI v0.28.0")
-        return True
-    except Exception as e:
-        logger.error(f"❌ Failed to install OpenAI: {e}")
-        return False
-
-def check_dspy_installation():
-    """Check if DSPy is installed."""
-    try:
-        import dspy
-        logger.info(f"✅ DSPy found (version: {getattr(dspy, '__version__', 'unknown')})")
-        return True
-    except ImportError:
-        logger.warning("❌ DSPy not found, installing...")
-        return False
-
-def fix_dspy_installation():
-    """Install DSPy."""
-    logger.info("Installing DSPy 2.0.4...")
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-cache-dir", "dspy-ai==2.0.4"])
-        logger.info("✅ Successfully installed DSPy 2.0.4")
-        return True
-    except Exception as e:
-        logger.error(f"❌ Failed to install DSPy: {e}")
-        return False
+def install_package(package_name, version=None):
+    """Install a package with pip."""
+    cmd = [sys.executable, "-m", "pip", "install"]
+    if version:
+        cmd.append(f"{package_name}=={version}")
+    else:
+        cmd.append(package_name)
+    
+    print(f"Installing {package_name}{'==' + version if version else ''}...")
+    subprocess.check_call(cmd)
 
 def main():
-    """Run the fix script."""
-    print("=" * 60)
-    print("DSPy OpenAI Dependency Fix Script")
-    print("=" * 60)
+    print("Checking and fixing OpenAI and DSPy dependencies...")
     
-    # Check if OpenAI is already compatible
-    if check_openai_compatibility():
-        print("\nYour OpenAI package is already compatible with DSPy.")
-        return
-    
-    # Fix OpenAI installation
-    if fix_openai_installation():
-        print("\nOpenAI dependency fixed successfully.")
+    # Fix OpenAI version if needed
+    if check_package_installed("openai"):
+        import openai
+        print(f"Current OpenAI version: {openai.__version__}")
+        if openai.__version__ != "0.28.0":
+            print("Reinstalling OpenAI to version 0.28.0 (required for DSPy)...")
+            install_package("openai", "0.28.0")
     else:
-        print("\nFailed to fix OpenAI dependency. Try manually running:")
-        print("pip install openai==0.28.0")
+        install_package("openai", "0.28.0")
     
-    # Check DSPy installation
-    if not check_dspy_installation():
-        fix_dspy_installation()
-    
-    # Verify fix worked
-    if check_openai_compatibility():
-        print("\nFix succeeded! The application should now work correctly.")
-        print("Run the web application with: streamlit run src/web_app.py")
+    # Install or fix DSPy
+    if check_package_installed("dspy"):
+        print("Reinstalling DSPy to ensure compatibility...")
+        install_package("dspy-ai", "2.0.4")
     else:
-        print("\nFix did not resolve the issue. Try restarting your environment.")
+        install_package("dspy-ai", "2.0.4")
+    
+    # Fix sentence-transformers
+    if not check_package_installed("sentence_transformers"):
+        install_package("sentence-transformers", "2.2.2")
+    
+    print("Dependency fixes completed.")
+    print("Please restart the application to apply changes.")
 
 if __name__ == "__main__":
     main() 

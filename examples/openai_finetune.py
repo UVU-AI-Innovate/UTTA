@@ -20,6 +20,20 @@ import openai
 from openai import OpenAI
 from typing import List, Dict, Any
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load from parent directory if this is in examples/
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        print(f"Loaded environment variables from {env_path}")
+    else:
+        load_dotenv()  # Try default locations
+        print("Loaded environment variables from default locations")
+except ImportError:
+    print("Warning: dotenv package not found. Environment variables must be set manually.")
+
 ###########################################
 # STEP 1: ENVIRONMENT & DATA PREPARATION #
 ###########################################
@@ -31,7 +45,7 @@ if not os.getenv("OPENAI_API_KEY"):
     sys.exit(1)
 
 # Configure OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 print("Step 1: Environment & Data Preparation")
 
 # Sample data for teacher-student dialogues
@@ -194,7 +208,7 @@ def upload_training_file(file_path, purpose="fine-tune"):
     """Upload the training file to OpenAI - costs money when executed"""
     try:
         with open(file_path, "rb") as f:
-            response = client.files.create(
+            response = openai.File.create(
                 file=f,
                 purpose=purpose
             )
@@ -219,7 +233,7 @@ def create_fine_tuning_job(training_file_id, validation_file_id=None, model="gpt
         if validation_file_id:
             job_params["validation_file"] = validation_file_id
             
-        response = client.fine_tuning.jobs.create(**job_params)
+        response = openai.FineTuningJob.create(**job_params)
         print(f"Fine-tuning job created. Job ID: {response.id}")
         return response.id
     except Exception as e:
@@ -230,7 +244,7 @@ def create_fine_tuning_job(training_file_id, validation_file_id=None, model="gpt
 def check_job_status(job_id):
     """Check the status of a fine-tuning job"""
     try:
-        job = client.fine_tuning.jobs.retrieve(job_id)
+        job = openai.FineTuningJob.retrieve(job_id)
         print(f"Job status: {job.status}")
         return job
     except Exception as e:
@@ -378,7 +392,7 @@ def evaluate_teacher_responses(responses: List[str]) -> Dict[str, float]:
 def get_base_model_response(messages):
     """Get response from base model"""
     try:
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,

@@ -1,13 +1,10 @@
 # 🧠 LLM Fine-Tuning Examples for Teacher-Student Dialogues
 
-This directory contains examples of different approaches to fine-tuning large language models (LLMs) for realistic teacher-student dialogue interactions.
-****
+This directory contains examples of three different approaches to fine-tuning large language models (LLMs) for realistic teacher-student dialogue interactions.
 
 ## 📚 Introduction
 
-### Project Overview
-
-This educational project demonstrates three different approaches to improving LLM performance for teacher-student dialogue interactions:
+### Three Fine-Tuning Approaches
 
 | Feature | DSPy | OpenAI | HuggingFace |
 |---------|------|--------|-------------|
@@ -15,24 +12,78 @@ This educational project demonstrates three different approaches to improving LL
 | Training data needed | Small (10-50 dialogues) | Medium (50-100+ dialogues) | Large (100-1000+ dialogues) |
 | Setup difficulty | Simple | Simple | Complex |
 | Control | Limited | Medium | Full |
-| Hardware required | None | None | GPU (16GB+ VRAM)* |
+| Hardware required | None | None | GPU (16GB+ VRAM) |
 | Deployment | API calls | API calls | Self-host |
 | Data privacy | Data shared with API | Data shared with API | Data stays local |
 | Time to results | Immediate | Hours | Hours (with GPU) |
-| Dialogue quality | Good | Better | Best |
-| Evaluation metrics | Included | Included | Included |
 
-> **Note**: For educational purposes, these examples use much smaller datasets than would be required for production use. The dataset sizes in the table reflect realistic requirements for meaningful results in real-world applications.
->
-> *Students in this project can use the provided GPU server for HuggingFace fine-tuning, eliminating the hardware requirement barrier.
+## 🔍 Example Files
 
-### Which Approach Is Right For You?
+### Core Example Files
+- `dspy_example.py` - DSPy prompt optimization for teacher-student dialogue
+- `openai_finetune.py` - OpenAI fine-tuning for educational dialogues
+- `huggingface_lora.py` - HuggingFace LoRA fine-tuning with local models
 
-- 👉 **DSPy**: Best for quick experiments, small datasets, immediate results
-- 👉 **OpenAI**: Best for production deployment, balanced control/convenience
-- 👉 **HuggingFace**: Best for complete control, data privacy, long-term usage
+### Data Files
+- `teacher_student_dialogues.jsonl` - Sample dialogue data for DSPy
+- `small_edu_qa.jsonl` - Sample Q&A pairs for simple examples
+- `openai_edu_qa_training.jsonl` - Sample training data for OpenAI fine-tuning
 
+### Utility Scripts
+- `run_all_examples.sh` - Script to run all three main examples
+- `simple_example.py` - Quick overview of the three fine-tuning approaches
 
+### Assignment
+- `assingment.md` - Detailed assignment instructions for students
+
+## 🚀 Quick Start
+
+To understand the basic concepts of each approach:
+
+```bash
+python simple_example.py
+```
+
+To run the detailed examples (note: requires API keys and/or GPU):
+
+```bash
+./run_all_examples.sh
+```
+
+## 🔍 Approach Details
+
+### DSPy: Prompt Optimization
+
+DSPy optimizes the prompts used with LLMs without changing the model weights. This approach:
+- Requires minimal training data
+- Gives immediate results
+- Works with any LLM through APIs
+- Uses Chain-of-Thought prompting for improved pedagogical responses
+
+### OpenAI: Cloud Fine-Tuning
+
+OpenAI fine-tuning updates model weights through their cloud service:
+- Requires more training data than DSPy
+- Handles multi-turn conversations well
+- Provides better specialized responses than prompt engineering alone
+- Needs no local GPU infrastructure
+
+### HuggingFace: Local LoRA Fine-Tuning
+
+HuggingFace's LoRA (Low-Rank Adaptation) approach:
+- Updates model weights locally
+- Gives complete control over the training process
+- Keeps all data private on your own hardware
+- Requires GPU for efficient training
+- Produces models that can be deployed anywhere
+
+## 🔧 Which Approach Is Right For You?
+
+- **DSPy**: Best for quick experiments, small datasets, immediate results
+- **OpenAI**: Best for production deployment, balanced control/convenience
+- **HuggingFace**: Best for complete control, data privacy, long-term usage
+
+---
 
 ## 🔍 Three Approaches Explained
 
