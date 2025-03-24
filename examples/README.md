@@ -18,6 +18,189 @@ After working through these examples and applying them to your project, you will
    - Implementation complexity
 4. Build a production-ready fine-tuned model for your application
 
+## 📋 Assignment Requirements
+
+### Part 1: Baseline Implementation (30%)
+For each fine-tuning approach (DSPy, OpenAI, and LoRA), you must:
+1. Implement the basic version using provided example code
+2. Document your setup process and any challenges encountered
+3. Run experiments with the provided datasets
+4. Record baseline performance metrics:
+   - Response accuracy
+   - Generation quality
+   - Training/optimization time
+   - Resource usage
+
+### Part 2: Enhanced Implementation (40%)
+Choose TWO of the three approaches and:
+1. Create a custom dataset (minimum 100 examples) in your chosen domain:
+   - Healthcare
+   - Technical documentation
+   - Legal assistance
+   - Financial advising
+   - Or propose your own (requires approval)
+
+2. Implement at least THREE enhancements from:
+   - Custom evaluation metrics
+   - Advanced prompt templates
+   - Hybrid approach combining methods
+   - Cost optimization strategies
+   - Performance monitoring system
+   - Error handling and recovery
+   - Interactive demo interface
+
+3. Conduct comparative analysis:
+   - Performance metrics
+   - Resource requirements
+   - Cost analysis
+   - Scalability assessment
+   - Error analysis
+
+### Part 3: Production Readiness (30%)
+For your BEST performing approach:
+1. Implement production-grade features:
+   - Input validation
+   - Error handling
+   - Rate limiting
+   - Usage monitoring
+   - Cost tracking
+   - Performance logging
+
+2. Create a deployment plan including:
+   - Infrastructure requirements
+   - Scaling strategy
+   - Monitoring approach
+   - Cost projections
+   - Maintenance procedures
+
+### Submission Requirements
+
+1. **Code Repository**
+   - Well-organized codebase
+   - Clear documentation
+   - Requirements file
+   - Setup instructions
+   - Example configurations
+
+2. **Technical Report (2000-3000 words)**
+   - Implementation methodology
+   - Enhancement descriptions
+   - Experimental results
+   - Comparative analysis
+   - Production considerations
+   - Future improvements
+
+3. **Demo Video (5-7 minutes)**
+   - Implementation walkthrough
+   - Enhancement demonstrations
+   - Results presentation
+   - Production features
+   - Deployment plan
+
+4. **Presentation Slides**
+   - Project overview
+   - Key findings
+   - Technical challenges
+   - Solution approach
+   - Results summary
+
+### Evaluation Rubric
+
+1. **Technical Implementation (40%)**
+   - Baseline implementation correctness (10%)
+   - Enhancement quality and creativity (15%)
+   - Production feature implementation (15%)
+
+2. **Analysis & Documentation (30%)**
+   - Experimental methodology (10%)
+   - Results analysis (10%)
+   - Documentation quality (10%)
+
+3. **Innovation & Problem Solving (20%)**
+   - Creative solutions (10%)
+   - Challenge handling (10%)
+
+4. **Presentation & Communication (10%)**
+   - Report clarity (5%)
+   - Demo quality (5%)
+
+### Important Dates
+- Project Start: [Date]
+- Enhancement Proposal Due: [Date] (Week 2)
+- Progress Report Due: [Date] (Week 4)
+- Final Submission Due: [Date] (Week 6)
+
+### Academic Integrity
+- All code must be original or properly cited
+- Datasets must be either provided, publicly available, or originally created
+- Third-party tools must be approved and documented
+- Collaboration is limited to discussion; implementation must be individual
+
+## 📊 Expert Evaluation Process
+
+Your implemented chatbot will be evaluated by a panel of subject matter experts, including:
+- Elementary school teachers (2nd-grade specialists)
+- Child development specialists
+- Educational psychologists
+
+### What Experts Will Evaluate
+
+1. **Student Simulation Authenticity**
+   - Age-appropriate vocabulary and language use
+   - Typical second-grade reasoning patterns
+   - Common misconceptions and learning challenges
+   - Natural conversation flow for the age group
+
+2. **Educational Value**
+   - Alignment with second-grade curriculum
+   - Appropriate learning progression
+   - Engagement level
+   - Knowledge demonstration
+
+3. **Interaction Quality**
+   - Response appropriateness
+   - Conversation naturalness
+   - Question-asking behavior
+   - Learning patterns
+
+### Submission Requirements
+
+1. **Implementation Documentation**
+   - Description of fine-tuning approach used
+   - Training data sources and preparation process
+   - Model parameters and configuration
+   - Any special considerations or adaptations made
+
+2. **Test Conversations**
+   - Provide 10-15 example conversations
+   - Include various subject areas
+   - Show different interaction patterns
+   - Demonstrate error handling
+
+3. **Self-Assessment Notes**
+   - What works well
+   - Known limitations
+   - Areas for improvement
+   - Challenges encountered
+
+### Expert Review Process
+
+1. **Initial Review**
+   - Each expert will independently review your chatbot
+   - Multiple test conversations will be conducted
+   - Notes and observations will be recorded
+
+2. **Group Evaluation**
+   - Experts will meet to discuss observations
+   - Consensus on strengths and weaknesses
+   - Recommendations for improvements
+
+3. **Feedback Delivery**
+   - Written evaluation report
+   - Specific improvement suggestions
+   - Areas of success
+   - Development priorities
+
 ## 🎯 Project-Based Learning Approach
 
 This course follows a project-based learning approach where you'll:
