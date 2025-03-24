@@ -1,4 +1,4 @@
-# 🎓 Educational Examples: Fine-tuning Methods for LLMs
+# Fine-tuning Methods for LLMs
 
 This directory contains educational examples and assignments designed to help students learn and apply different fine-tuning approaches in their own projects. Through hands-on experience with these examples, students will develop practical skills in adapting Large Language Models (LLMs) for real-world applications.
 
