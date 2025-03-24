@@ -18,6 +18,166 @@ After working through these examples, students will be able to:
    - Implementation complexity
 4. Make informed decisions about which approach best suits different educational scenarios
 
+## 🛠️ Environment Setup
+
+### Prerequisites
+- Python 3.10 or higher
+- Conda package manager
+- OpenAI API key (for DSPy and OpenAI approaches)
+- Git (for cloning the repository)
+
+### Setting up the Environment
+
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+   ```
+
+2. **Create and Activate the Conda Environment**
+   ```bash
+   # Create the environment from environment.yml
+   conda env create -f environment.yml
+
+   # Activate the environment
+   conda activate utta
+   ```
+
+   The `environment.yml` file includes all necessary dependencies:
+   - dspy-ai: For prompt optimization
+   - openai: For cloud-based fine-tuning
+   - torch: For local model training
+   - transformers: For HuggingFace models
+   - peft: For LoRA fine-tuning
+   - Additional utilities and dependencies
+
+3. **Verify Installation**
+   ```bash
+   # Check if key packages are installed
+   python -c "import dspy; import openai; import torch; print('Setup successful!')"
+   ```
+
+### OpenAI API Key Configuration
+
+The OpenAI API key is required for:
+- DSPy approach: For making API calls during prompt optimization
+- OpenAI fine-tuning: For both training and using the fine-tuned model
+
+Set up your API key in one of these ways:
+
+1. **Environment Variable (Recommended for Development)**
+   ```bash
+   # Linux/macOS
+   export OPENAI_API_KEY='your-api-key'
+   
+   # Windows (PowerShell)
+   $env:OPENAI_API_KEY='your-api-key'
+   ```
+
+2. **Create a .env File (Recommended for Project)**
+   ```bash
+   # Create .env in the project root
+   echo "OPENAI_API_KEY=your-api-key" > .env
+   ```
+
+3. **Direct Configuration in Python (Not Recommended)**
+   ```python
+   import openai
+   openai.api_key = 'your-api-key'  # Not recommended for production
+   ```
+
+### Cost Management
+
+1. **DSPy Approach**
+   - API calls during optimization: ~$0.01-$0.20 per cycle
+   - Can use cheaper models (e.g., GPT-3.5-turbo)
+   - Best for: Quick experiments and immediate results
+   - Cost reduction: Use caching and cheaper models
+
+2. **OpenAI Fine-tuning**
+   - Training: $0.008 per 1K training tokens
+   - Inference: 1.5-2x base model cost
+   - Best for: Production-ready educational chatbots
+   - Cost reduction: Optimize dataset size, use GPT-3.5
+
+3. **HuggingFace LoRA**
+   - No API costs (runs locally)
+   - Requires computational resources
+   - Best for: Long-term deployment and data privacy
+   - Cost reduction: Use smaller models, quantization
+
+## 📊 Working with Datasets
+
+### Understanding the Example Datasets
+
+1. **DSPy Dataset (`teacher_student_dialogues.jsonl`)**
+   ```json
+   {
+     "dialogue": [
+       {"role": "teacher", "content": "Can you explain what photosynthesis is?"},
+       {"role": "student", "content": "It's how plants make their food, right?"},
+       {"role": "teacher", "content": "That's a good start! Can you tell me more?"}
+     ]
+   }
+   ```
+   - Purpose: Optimize prompts for better teaching interactions
+   - Size: 5-10 high-quality examples
+   - Features: Natural dialogue flow, Socratic questioning
+
+2. **OpenAI Dataset (`openai_teacher_dialogue_training.jsonl`)**
+   ```json
+   {
+     "messages": [
+       {"role": "system", "content": "You are a knowledgeable teacher..."},
+       {"role": "user", "content": "What is the water cycle?"},
+       {"role": "assistant", "content": "The water cycle is the continuous movement..."}
+     ]
+   }
+   ```
+   - Purpose: Fine-tune OpenAI models for teaching
+   - Size: 15-20 training examples, 5-10 validation
+   - Features: System prompts, structured Q&A format
+
+3. **LoRA Dataset (`small_edu_qa.jsonl`)**
+   ```json
+   {
+     "instruction": "Explain the concept of gravity to a middle school student.",
+     "output": "Gravity is like an invisible force that pulls objects toward each other..."
+   }
+   ```
+   - Purpose: Local fine-tuning with LoRA
+   - Size: 20+ examples for training
+   - Features: Clear instructions, age-appropriate content
+
+### Creating Your Own Datasets
+
+When adapting these methods to your project:
+
+1. **Data Collection**
+   - Record real teacher-student interactions
+   - Create subject-specific Q&A pairs
+   - Include diverse teaching scenarios
+   - Cover multiple difficulty levels
+
+2. **Data Preparation**
+   - Clean and normalize text
+   - Format according to approach requirements
+   - Split into training/validation sets
+   - Validate data quality
+
+3. **Best Practices**
+   - Include diverse teaching styles
+   - Cover common misconceptions
+   - Use clear, consistent language
+   - Balance difficulty levels
+
+4. **Validation**
+   For each approach, verify:
+   - Format correctness
+   - Content quality
+   - Educational value
+   - Technical requirements
+
 ## 📂 Repository Structure
 
 ```
@@ -113,41 +273,6 @@ def prepare_model_and_tokenizer():
         bias="none",
         task_type="CAUSAL_LM"
     )
-```
-
-## 📊 Dataset Formats
-
-### 1. teacher_student_dialogues.jsonl
-Multi-turn dialogues for DSPy:
-```json
-{
-  "dialogue": [
-    {"role": "teacher", "content": "Can you explain what photosynthesis is?"},
-    {"role": "student", "content": "It's how plants make their food, right?"},
-    {"role": "teacher", "content": "That's a good start! Can you tell me more?"}
-  ]
-}
-```
-
-### 2. openai_teacher_dialogue_training.jsonl
-OpenAI chat completion format:
-```json
-{
-  "messages": [
-    {"role": "system", "content": "You are a knowledgeable teacher..."},
-    {"role": "user", "content": "What is the water cycle?"},
-    {"role": "assistant", "content": "The water cycle is the continuous movement..."}
-  ]
-}
-```
-
-### 3. small_edu_qa.jsonl
-Simple QA pairs for LoRA:
-```json
-{
-  "instruction": "Explain the concept of gravity to a middle school student.",
-  "output": "Gravity is like an invisible force that pulls objects toward each other..."
-}
 ```
 
 ## 📝 Assignment Structure
