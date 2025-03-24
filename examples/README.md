@@ -18,188 +18,65 @@ After working through these examples and applying them to your project, you will
    - Implementation complexity
 4. Build a production-ready fine-tuned model for your application
 
-## 📋 Assignment Requirements
-
-### Part 1: Baseline Implementation (30%)
-For each fine-tuning approach (DSPy, OpenAI, and LoRA), you must:
-1. Implement the basic version using provided example code
-2. Document your setup process and any challenges encountered
-3. Run experiments with the provided datasets
-4. Record baseline performance metrics:
-   - Response accuracy
-   - Generation quality
-   - Training/optimization time
-   - Resource usage
-
-### Part 2: Enhanced Implementation (40%)
-Choose TWO of the three approaches and:
-1. Create a custom dataset (minimum 100 examples) in your chosen domain:
-   - Healthcare
-   - Technical documentation
-   - Legal assistance
-   - Financial advising
-   - Or propose your own (requires approval)
-
-2. Implement at least THREE enhancements from:
-   - Custom evaluation metrics
-   - Advanced prompt templates
-   - Hybrid approach combining methods
-   - Cost optimization strategies
-   - Performance monitoring system
-   - Error handling and recovery
-   - Interactive demo interface
-
-3. Conduct comparative analysis:
-   - Performance metrics
-   - Resource requirements
-   - Cost analysis
-   - Scalability assessment
-   - Error analysis
-
-### Part 3: Production Readiness (30%)
-For your BEST performing approach:
-1. Implement production-grade features:
-   - Input validation
-   - Error handling
-   - Rate limiting
-   - Usage monitoring
-   - Cost tracking
-   - Performance logging
-
-2. Create a deployment plan including:
-   - Infrastructure requirements
-   - Scaling strategy
-   - Monitoring approach
-   - Cost projections
-   - Maintenance procedures
-
-### Submission Requirements
-
-1. **Code Repository**
-   - Well-organized codebase
-   - Clear documentation
-   - Requirements file
-   - Setup instructions
-   - Example configurations
-
-2. **Technical Report (2000-3000 words)**
-   - Implementation methodology
-   - Enhancement descriptions
-   - Experimental results
-   - Comparative analysis
-   - Production considerations
-   - Future improvements
-
-3. **Demo Video (5-7 minutes)**
-   - Implementation walkthrough
-   - Enhancement demonstrations
-   - Results presentation
-   - Production features
-   - Deployment plan
-
-4. **Presentation Slides**
-   - Project overview
-   - Key findings
-   - Technical challenges
-   - Solution approach
-   - Results summary
-
-### Evaluation Rubric
-
-1. **Technical Implementation (40%)**
-   - Baseline implementation correctness (10%)
-   - Enhancement quality and creativity (15%)
-   - Production feature implementation (15%)
-
-2. **Analysis & Documentation (30%)**
-   - Experimental methodology (10%)
-   - Results analysis (10%)
-   - Documentation quality (10%)
-
-3. **Innovation & Problem Solving (20%)**
-   - Creative solutions (10%)
-   - Challenge handling (10%)
-
-4. **Presentation & Communication (10%)**
-   - Report clarity (5%)
-   - Demo quality (5%)
-
-### Important Dates
-- Project Start: [Date]
-- Enhancement Proposal Due: [Date] (Week 2)
-- Progress Report Due: [Date] (Week 4)
-- Final Submission Due: [Date] (Week 6)
-
-### Academic Integrity
-- All code must be original or properly cited
-- Datasets must be either provided, publicly available, or originally created
-- Third-party tools must be approved and documented
-- Collaboration is limited to discussion; implementation must be individual
-
 ## 📊 Expert Evaluation Process
 
-Your implemented chatbot will be evaluated by a panel of subject matter experts, including:
-- Elementary school teachers (2nd-grade specialists)
-- Child development specialists
-- Educational psychologists
+Your team's implementation will be evaluated through a presentation to your assigned elementary teacher professor. These experts specialize in elementary education and will assess how well your chatbot simulates a second-grade student.
 
-### What Experts Will Evaluate
+### Presentation Format (20 minutes)
+
+1. **Implementation Overview (5 minutes)**
+   - Chosen fine-tuning approach(es) and rationale
+   - Dataset preparation and characteristics
+   - Technical implementation details
+   - Challenges and solutions
+
+2. **Live Demo (10 minutes)**
+   - Interactive demonstration of your chatbot
+   - Show various subject area interactions
+   - Demonstrate grade-level appropriate responses
+   - Handle questions from the professor
+
+3. **Q&A Discussion (5 minutes)**
+   - Address professor's questions
+   - Discuss potential improvements
+   - Explore educational applications
+   - Receive immediate feedback
+
+### What Professors Will Evaluate
 
 1. **Student Simulation Authenticity**
-   - Age-appropriate vocabulary and language use
+   - Age-appropriate vocabulary and language
    - Typical second-grade reasoning patterns
    - Common misconceptions and learning challenges
-   - Natural conversation flow for the age group
+   - Natural conversation flow
 
 2. **Educational Value**
    - Alignment with second-grade curriculum
-   - Appropriate learning progression
+   - Learning progression demonstration
+   - Subject matter understanding
    - Engagement level
-   - Knowledge demonstration
 
-3. **Interaction Quality**
-   - Response appropriateness
-   - Conversation naturalness
-   - Question-asking behavior
-   - Learning patterns
+### Submission Package
 
-### Submission Requirements
+1. **Presentation Materials**
+   - Slides covering implementation details
+   - Live demo preparation
+   - Example conversations ready to show
+   - Technical architecture overview
 
-1. **Implementation Documentation**
-   - Description of fine-tuning approach used
-   - Training data sources and preparation process
-   - Model parameters and configuration
-   - Any special considerations or adaptations made
+2. **Implementation Documentation**
+   - Source code with clear comments
+   - Setup instructions
+   - Training data samples
+   - Configuration details
 
-2. **Test Conversations**
-   - Provide 10-15 example conversations
-   - Include various subject areas
-   - Show different interaction patterns
-   - Demonstrate error handling
-
-3. **Self-Assessment Notes**
-   - What works well
-   - Known limitations
-   - Areas for improvement
+3. **Project Report**
+   - Implementation approach
+   - Design decisions
    - Challenges encountered
+   - Future improvements
 
-### Expert Review Process
-
-1. **Initial Review**
-   - Each expert will independently review your chatbot
-   - Multiple test conversations will be conducted
-   - Notes and observations will be recorded
-
-2. **Group Evaluation**
-   - Experts will meet to discuss observations
-   - Consensus on strengths and weaknesses
-   - Recommendations for improvements
-
-3. **Feedback Delivery**
-   - Written evaluation report
-   - Specific improvement suggestions
-   - Areas of success
-   - Development priorities
+Your assigned professor will provide direct feedback during the presentation and help identify both strengths and areas for improvement in your implementation.
 
 ## 🎯 Project-Based Learning Approach
 
@@ -606,55 +483,6 @@ def prepare_model_and_tokenizer():
     )
 ```
 
-## 📝 Assignment Structure
-
-Each approach should be studied independently in this order:
-
-1. **DSPy Prompt Optimization (40% of learning)**
-   - Study and run dspy_example.py
-   - Create new educational dialogues
-   - Implement enhancements
-   - Evaluate performance
-
-2. **OpenAI Fine-tuning (30% of learning)**
-   - Prepare domain-specific QA pairs
-   - Configure fine-tuning parameters
-   - Analyze costs and benefits
-
-3. **HuggingFace LoRA (30% of learning)**
-   - Set up the local environment
-   - Understand LoRA parameters
-   - Implement and evaluate
-
-## 💡 Recommended Learning Path
-
-For each approach:
-
-1. **Study the Implementation**
-   - Read through the code thoroughly
-   - Understand key components
-   - Review documentation
-
-2. **Prepare the Environment**
-   - Set up dependencies
-   - Configure API keys/settings
-   - Verify setup
-
-3. **Run and Experiment**
-   - Test with provided data
-   - Try different parameters
-   - Document results
-
-4. **Implement Enhancements**
-   - Add improvements
-   - Test with new data
-   - Document changes
-
-5. **Evaluate and Analyze**
-   - Compare performance
-   - Document limitations
-   - Suggest improvements
-
 ## 📚 Resources
 
 - DSPy Documentation: [https://dspy.ai/](https://dspy.ai/)
@@ -667,29 +495,5 @@ If you encounter issues:
 1. Check the documentation in each example file
 2. Review the code comments
 3. Contact course staff through designated channels
-
-## 📊 Evaluation Criteria
-
-Your work will be evaluated on:
-
-1. **Technical Implementation (40%)**
-   - Correct implementation
-   - Code quality
-   - Error handling
-
-2. **Analysis & Understanding (30%)**
-   - Depth of analysis
-   - Understanding of tradeoffs
-   - Documentation quality
-
-3. **Creativity & Enhancement (20%)**
-   - Innovative improvements
-   - Novel evaluation metrics
-   - Creative solutions
-
-4. **Presentation (10%)**
-   - Clear documentation
-   - Organized code
-   - Professional presentation
 
 Good luck with your learning journey! 🚀
