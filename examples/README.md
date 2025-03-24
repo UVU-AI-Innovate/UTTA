@@ -22,25 +22,6 @@ After working through these examples and applying them to your project, you will
 
 Your team's implementation will be evaluated through a presentation to your assigned elementary teacher professor. These experts specialize in elementary education and will assess how well your chatbot simulates a second-grade student.
 
-### Presentation Format (20 minutes)
-
-1. **Implementation Overview (5 minutes)**
-   - Chosen fine-tuning approach(es) and rationale
-   - Dataset preparation and characteristics
-   - Technical implementation details
-   - Challenges and solutions
-
-2. **Live Demo (10 minutes)**
-   - Interactive demonstration of your chatbot
-   - Show various subject area interactions
-   - Demonstrate grade-level appropriate responses
-   - Handle questions from the professor
-
-3. **Q&A Discussion (5 minutes)**
-   - Address professor's questions
-   - Discuss potential improvements
-   - Explore educational applications
-   - Receive immediate feedback
 
 ### What Professors Will Evaluate
 
@@ -330,61 +311,6 @@ Each example is designed to demonstrate best practices that you can apply to you
    - Implement quantization
    - Deploy efficiently
 
-## 📝 Project Deliverables
-
-Your project should demonstrate:
-
-1. **Implementation (40%)**
-   - Working fine-tuned model
-   - Clean, documented code
-   - Efficient data pipeline
-   - Error handling
-
-2. **Analysis (30%)**
-   - Method comparison
-   - Performance metrics
-   - Cost analysis
-   - Scaling considerations
-
-3. **Innovation (20%)**
-   - Novel applications
-   - Creative solutions
-   - Performance improvements
-   - Unique features
-
-4. **Documentation (10%)**
-   - Clear explanation
-   - Setup instructions
-   - Usage guidelines
-   - Future improvements
-
-## 🔍 Project Examples
-
-Here are some example projects you could develop:
-
-1. **Customer Service Bot**
-   - Fine-tune for company-specific responses
-   - Handle multi-turn conversations
-   - Maintain brand voice
-   - Track user satisfaction
-
-2. **Technical Documentation Assistant**
-   - Process technical documents
-   - Answer specific queries
-   - Generate examples
-   - Explain complex concepts
-
-3. **Language Learning Tutor**
-   - Adapt to learner level
-   - Provide grammar corrections
-   - Generate exercises
-   - Track progress
-
-4. **Healthcare Information System**
-   - Process medical queries
-   - Provide accurate information
-   - Maintain medical guidelines
-   - Handle sensitive data
 
 ## 📂 Repository Structure
 
