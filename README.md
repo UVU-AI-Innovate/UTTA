@@ -214,6 +214,53 @@ Each example includes detailed comments and documentation to help you understand
 
 See `examples/README.md` for more details on the different approaches to fine-tuning and their use cases.
 
+## Cost Analysis for Fine-Tuning Approaches
+
+Understanding the costs associated with each fine-tuning method is crucial for planning and budgeting educational AI projects.
+
+### DSPy Cost Analysis
+
+DSPy leverages existing Large Language Models (LLMs) via API calls. Costs depend on the chosen LLM (e.g., OpenAI models), the number of calls during optimization and inference, and token usage.
+
+**Key Cost Components:**
+
+1.  **Optimization Phase:** Using DSPy optimizers (`Teleprompter`) involves multiple API calls per example in your dataset to find the best prompts. This is a development-time cost.
+2.  **Inference Phase:** Each execution of the optimized DSPy program makes one or more API calls as defined by your modules.
+
+**Estimating Costs with OpenAI Models (Example Pricing - Check current rates):**
+
+*Pricing below is illustrative and subject to change.* 
+
+| Model              | Input Token Price (per 1K tokens) | Output Token Price (per 1K tokens) |
+|--------------------|-----------------------------------|------------------------------------|
+| GPT-3.5-Turbo      | ~$0.0005 - $0.0015                | ~$0.0015 - $0.0045                 |
+| GPT-4              | ~$0.03                            | ~$0.06                             |
+| GPT-4-Turbo        | ~$0.01                            | ~$0.03                             |
+
+**Table 1: Estimated DSPy Cost During Optimization (Per Example in Dataset)**
+
+*Assumes 10 trial calls per example, avg. 1K input / 0.5K output tokens per trial.*
+
+| Base LLM         | Est. Cost per Example |
+|------------------|-----------------------|
+| GPT-3.5-Turbo    | ~$0.01 - $0.04        |
+| GPT-4-Turbo      | ~$0.25                |
+| GPT-4            | ~$0.60                |
+
+**Table 2: Estimated DSPy Cost During Inference (Per Program Execution)**
+
+*Assumes 2 chained API calls, avg. 1K input / 0.5K output tokens per call.*
+
+| Base LLM         | Estimated Cost per Execution |
+|------------------|------------------------------|
+| GPT-3.5-Turbo    | ~$0.0025 - $0.0075           |
+| GPT-4-Turbo      | ~$0.05                       |
+| GPT-4            | ~$0.12                       |
+
+**DSPy Dataset Size Influence:** Larger datasets increase *total optimization cost* proportionally.
+
+**(Note: Detailed cost analyses for OpenAI Fine-tuning and LoRA should also be added here if desired, following a similar structure.)**
+
 ## Troubleshooting
 
 ### Common Issues
