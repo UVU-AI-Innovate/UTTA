@@ -227,6 +227,11 @@ DSPy leverages existing Large Language Models (LLMs) via API calls. Costs depend
 1.  **Optimization Phase:** Using DSPy optimizers (`Teleprompter`) involves multiple API calls per example in your dataset to find the best prompts. This is a development-time cost.
 2.  **Inference Phase:** Each execution of the optimized DSPy program makes one or more API calls as defined by your modules.
 
+**Data Size for Good Results:**
+*   **Recommendation:** Often 10-50 high-quality examples are sufficient for DSPy optimization.
+*   **Estimated Total Optimization Cost (using GPT-3.5-Turbo, 30 examples):** 30 examples * ~$0.025/example (avg from Table 1) = **~$0.75**
+*   **Estimated Total Optimization Cost (using GPT-4-Turbo, 30 examples):** 30 examples * ~$0.25/example = **~$7.50**
+
 **Estimating Costs with OpenAI Models (Example Pricing - Check current rates):**
 
 *Pricing below is illustrative and subject to change.* 
@@ -257,9 +262,48 @@ DSPy leverages existing Large Language Models (LLMs) via API calls. Costs depend
 | GPT-4-Turbo      | ~$0.05                       |
 | GPT-4            | ~$0.12                       |
 
-**DSPy Dataset Size Influence:** Larger datasets increase *total optimization cost* proportionally.
+### OpenAI Fine-tuning Cost Analysis
 
-**(Note: Detailed cost analyses for OpenAI Fine-tuning and LoRA should also be added here if desired, following a similar structure.)**
+Costs involve a one-time training fee based on dataset size and ongoing inference costs per API call to your custom model.
+
+**Key Cost Components:**
+
+1.  **Training Job:** Charged based on the total number of tokens processed across all examples and epochs. OpenAI's base rate is often around $0.008 per 1K tokens (check current pricing).
+2.  **Inference:** Calls to your fine-tuned model are charged per 1K input and output tokens, potentially at different rates than the base model (e.g., `ft:gpt-3.5-turbo` might cost more than base `gpt-3.5-turbo`).
+
+**Data Size for Good Results:**
+*   **Recommendation:** Typically 50-500 examples provide noticeable improvements, with more data generally leading to better performance.
+*   **Estimating Total Tokens:** A dataset of 200 examples, each with ~500 tokens (system prompt, user query, assistant response), trained for 3 epochs: 200 examples * 500 tokens/example * 3 epochs = 300,000 tokens.
+*   **Estimated Total Training Cost (using $0.008/1K tokens):** (300,000 tokens / 1,000) * $0.008 = **~$2.40**
+
+**Table 3: Estimated OpenAI Inference Cost (Per API Call to Fine-Tuned Model)**
+
+*Check official pricing for your specific fine-tuned model. These are illustrative.* 
+*Assumes average 1K input tokens and 0.5K output tokens per call.*
+
+| Fine-Tuned Model Base | Est. Input Price (per 1K) | Est. Output Price (per 1K) | Estimated Cost per Call |
+|-----------------------|---------------------------|----------------------------|-------------------------|
+| `ft:gpt-3.5-turbo`    | ~$0.003                   | ~$0.006                    | ~$0.006                  |
+| (Other models vary)   |                           |                            |                         |
+
+### LoRA Fine-tuning Cost Analysis
+
+Costs are primarily driven by compute time (GPU rental or hardware/power costs) rather than per-token API fees.
+
+**Key Cost Components:**
+
+1.  **Compute Resources:** Cost of accessing a suitable GPU (e.g., cloud instance rental like AWS EC2, GCP AI Platform, Lambda Labs, or local hardware purchase + electricity).
+2.  **Training Time:** Duration depends on dataset size, model size, GPU performance, and training parameters (epochs, batch size).
+
+**Data Size for Good Results:**
+*   **Recommendation:** Often 100-1000+ examples are used for LoRA, depending on the task complexity and base model.
+*   **Estimating Training Time:** Training a medium-sized model (e.g., 7B parameters) on 500 examples for 3 epochs on a mid-range GPU (like an A10G or RTX 3090) might take 1-4 hours.
+*   **Estimated Total Training Cost (Cloud GPU Example):** Using a cloud GPU instance at ~$1.00/hour for 3 hours = **~$3.00** (highly variable based on provider and instance type).
+*   **Estimated Total Training Cost (Local Hardware):** Primarily electricity cost, likely < $1.00 for a few hours of training, plus the upfront hardware investment.
+
+**Inference Cost:** Minimal if running locally (electricity), or based on compute time if hosting the adapted model on a server/cloud instance.
+
+**(End of Cost Analysis Section)**
 
 ## Troubleshooting
 
