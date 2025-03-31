@@ -1,309 +1,205 @@
-# DSPy Guide for Educational AI Development
+# DSPy Guide for Educational AI
 
-### What is DSPy?
-DSPy is a framework for programming with language models that enables systematic prompt optimization. Think of it as a teaching assistant development toolkit that helps create more effective and consistent AI-powered educational experiences.
+## Table of Contents
+1. [Quick Start](#1-quick-start)
+2. [Core Concepts](#2-core-concepts)
+3. [Building Modules](#3-building-modules)
+4. [Optimization Guide](#4-optimization-guide)
+5. [Student Simulation](#5-student-simulation)
+6. [Implementation Tips](#6-implementation-tips)
+7. [Practical Considerations](#7-practical-considerations)
+8. [Resources](#8-resources)
 
-### Key Components
+## 1. Quick Start
 
-1. **Signatures**
-   - Define the structure of inputs and outputs
-   - Example: Student question → Personalized explanation
-   - Ensure consistent response formats
-
-2. **Modules**
-   - Reusable components for specific teaching tasks
-   - Can be chained together for complex interactions
-   - Support different teaching strategies
-
-3. **Optimizers**
-   - Fine-tune prompts using example dialogues
-   - Adapt to different learning styles
-   - Improve response quality over time
-
-## Implementation Guide
-
-### 1. Environment Setup
+### Installation
 ```bash
-pip install dspy
+pip install dspy-ai==2.0.4
 pip install openai  # or your preferred LLM provider
 ```
 
-### 2. Basic Educational Module
+### Basic Usage
 ```python
 import dspy
 from dspy.teleprompt import BootstrapFewShot
 
+# Configure LLM
+dspy.settings.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo"))
+
+# Create a simple module
+class SimpleTeacher(dspy.Module):
+    def forward(self, question):
+        return self.predictor(
+            instruction="Explain clearly and simply",
+            question=question
+        )
+
+# Use the module
+teacher = SimpleTeacher()
+response = teacher("What is photosynthesis?")
+```
+
+## 2. Core Concepts
+
+### What is DSPy?
+- A framework for optimizing LLM prompts
+- Focuses on improving responses without model retraining
+- Ideal for educational AI applications
+
+### Key Components
+1. **Signatures**
+   - Define input/output formats
+   - Structure responses consistently
+
+2. **Modules**
+   - Reusable teaching components
+   - Chain together for complex interactions
+
+3. **Optimizers**
+   - Improve prompts using examples
+   - No model weight updates needed
+
+## 3. Building Modules
+
+### Basic Teaching Module
+```python
 class BasicTeacher(dspy.Module):
-    """A simple teaching module that provides explanations."""
-    
     def forward(self, student_question):
-        # Generate a clear, structured explanation
-        explanation = self.generate(
+        return self.generate(
             instruction="""
             Provide a clear explanation that:
-            1. Starts with the main concept
-            2. Uses simple language
-            3. Includes relevant examples
-            4. Checks for understanding
+            1. Uses simple language
+            2. Includes examples
+            3. Checks understanding
             """,
             question=student_question
         )
-        return {"explanation": explanation}
 ```
 
-### 3. Adaptive Teaching Module
+### Adaptive Teaching Module
 ```python
 class AdaptiveTeacher(dspy.Module):
-    """An advanced teaching module that adapts to student needs."""
-    
-    def forward(self, student_question, knowledge_level, learning_style):
-        # Step 1: Analyze the question
-        question_analysis = self.generate(
-            instruction="Analyze the question's complexity and key concepts",
-            question=student_question
+    def forward(self, question, level, style):
+        # Analyze question
+        analysis = self.generate(
+            instruction="Analyze complexity and concepts",
+            question=question
         )
         
-        # Step 2: Generate personalized explanation
-        explanation = self.generate(
-            instruction=f"""
-            Create an explanation that:
-            - Matches {knowledge_level} knowledge level
-            - Uses {learning_style} learning approach
-            - Builds on existing knowledge
-            - Provides scaffolded learning
-            """,
-            analysis=question_analysis,
-            question=student_question
+        # Generate explanation
+        return self.generate(
+            instruction=f"Explain for {level} level using {style} style",
+            analysis=analysis,
+            question=question
         )
-        
-        # Step 3: Create comprehension check
-        check_question = self.generate(
-            instruction="Generate a question that tests understanding",
-            previous_explanation=explanation
-        )
-        
-        return {
-            "analysis": question_analysis,
-            "explanation": explanation,
-            "check_question": check_question
-        }
 ```
 
-### 4. Progress Tracking Module
-```python
-class LearningTracker(dspy.Module):
-    """Monitors student progress and adapts teaching strategy."""
-    
-    def forward(self, student_response, previous_interactions):
-        # Assess understanding
-        assessment = self.generate(
-            instruction="""
-            Evaluate the response for:
-            1. Concept mastery
-            2. Common misconceptions
-            3. Areas needing reinforcement
-            """,
-            response=student_response,
-            history=previous_interactions
-        )
-        
-        # Recommend next steps
-        next_steps = self.generate(
-            instruction="Suggest personalized learning activities",
-            assessment=assessment
-        )
-        
-        return {
-            "assessment": assessment,
-            "recommendations": next_steps
-        }
-```
+## 4. Optimization Guide
 
-## Optimization Strategies
+### How DSPy Optimization Works
+1. Define success metrics
+2. Prepare example data
+3. Let DSPy test and improve prompts
+4. Get optimized responses
 
-### 1. Preparing Training Data
+### Example Setup
 ```python
-# Example training data structure
-training_examples = [
-    {
-        "student_question": "What is photosynthesis?",
-        "knowledge_level": "beginner",
-        "learning_style": "visual",
-        "ideal_response": """
-        Photosynthesis is how plants make their food! 🌱
-        Think of it like a solar-powered kitchen:
-        - Sunlight = Energy source
-        - Leaves = Solar panels
-        - Water + CO2 = Ingredients
-        - Sugar = The food produced
-        
-        Would you like to draw this process?
-        """
-    },
-    # Add more examples...
+# Create training examples
+examples = [
+    dspy.Example(
+        question="What is photosynthesis?",
+        level="beginner",
+        response="Plants make food using sunlight..."
+    ).with_inputs("question", "level")
 ]
-```
 
-### 2. Optimizing with Teleprompter
-```python
-# Initialize optimizer
-teleprompter = BootstrapFewShot(
-    metric="relevance",  # or custom metric
-    max_bootstrapped=3,  # number of examples to use
-    max_rounds=2        # optimization rounds
+# Define quality metric
+def quality_metric(example, prediction):
+    """Score response quality"""
+    score = 0
+    # Add scoring logic
+    return score
+
+# Run optimization
+optimizer = BootstrapFewShot(
+    metric=quality_metric,
+    max_bootstrapped_demos=3,
+    max_labeled_demos=10
 )
 
-# Optimize the teacher module
-optimized_teacher = teleprompter.optimize(
-    module=AdaptiveTeacher(),
-    trainset=training_examples,
-    valset=validation_examples
+optimized = optimizer.compile(
+    student=teacher,
+    trainset=examples
 )
 ```
 
-## Best Practices
+## 5. Student Simulation
+
+### Our Example Implementation
+The `dspy_example.py` shows how to create realistic student responses:
+
+1. **Define Student Behaviors**
+   - Show uncertainty when appropriate
+   - Ask clarifying questions
+   - Give partial answers
+
+2. **Optimize for Realism**
+   - Use real dialogue examples
+   - Score based on student-like traits
+   - Maintain consistent personality
+
+### Benefits
+- Works with minimal data (5 dialogues)
+- Creates authentic student interactions
+- Easy to customize behaviors
+
+## 6. Implementation Tips
 
 ### Educational Design
-1. **Progressive Learning**
-   - Start with foundational concepts
-   - Build complexity gradually
-   - Provide frequent checkpoints
+- Start with basic concepts
+- Build complexity gradually
+- Include regular checkpoints
+- Use real-world examples
 
-2. **Engagement Techniques**
-   - Use interactive elements
-   - Incorporate real-world examples
-   - Maintain conversational tone
+### Technical Best Practices
+- Keep modules focused and simple
+- Test with diverse scenarios
+- Handle errors gracefully
+- Monitor and log behavior
 
-3. **Assessment Integration**
-   - Regular comprehension checks
-   - Varied question types
-   - Constructive feedback
+## 7. Practical Considerations
 
-### Technical Implementation
-1. **Module Design**
-   - Single responsibility principle
-   - Clear input/output signatures
-   - Comprehensive documentation
+### Cost Overview
+| Usage | GPT-3.5-Turbo | GPT-4 |
+|-------|---------------|-------|
+| Optimization | ~$0.02/example | ~$0.60/example |
+| Runtime | ~$0.005/query | ~$0.12/query |
 
-2. **Optimization**
-   - Diverse training examples
-   - Regular performance monitoring
-   - Iterative refinement
+### Cost Management
+- Use GPT-3.5-Turbo for development
+- Implement response caching
+- Optimize prompt length
+- Monitor API usage
 
-3. **Error Handling**
-   - Graceful fallbacks
-   - Clear error messages
-   - Recovery strategies
+### Troubleshooting
+**Common Issues:**
+- Bad responses → Check examples
+- Slow performance → Enable caching
+- Integration problems → Verify API setup
 
-## Evaluation Metrics
-
-1. Learning Effectiveness
-   - Concept retention rate
-   - Problem-solving improvement
-   - Knowledge transfer ability
-
-2. Engagement Metrics
-   - Student interaction patterns
-   - Time spent on explanations
-   - Follow-up question frequency
-
-3. Adaptation Quality
-   - Response personalization accuracy
-   - Learning style alignment
-   - Difficulty level appropriateness
-
-## Cost Analysis for DSPy Implementation
-
-DSPy leverages existing Large Language Models (LLMs) via API calls. Therefore, the primary costs are associated with the API provider (e.g., OpenAI, Anthropic, Cohere). Costs depend heavily on the chosen LLM, the number of API calls made during optimization and inference, and the number of tokens processed.
-
-**Key Cost Components:**
-
-1.  **Optimization Phase:** When using DSPy optimizers (like `BootstrapFewShot` or teleprompters), multiple calls are made to the underlying LLM to evaluate different prompt variations or program structures based on your example dataset. This is typically a one-time or infrequent cost during development.
-2.  **Inference Phase:** Once the DSPy program is optimized, each execution (e.g., generating an explanation, analyzing a response) usually involves one or more API calls to the LLM as defined by your modules and chains.
-
-**Estimating Costs with OpenAI Models (Example Pricing - Check current rates):**
-
-*Pricing below is illustrative and subject to change. Always refer to the official OpenAI pricing page.* 
-
-| Model              | Input Token Price (per 1K tokens) | Output Token Price (per 1K tokens) |
-|--------------------|-----------------------------------|------------------------------------|
-| GPT-3.5-Turbo      | ~$0.0005 - $0.0015                | ~$0.0015 - $0.0045                 |
-| GPT-4              | ~$0.03                            | ~$0.06                             |
-| GPT-4-Turbo        | ~$0.01                            | ~$0.03                             |
-
-**Table 1: Estimated Cost During Optimization (Per Example in Dataset)**
-
-*Assumes an optimizer makes 5-15 trial calls per example.* 
-*Assumes average 1K input tokens and 0.5K output tokens per trial call.*
-
-| Base LLM         | Avg. Trials per Example | Est. Input Tokens (per Ex.) | Est. Output Tokens (per Ex.) | Estimated Cost per Example |
-|------------------|-------------------------|-----------------------------|------------------------------|----------------------------|
-| GPT-3.5-Turbo    | 10                      | 10K                         | 5K                           | ~$0.01 - $0.04             |
-| GPT-4-Turbo      | 10                      | 10K                         | 5K                           | ~$0.25                     |
-| GPT-4            | 10                      | 10K                         | 5K                           | ~$0.60                     |
-
-**Table 2: Estimated Cost During Inference (Per DSPy Program Execution)**
-
-*Assumes a typical program execution involves 2 chained calls (e.g., explanation + analysis).*
-*Assumes average 1K input tokens and 0.5K output tokens per call (total 2K input, 1K output per execution).*
-
-| Base LLM         | Calls per Execution | Est. Input Tokens (per Exec.) | Est. Output Tokens (per Exec.) | Estimated Cost per Execution |
-|------------------|---------------------|-------------------------------|--------------------------------|------------------------------|
-| GPT-3.5-Turbo    | 2                   | 2K                            | 1K                             | ~$0.0025 - $0.0075           |
-| GPT-4-Turbo      | 2                   | 2K                            | 1K                             | ~$0.05                       |
-| GPT-4            | 2                   | 2K                            | 1K                             | ~$0.12                       |
-
-**Dataset Size Influence:**
-
-*   **Optimization:** A larger dataset provided to the optimizer (`Teleprompter`) will directly increase the *total* optimization cost, as each example incurs the cost estimated in Table 1.
-*   **Inference:** Dataset size does not directly impact inference cost per execution.
-
-**Cost Optimization Strategies:**
-
-*   **Model Selection:** Use cheaper models like GPT-3.5-Turbo during initial development and optimization. Consider more powerful models (GPT-4/Turbo) for final optimization or production if needed.
-*   **Efficient Prompts:** Craft concise prompts to reduce token usage.
-*   **Caching:** Implement caching mechanisms (like `dspy.settings.cache`) to avoid redundant API calls for identical inputs during optimization or even inference.
-*   **Optimizer Configuration:** Adjust optimizer parameters (e.g., number of trials) to balance cost and performance.
-*   **Selective Optimization:** Only optimize modules critical to performance.
-
-## Troubleshooting Guide
-
-### Common Issues and Solutions
-
-1. **Inconsistent Responses**
-   - Review training examples
-   - Adjust optimization parameters
-   - Implement response validation
-
-2. **Performance Issues**
-   - Optimize token usage
-   - Implement caching
-   - Use appropriate model tier
-
-3. **Integration Challenges**
-   - Check API configurations
-   - Verify module signatures
-   - Test chain connections
-
-### Debugging Tips
-1. Enable detailed logging
-2. Use step-by-step execution
+**Debug Steps:**
+1. Test with simple inputs
+2. Enable detailed logging
 3. Monitor token usage
-4. Test with simple cases first
 
-## Resources and Further Reading
+## 8. Resources
 
-### Official Documentation
+### Official Links
 - [DSPy Documentation](https://dspy.ai)
-- [Example Scripts](../dspy_example.py)
+- [Example Code](../dspy_example.py)
 - [Community Forums](https://github.com/stanfordnlp/dspy/discussions)
 
-### Educational Resources
-- [Pedagogical Best Practices](https://github.com/stanfordnlp/dspy/wiki/Educational-AI)
-- [Case Studies in Educational AI](https://github.com/stanfordnlp/dspy/wiki/Case-Studies)
-- [Research Papers](https://github.com/stanfordnlp/dspy/wiki/Research)
-
-### Community Support
-- GitHub Discussions
-- Discord Channel
-- Regular Webinars 
+### Getting Help
+- Check documentation first
+- Use community forums
+- Report issues on GitHub 
