@@ -9,6 +9,12 @@ Key characteristics of this approach:
 - No special infrastructure required
 - Models multi-turn educational conversations with simulated student
 - Incorporates realistic student behaviors like asking questions, showing partial understanding
+
+API KEY REQUIREMENTS:
+- This example requires a valid OpenAI API key.
+- The key can be in standard format (sk-...) or project format (sk-proj-...)
+- Set it in the .env file or as an environment variable: OPENAI_API_KEY=sk-...
+- You can get a key from https://platform.openai.com/account/api-keys
 """
 import json
 import random
@@ -36,10 +42,14 @@ except ImportError:
 SIMULATION_MODE = False
 
 # Load environment variables and check API key
-if not load_api_key():
+load_api_key()
+api_key = os.environ.get('OPENAI_API_KEY')
+if not api_key:
     print("Warning: OPENAI_API_KEY not available. Running in simulation mode.")
     SIMULATION_MODE = True
-
+else:
+    print(f"API key loaded in environment: {api_key[:5]}...{api_key[-4:]}")
+    
 # Check DSPy installation
 if not check_dspy_installation() and not SIMULATION_MODE:
     print("Warning: DSPy not properly installed. Running in simulation mode.")
@@ -55,11 +65,28 @@ print("Step 1: Environment & Data Preparation")
 if not SIMULATION_MODE:
     try:
         import dspy
-        # Configure DSPy to use OpenAI
-        dspy.settings.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo", temperature=0.7))
-        print("- LLM: OpenAI GPT-3.5-Turbo")
+        # Configure DSPy to use OpenAI with the correct configuration
+        api_key = os.environ.get("OPENAI_API_KEY")
+        print(f"Using API key: {api_key[:5]}...{api_key[-4:]}")
+        
+        # Configuration for DSPy with OpenAI
+        openai_lm = dspy.OpenAI(model="gpt-3.5-turbo", api_key=api_key)
+        dspy.settings.configure(lm=openai_lm)
+        
+        # Test the DSPy configuration
+        print("Testing DSPy configuration with OpenAI...")
+        try:
+            test_prompt = "Say hello in one word:"
+            test_response = openai_lm(test_prompt)
+            print(f"DSPy test response: {test_response}")
+            print("DSPy configuration working successfully with OpenAI API!")
+            print("- LLM: OpenAI GPT-3.5-Turbo")
+        except Exception as e:
+            print(f"DSPy test with OpenAI API failed: {e}")
+            print("Running in simulation mode.")
+            SIMULATION_MODE = True
     except Exception as e:
-        print(f"Error configuring DSPy with OpenAI: {e}")
+        print(f"Error configuring DSPy: {e}")
         print("Running in simulation mode.")
         SIMULATION_MODE = True
 else:
@@ -239,11 +266,13 @@ def prepare_dspy_examples(dialogues):
             # Get conversation history up to this point
             history = format_dialogue_history(dialogue, i-2) if i > 1 else ""
             
+            # Create example with proper input/output specification for DSPy 2.0.4
             example = dspy.Example(
                 conversation_history=history,
                 teacher_prompt=teacher_prompt,
                 student_response=student_response
-            )
+            ).with_inputs("conversation_history", "teacher_prompt")
+            
             examples.append(example)
     
     return examples
@@ -279,8 +308,18 @@ class StudentSimulationModel(dspy.Module):
     def __init__(self, model_name="gpt-3.5-turbo"):
         super().__init__()
         print("- Using ChainOfThought for student-like reasoning")
+        # Initialize the predictor properly for DSPy 2.0.4
         self.predictor = dspy.ChainOfThought(StudentResponse)
         self.conversation_history = []
+
+    def forward(self, conversation_history, teacher_prompt):
+        """Forward method required for DSPy 2.0.4 optimization"""
+        # Return prediction with proper output field
+        prediction = self.predictor(
+            conversation_history=conversation_history,
+            teacher_prompt=teacher_prompt
+        )
+        return prediction
 
     def add_to_history(self, role, content):
         """Add a turn to the conversation history"""
@@ -335,8 +374,14 @@ unoptimized_model = StudentSimulationModel()
 print("- Created unoptimized StudentSimulationModel")
 
 # Define metric for optimization - using a function-based approach for DSPy 2.0+
-def student_behavior_metric(example, pred):
-    """Evaluates student responses based on realistic student behaviors."""
+def student_behavior_metric(example, pred, trace=None):
+    """Evaluates student responses based on realistic student behaviors.
+    
+    Args:
+        example: The example being evaluated
+        pred: The prediction from the model
+        trace: Optional trace information (required by DSPy 2.0.4)
+    """
     behaviors = [
         "i'm not sure", 
         "i think", 
@@ -348,7 +393,12 @@ def student_behavior_metric(example, pred):
         "let me try"
     ]
     
-    response = pred.student_response.lower()
+    # Get student response from prediction
+    response = pred.student_response.lower() if hasattr(pred, 'student_response') else ""
+    
+    # For DSPy 2.0.4 compatibility - handle different response formats
+    if not response and hasattr(pred, 'output'):
+        response = pred.output.lower() if isinstance(pred.output, str) else ""
     
     # Check for realistic student behaviors
     shows_uncertainty = any(b in response for b in ["i'm not sure", "i think", "maybe", "possibly"])
@@ -385,48 +435,55 @@ try:
             from dspy.teleprompt import BootstrapFewShot
             print("- Using DSPy 2.0+ optimization framework")
             
-            # Try different parameter combinations for BootstrapFewShot based on different versions
             try:
-                optimizer = BootstrapFewShot(unoptimized_model)  # Try positional argument
+                # Initialize BootstrapFewShot with parameters for DSPy 2.0.4
+                print("- Creating DSPy optimizer with student behavior metric")
+                optimizer = BootstrapFewShot(
+                    metric=student_behavior_metric,
+                    max_bootstrapped_demos=3,
+                    max_labeled_demos=10,
+                    max_rounds=2
+                )
+                
+                # Limit the number of examples for faster optimization
+                training_subset = train_examples[:min(len(train_examples), 10)]
+                
+                # Compile with appropriate parameters for DSPy 2.0.4
+                print(f"- Starting optimization with {len(training_subset)} training examples")
+                
+                # Print the first example structure to debug
+                if training_subset:
+                    first_example = training_subset[0]
+                    print(f"- Example structure: {[f for f in dir(first_example) if not f.startswith('_')]}")
+                    print(f"- Example inputs: {first_example.inputs}")
+                
+                # Compile the model with the optimizer
                 optimized_model = optimizer.compile(
-                    trainset=train_examples[:min(len(train_examples), 10)],
-                    metric=student_behavior_metric,
-                    max_bootstrapped_demos=3,
-                    verbose=True
-                )
-            except Exception as e1:
-                print(f"- Error with initialization method 1: {e1}")
-                try:
-                    # Try other argument styles
-                    optimizer = BootstrapFewShot(model=unoptimized_model)
-                    optimized_model = optimizer.compile(
-                        trainset=train_examples[:min(len(train_examples), 10)],
-                        metric=student_behavior_metric,
-                        max_bootstrapped_demos=3,
-                        verbose=True
-                    )
-                except Exception as e2:
-                    print(f"- Error with initialization method 2: {e2}")
-                    raise
-        except Exception as e:
-            # If 2.0+ structure fails, try older DSPy structure (0.11.0)
-            print(f"- Error with DSPy 2.0 optimization: {e}")
-            print("- Trying legacy DSPy optimization framework")
-            try:
-                teleprompter = dspy.teleprompt.Teleprompter(teacher_model=unoptimized_model)
-                optimized_model = teleprompter.compile(
                     student=unoptimized_model,
-                    trainset=train_examples[:min(len(train_examples), 10)],
-                    metric=student_behavior_metric,
-                    max_bootstrapped_demos=3,
-                    verbose=True
+                    trainset=training_subset,
+                    valset=test_examples
                 )
-            except Exception as e_legacy:
-                print(f"- Error with legacy optimization: {e_legacy}")
-                raise
+                print("- Successfully completed optimization with DSPy 2.0.4")
+            except Exception as e:
+                print(f"- Error during DSPy 2.0.4 optimization: {str(e)}")
+                import traceback
+                print(f"- Traceback: {traceback.format_exc()}")
+                print("- Falling back to simulation mode")
+                SIMULATION_MODE = True
+                # In simulation mode, create a copy of unoptimized model
+                optimized_model = StudentSimulationModel()
+                print("- Created simulated optimized model (copy of unoptimized)")
+        except Exception as e:
+            print(f"- Error with DSPy 2.0 optimization: {e}")
+            print("- Falling back to simulation mode")
+            SIMULATION_MODE = True
+            # In simulation mode, create a copy of unoptimized model
+            optimized_model = StudentSimulationModel()
+            print("- Created simulated optimized model (copy of unoptimized)")
     else:
-        # In simulation mode, just use the unoptimized model as a base
-        optimized_model = unoptimized_model
+        # In simulation mode, create a copy of unoptimized model
+        optimized_model = StudentSimulationModel()
+        print("- Created simulated optimized model (copy of unoptimized)")
         
 except Exception as e:
     print(f"- All optimization attempts failed: {e}")
