@@ -146,13 +146,6 @@ class ComprehensiveTeacher(dspy.Module):
         return teaching_response
 ```
 
-## Resources
-
-- [DSPy Documentation](https://dspy.ai)
-- [Example Scripts](../dspy_example.py)
-- [Community Forums](https://github.com/stanfordnlp/dspy/discussions)
-- [Educational AI Best Practices](https://github.com/stanfordnlp/dspy/wiki/Educational-AI)
-
 ## Evaluation Metrics
 
 1. Learning Effectiveness
@@ -168,4 +161,65 @@ class ComprehensiveTeacher(dspy.Module):
 3. Adaptation Quality
    - Response personalization accuracy
    - Learning style alignment
-   - Difficulty level appropriateness 
+   - Difficulty level appropriateness
+
+## Cost Analysis for DSPy Implementation
+
+DSPy leverages existing Large Language Models (LLMs) via API calls. Therefore, the primary costs are associated with the API provider (e.g., OpenAI, Anthropic, Cohere). Costs depend heavily on the chosen LLM, the number of API calls made during optimization and inference, and the number of tokens processed.
+
+**Key Cost Components:**
+
+1.  **Optimization Phase:** When using DSPy optimizers (like `BootstrapFewShot` or teleprompters), multiple calls are made to the underlying LLM to evaluate different prompt variations or program structures based on your example dataset. This is typically a one-time or infrequent cost during development.
+2.  **Inference Phase:** Once the DSPy program is optimized, each execution (e.g., generating an explanation, analyzing a response) usually involves one or more API calls to the LLM as defined by your modules and chains.
+
+**Estimating Costs with OpenAI Models (Example Pricing - Check current rates):**
+
+*Pricing below is illustrative and subject to change. Always refer to the official OpenAI pricing page.* 
+
+| Model              | Input Token Price (per 1K tokens) | Output Token Price (per 1K tokens) |
+|--------------------|-----------------------------------|------------------------------------|
+| GPT-3.5-Turbo      | ~$0.0005 - $0.0015                | ~$0.0015 - $0.0045                 |
+| GPT-4              | ~$0.03                            | ~$0.06                             |
+| GPT-4-Turbo        | ~$0.01                            | ~$0.03                             |
+
+**Table 1: Estimated Cost During Optimization (Per Example in Dataset)**
+
+*Assumes an optimizer makes 5-15 trial calls per example.* 
+*Assumes average 1K input tokens and 0.5K output tokens per trial call.*
+
+| Base LLM         | Avg. Trials per Example | Est. Input Tokens (per Ex.) | Est. Output Tokens (per Ex.) | Estimated Cost per Example |
+|------------------|-------------------------|-----------------------------|------------------------------|----------------------------|
+| GPT-3.5-Turbo    | 10                      | 10K                         | 5K                           | ~$0.01 - $0.04             |
+| GPT-4-Turbo      | 10                      | 10K                         | 5K                           | ~$0.25                     |
+| GPT-4            | 10                      | 10K                         | 5K                           | ~$0.60                     |
+
+**Table 2: Estimated Cost During Inference (Per DSPy Program Execution)**
+
+*Assumes a typical program execution involves 2 chained calls (e.g., explanation + analysis).*
+*Assumes average 1K input tokens and 0.5K output tokens per call (total 2K input, 1K output per execution).*
+
+| Base LLM         | Calls per Execution | Est. Input Tokens (per Exec.) | Est. Output Tokens (per Exec.) | Estimated Cost per Execution |
+|------------------|---------------------|-------------------------------|--------------------------------|------------------------------|
+| GPT-3.5-Turbo    | 2                   | 2K                            | 1K                             | ~$0.0025 - $0.0075           |
+| GPT-4-Turbo      | 2                   | 2K                            | 1K                             | ~$0.05                       |
+| GPT-4            | 2                   | 2K                            | 1K                             | ~$0.12                       |
+
+**Dataset Size Influence:**
+
+*   **Optimization:** A larger dataset provided to the optimizer (`Teleprompter`) will directly increase the *total* optimization cost, as each example incurs the cost estimated in Table 1.
+*   **Inference:** Dataset size does not directly impact inference cost per execution.
+
+**Cost Optimization Strategies:**
+
+*   **Model Selection:** Use cheaper models like GPT-3.5-Turbo during initial development and optimization. Consider more powerful models (GPT-4/Turbo) for final optimization or production if needed.
+*   **Efficient Prompts:** Craft concise prompts to reduce token usage.
+*   **Caching:** Implement caching mechanisms (like `dspy.settings.cache`) to avoid redundant API calls for identical inputs during optimization or even inference.
+*   **Optimizer Configuration:** Adjust optimizer parameters (e.g., number of trials) to balance cost and performance.
+*   **Selective Optimization:** Only optimize modules critical to performance.
+
+## Resources
+
+- [DSPy Documentation](https://dspy.ai)
+- [Example Scripts](../dspy_example.py)
+- [Community Forums](https://github.com/stanfordnlp/dspy/discussions)
+- [Educational AI Best Practices](https://github.com/stanfordnlp/dspy/wiki/Educational-AI) 
