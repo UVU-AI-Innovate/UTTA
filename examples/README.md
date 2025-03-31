@@ -1,94 +1,92 @@
-# Fine-tuning LLMs for Educational Applications
+# Fine-tuning LLMs for Educational Applications: Examples
 
-This guide explains three methods for fine-tuning Large Language Models to simulate a second-grade student chatbot.
+This directory contains example implementations for three distinct methods of fine-tuning Large Language Models (LLMs) specifically tailored for educational applications. The goal of these examples is to simulate a second-grade student chatbot, demonstrating how each technique can be applied.
 
 ## Learning Objectives
 
-- Compare three fine-tuning approaches: DSPy, OpenAI, and LoRA
-- Create effective datasets for each method
-- Choose the appropriate method for your use case
-- Implement and evaluate your fine-tuned model
+- Understand the practical application of DSPy, OpenAI Fine-tuning, and LoRA through code examples.
+- Compare the structure and requirements of datasets for each method.
+- Learn the basic steps to run each fine-tuning example.
+- Gain insight into the potential trade-offs (complexity, cost, control) of each approach.
 
-## Method Comparison
+## Example Methods Overview
 
-| Method | Description | Data Needed | Best For |
-|--------|-------------|-------------|----------|
-| **DSPy** | Optimizes prompts without changing model weights | 10-50 examples | Quick prototyping, limited data |
-| **OpenAI** | Updates model weights through cloud API | 50-100+ examples | Production chatbots, consistent behavior |
-| **LoRA** | Adapts specific model parameters locally | 100+ examples | Complete control, data privacy |
+| Method              | Description within Examples                                     | Key Example Files                    | Best For Learning About...          | Cost Note (Examples) | Full Guide                                 |
+|---------------------|-----------------------------------------------------------------|--------------------------------------|-----------------------------------|----------------------|--------------------------------------------|
+| **DSPy**            | Demonstrates optimizing prompts using a few dialogue examples without changing model weights. Focuses on crafting effective interaction flows. | `Approach 1: DSPy/dspy_example.py`, `Approach 1: DSPy/teacher_student_dialogues.jsonl` | Rapid prototyping, prompt engineering, structured reasoning | Low (API calls during optimization) | [DSPy Guide](./docs/dspy_guide.md)       |
+| **OpenAI Fine-tuning** | Shows how to update model weights via the OpenAI API using a larger set of structured messages for consistent persona and knowledge injection. | `Approach 2: OpenAI/openai_finetune.py`, `Approach 2: OpenAI/openai_teacher_dialogue_training.jsonl` | Cloud-based fine-tuning, persona consistency, leveraging OpenAI infra | Moderate (Training + API calls) | [OpenAI Guide](./docs/openai_guide.md) |
+| **LoRA (PEFT)**     | Illustrates adapting specific parameters of a pre-trained model locally using Parameter-Efficient Fine-Tuning (PEFT) for greater control and potential privacy. | `Approach 3: LoRA/huggingface_lora.py`, `Approach 3: LoRA/small_edu_qa.jsonl` | Local fine-tuning, resource efficiency, model customization | Low/Variable (Local compute) | [LoRA Guide](./docs/lora_guide.md)       |
 
-## Dataset Formats
+## Dataset Formats Used in Examples
 
-### DSPy Format
+The examples utilize specific dataset formats suitable for each method:
+
+### DSPy Example Format (`teacher_student_dialogues.jsonl`)
+Each line is a JSON object containing a list of dialogue turns.
 ```json
-{
-  "dialogue": [
-    {"role": "teacher", "content": "What happens when ice melts?"},
-    {"role": "student", "content": "It turns into water! We did an experiment in class."},
-    {"role": "teacher", "content": "Why do you think it melted?"},
-    {"role": "student", "content": "Because the sun is hot!"}
-  ]
-}
+{"dialogue": [{"role": "teacher", "content": "..."}, {"role": "student", "content": "..."}, ...]}
 ```
 
-### OpenAI Format
+### OpenAI Example Format (`openai_teacher_dialogue_training.jsonl`)
+Each line is a JSON object containing a list of messages following the chat completion format.
 ```json
-{
-  "messages": [
-    {"role": "system", "content": "You are a second-grade student."},
-    {"role": "user", "content": "What is the water cycle?"},
-    {"role": "assistant", "content": "Water goes up to the sky and makes clouds."}
-  ]
-}
+{"messages": [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
 ```
 
-### LoRA Format
+### LoRA Example Format (`small_edu_qa.jsonl`)
+A JSON list where each object represents a question-answer pair, often used for instruction tuning.
 ```json
-{
-  "question": "How do plants grow?",
-  "answer": "Plants grow from seeds! First you put a seed in dirt and water it."
-}
+[{"question": "...", "answer": "..."}, ...]
 ```
 
-## Implementation Steps
+## Running the Examples
 
-1. **Setup Environment**
-   - Python 3.10+, Conda, OpenAI API key (for DSPy/OpenAI)
-   - Install dependencies: `conda env create -f environment.yml`
+1.  **Setup Environment:**
+    *   Ensure you have Python 3.10+ and Conda installed.
+    *   Obtain an OpenAI API key if running the DSPy or OpenAI examples. Set it as an environment variable: `export OPENAI_API_KEY='your-key-here'`.
+    *   For LoRA, ensure you have a suitable GPU and have installed PyTorch with CUDA support.
+    *   Install dependencies from the root directory: `conda env create -f environment.yml` (or install specific packages listed in the individual guides).
+    *   Activate the environment: `conda activate utta-env` (adjust name if different).
 
-2. **Create Dataset**
-   - Follow the appropriate format for your chosen method
-   - Include age-appropriate content (vocabulary level: 2,000-5,000 words)
-   - Cover various subjects: math, science, language arts, social studies
+2.  **Prepare Datasets:**
+    *   The example datasets are provided within each approach's directory. Review their structure.
+    *   For OpenAI, you might need to upload the `.jsonl` file via their interface or the script.
 
-3. **Implement Your Chosen Method**
-   - **DSPy**: Create dialogue dataset → Define signatures → Run optimization
-   - **OpenAI**: Format messages → Upload dataset → Initiate fine-tuning
-   - **LoRA**: Prepare QA pairs → Configure parameters → Train locally
+3.  **Execute the Scripts:**
+    *   Navigate to the specific approach directory (e.g., `cd examples/Approach 1: DSPy`).
+    *   Run the corresponding Python script (e.g., `python dspy_example.py`).
+    *   Follow any specific instructions provided within the scripts or the detailed guides. **Note:** The LoRA example might require significant compute resources.
 
-4. **Evaluation**
-   - Test with various subject-matter questions
-   - Verify age-appropriate responses and reasoning
-   - Check for natural conversation flow and educational value
+4.  **Evaluation:**
+    *   Observe the output generated by the scripts.
+    *   Compare the quality and style of responses generated after optimization/fine-tuning.
+    *   Refer to the full guides in `./docs/` for detailed evaluation metrics and techniques.
 
-## Repository Structure
+## Example Directory Structure
 
 ```
 examples/
-├── README.md                                 # This file
-├── Approach 1: DSPy Prompt Optimization
-│   ├── dspy_example.py
-│   └── teacher_student_dialogues.jsonl
-├── Approach 2: OpenAI Fine-tuning
-│   ├── openai_finetune.py
-│   └── openai_teacher_dialogue_training.jsonl
-└── Approach 3: HuggingFace LoRA
-    ├── huggingface_lora.py
-    └── small_edu_qa.jsonl
+├── README.md                                 # This overview file
+├── docs/                                     # Detailed guides
+│   ├── dspy_guide.md
+│   ├── openai_guide.md
+│   └── lora_guide.md
+├── Approach 1: DSPy Prompt Optimization/
+│   ├── dspy_example.py                       # DSPy implementation script
+│   └── teacher_student_dialogues.jsonl       # Example DSPy dataset
+├── Approach 2: OpenAI Fine-tuning/
+│   ├── openai_finetune.py                    # OpenAI fine-tuning script
+│   └── openai_teacher_dialogue_training.jsonl # Example OpenAI dataset
+└── Approach 3: LoRA/
+    ├── huggingface_lora.py                   # LoRA implementation script
+    └── small_edu_qa.jsonl                    # Example LoRA dataset
 ```
 
 ## Resources
 
-- DSPy: [https://dspy.ai/](https://dspy.ai/)
-- OpenAI Fine-tuning: [https://platform.openai.com/docs/guides/fine-tuning](https://platform.openai.com/docs/guides/fine-tuning)
-- HuggingFace LoRA: [https://huggingface.co/docs/peft/conceptual_guides/lora](https://huggingface.co/docs/peft/conceptual_guides/lora)
+For deeper dives into each method, consult the full guides and official documentation:
+
+-   **Detailed Guides:** [`./docs/`](./docs/)
+-   **DSPy:** [https://dspy.ai/](https://dspy.ai/)
+-   **OpenAI Fine-tuning:** [https://platform.openai.com/docs/guides/fine-tuning](https://platform.openai.com/docs/guides/fine-tuning)
+-   **HuggingFace PEFT (LoRA):** [https://huggingface.co/docs/peft/](https://huggingface.co/docs/peft/)
