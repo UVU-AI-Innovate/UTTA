@@ -198,8 +198,3 @@ The `dspy_example.py` shows how to create realistic student responses:
 - [DSPy Documentation](https://dspy.ai)
 - [Example Code](../dspy_example.py)
 - [Community Forums](https://github.com/stanfordnlp/dspy/discussions)
-
-### Getting Help
-- Check documentation first
-- Use community forums
-- Report issues on GitHub 
