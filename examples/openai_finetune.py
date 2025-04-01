@@ -17,7 +17,8 @@ import sys
 import random
 from pathlib import Path
 import openai
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+from dataclasses import dataclass
 
 # Load environment variables from .env file
 try:
@@ -34,8 +35,152 @@ except ImportError:
     print("Warning: dotenv package not found. Environment variables must be set manually.")
 
 ###########################################
-# STEP 1: ENVIRONMENT & DATA PREPARATION #
+# STEP 1: DATA MANAGEMENT CLASSES        #
 ###########################################
+
+@dataclass
+class Message:
+    """Represents a single message in a dialogue"""
+    role: str
+    content: str
+
+    def to_dict(self) -> Dict[str, str]:
+        return {"role": self.role, "content": self.content}
+
+@dataclass
+class Dialogue:
+    """Represents a complete dialogue sequence"""
+    messages: List[Message]
+    subject: str
+    difficulty: str
+    tags: List[str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "messages": [msg.to_dict() for msg in self.messages],
+            "metadata": {
+                "subject": self.subject,
+                "difficulty": self.difficulty,
+                "tags": self.tags
+            }
+        }
+
+class DatasetManager:
+    """Manages dialogue datasets for fine-tuning"""
+    
+    def __init__(self, data_dir: str = "datasets"):
+        self.data_dir = data_dir
+        self.dialogues: List[Dialogue] = []
+        self.ensure_data_directory()
+
+    def ensure_data_directory(self):
+        """Create data directory if it doesn't exist"""
+        os.makedirs(self.data_dir, exist_ok=True)
+
+    def add_dialogue(self, dialogue: Dialogue):
+        """Add a single dialogue to the dataset"""
+        self.dialogues.append(dialogue)
+
+    def add_dialogues_from_file(self, filepath: str):
+        """Load dialogues from a JSON or JSONL file"""
+        with open(filepath, 'r') as f:
+            if filepath.endswith('.json'):
+                data = json.load(f)
+                for item in data:
+                    self.add_dialogue_from_dict(item)
+            else:  # JSONL
+                for line in f:
+                    item = json.loads(line)
+                    self.add_dialogue_from_dict(item)
+
+    def add_dialogue_from_dict(self, data: Dict[str, Any]):
+        """Convert dictionary to Dialogue object and add it"""
+        messages = [Message(**msg) for msg in data["messages"]]
+        metadata = data.get("metadata", {})
+        dialogue = Dialogue(
+            messages=messages,
+            subject=metadata.get("subject", "general"),
+            difficulty=metadata.get("difficulty", "intermediate"),
+            tags=metadata.get("tags", [])
+        )
+        self.add_dialogue(dialogue)
+
+    def save_to_file(self, filename: str, subset: Optional[List[str]] = None):
+        """Save dialogues to a JSONL file, optionally filtering by subjects"""
+        filepath = os.path.join(self.data_dir, filename)
+        dialogues_to_save = self.dialogues
+        if subset:
+            dialogues_to_save = [d for d in self.dialogues if d.subject in subset]
+            
+        with open(filepath, 'w') as f:
+            for dialogue in dialogues_to_save:
+                f.write(json.dumps(dialogue.to_dict()) + '\n')
+        print(f"Saved {len(dialogues_to_save)} dialogues to {filepath}")
+
+    def split_train_val(self, val_ratio: float = 0.2) -> tuple[List[Dialogue], List[Dialogue]]:
+        """Split dialogues into training and validation sets"""
+        random.shuffle(self.dialogues)
+        split_idx = int(len(self.dialogues) * (1 - val_ratio))
+        return self.dialogues[:split_idx], self.dialogues[split_idx:]
+
+    def get_dialogues_by_subject(self, subject: str) -> List[Dialogue]:
+        """Get all dialogues for a specific subject"""
+        return [d for d in self.dialogues if d.subject == subject]
+
+    def get_dialogues_by_difficulty(self, difficulty: str) -> List[Dialogue]:
+        """Get all dialogues of a specific difficulty level"""
+        return [d for d in self.dialogues if d.difficulty == difficulty]
+
+    def get_dialogues_by_tags(self, tags: List[str]) -> List[Dialogue]:
+        """Get all dialogues that have any of the specified tags"""
+        return [d for d in self.dialogues if any(tag in d.tags for tag in tags)]
+
+###########################################
+# STEP 2: SAMPLE DIALOGUE CREATION       #
+###########################################
+
+def create_sample_dialogues() -> List[Dialogue]:
+    """Create sample dialogues for different subjects"""
+    return [
+        Dialogue(
+            messages=[
+                Message("system", "You are a helpful teacher assisting a student."),
+                Message("user", "I'm confused about photosynthesis."),
+                Message("assistant", "What specific part is confusing you?"),
+                Message("user", "How do plants convert sunlight to energy?"),
+                Message("assistant", "Plants capture sunlight with chlorophyll in their chloroplasts. This energy is used to convert CO2 and water into glucose and oxygen through a series of chemical reactions. Would you like me to explain any part of this process in more detail?")
+            ],
+            subject="biology",
+            difficulty="beginner",
+            tags=["photosynthesis", "plants", "energy"]
+        ),
+        # Add more sample dialogues here
+    ]
+
+###########################################
+# STEP 3: DATASET INITIALIZATION         #
+###########################################
+
+def initialize_dataset():
+    """Initialize the dataset with sample dialogues"""
+    dataset = DatasetManager()
+    
+    # Add sample dialogues
+    for dialogue in create_sample_dialogues():
+        dataset.add_dialogue(dialogue)
+    
+    # Load additional dialogues from files
+    for filename in os.listdir(dataset.data_dir):
+        if filename.endswith(('.json', '.jsonl')):
+            dataset.add_dialogues_from_file(os.path.join(dataset.data_dir, filename))
+    
+    return dataset
+
+###########################################
+# STEP 4: DATA PREPARATION              #
+###########################################
+
+print("\nStep 4: Data Preparation")
 
 # Check for API key
 if not os.getenv("OPENAI_API_KEY"):
@@ -45,150 +190,13 @@ if not os.getenv("OPENAI_API_KEY"):
 
 # Configure OpenAI client
 openai.api_key = os.getenv("OPENAI_API_KEY")
-print("Step 1: Environment & Data Preparation")
-
-# Sample data for teacher-student dialogues
-SAMPLE_DIALOGUES = [
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "I'm confused about photosynthesis."},
-            {"role": "assistant", "content": "What specific part is confusing you?"},
-            {"role": "user", "content": "How do plants convert sunlight to energy?"},
-            {"role": "assistant", "content": "Plants capture sunlight with chlorophyll in their chloroplasts. This energy is used to convert CO2 and water into glucose and oxygen through a series of chemical reactions. Would you like me to explain any part of this process in more detail?"}
-        ]
-    },
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "I don't understand Newton's third law."},
-            {"role": "assistant", "content": "Newton's third law states that for every action, there's an equal and opposite reaction. Can you think of any examples where you might have experienced this in everyday life?"},
-            {"role": "user", "content": "Maybe when I push against a wall?"},
-            {"role": "assistant", "content": "Exactly! When you push against a wall, you're applying a force to the wall, but at the same time, the wall is pushing back against your hand with equal force. That's why your hand doesn't go through the wall. Can you think of another example?"}
-        ]
-    },
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "I'm struggling with calculating derivatives."},
-            {"role": "assistant", "content": "I understand derivatives can be challenging. Could you tell me which specific aspect you're finding difficult?"},
-            {"role": "user", "content": "I don't understand the chain rule."},
-            {"role": "assistant", "content": "The chain rule helps us find the derivative of composite functions. If y = f(g(x)), then dy/dx = f'(g(x)) × g'(x). Let's work through an example: if y = sin(x²), what would be its derivative?"},
-            {"role": "user", "content": "I think it would be cos(x²) × 2x?"},
-            {"role": "assistant", "content": "Excellent! That's correct. You've applied the chain rule perfectly. The derivative of sin(x²) is indeed cos(x²) × 2x. Would you like to try another example to reinforce this concept?"}
-        ]
-    }
-]
-
-# Additional training dialogues
-ADDITIONAL_DIALOGUES = [
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "What's the difference between weather and climate?"},
-            {"role": "assistant", "content": "That's a great question. Before I explain, what do you think the difference might be?"},
-            {"role": "user", "content": "Weather is like what's happening outside right now, and climate is maybe more long-term?"},
-            {"role": "assistant", "content": "You're on the right track! Weather refers to short-term atmospheric conditions like temperature, humidity, and precipitation on a given day. Climate, on the other hand, describes the average weather patterns in a region over a longer period, typically 30+ years. Does that distinction make sense?"}
-        ]
-    },
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "I need help with the Pythagorean theorem."},
-            {"role": "assistant", "content": "I'd be happy to help with the Pythagorean theorem. What do you already know about it?"},
-            {"role": "user", "content": "It's something about triangles, but I don't remember the formula."},
-            {"role": "assistant", "content": "The Pythagorean theorem relates to right triangles specifically. It states that in a right triangle, the square of the length of the hypotenuse (the side opposite the right angle) equals the sum of squares of the other two sides. So if we call the sides a, b, and c, with c being the hypotenuse, the formula is: a² + b² = c². Would you like to try an example problem?"}
-        ]
-    },
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "How do vaccines work?"},
-            {"role": "assistant", "content": "Before I explain how vaccines work, could you tell me what you already understand about the immune system?"},
-            {"role": "user", "content": "I know that our body fights infections somehow."},
-            {"role": "assistant", "content": "That's a good starting point! Our immune system recognizes foreign invaders like viruses and bacteria and fights them off. Vaccines work by training this system without causing disease. They contain harmless pieces of the pathogen or weakened versions that trigger an immune response. Your body creates antibodies and memory cells, so if you encounter the real pathogen later, your immune system already knows how to fight it off quickly. Does that make sense?"},
-            {"role": "user", "content": "Yes, so vaccines are like a practice run for the immune system?"},
-            {"role": "assistant", "content": "Exactly! That's a great way to think about it. Vaccines provide a safe 'practice run' for your immune system, preparing it to respond quickly and effectively to the actual pathogen without you having to get sick first. This is why vaccination is so effective at preventing diseases."}
-        ]
-    },
-    {
-        "messages": [
-            {"role": "system", "content": "You are a helpful teacher assisting a student."},
-            {"role": "user", "content": "What causes earthquakes?"},
-            {"role": "assistant", "content": "That's an interesting question about our planet. Do you have any ideas about what might cause the ground to shake during an earthquake?"},
-            {"role": "user", "content": "Is it something about the ground moving?"},
-            {"role": "assistant", "content": "Yes, you're on the right track! Earthquakes are caused by the movement of tectonic plates - large pieces of the Earth's crust that float on the semi-liquid mantle beneath. These plates are constantly moving very slowly. Sometimes they get stuck against each other, building up pressure. When that pressure suddenly releases, the plates jerk into a new position, causing the ground to shake. This usually happens along fault lines, which are boundaries between tectonic plates. Does that explanation help you visualize why earthquakes happen?"}
-        ]
-    }
-]
-
-# Test scenarios for evaluation
-TEST_SCENARIOS = [
-    {
-        "subject": "Biology",
-        "student_queries": [
-            "I'm confused about how DNA works.",
-            "So DNA has two strands, but how does it copy itself?",
-            "What happens if there's a mistake in the copying?"
-        ],
-        "misconceptions": ["DNA copies itself by splitting completely into two separate strands"]
-    },
-    {
-        "subject": "Physics",
-        "student_queries": [
-            "Why do objects float in water?",
-            "So it's about density? What about boats made of metal?",
-            "Does that mean anything can float if shaped right?"
-        ],
-        "misconceptions": ["Metal always sinks", "Only light things can float"]
-    }
-]
-
-# Split data into training and validation sets
-def split_data(dialogues, validation_ratio=0.2):
-    """Split dialogue data into training and validation sets"""
-    dialogues_copy = dialogues.copy()
-    random.shuffle(dialogues_copy)
-    split_idx = int(len(dialogues_copy) * (1 - validation_ratio))
-    return dialogues_copy[:split_idx], dialogues_copy[split_idx:]
-
-# Combine all training data
-ALL_DIALOGUES = SAMPLE_DIALOGUES + ADDITIONAL_DIALOGUES
-TRAIN_DATA, VALIDATION_DATA = split_data(ALL_DIALOGUES, validation_ratio=0.2)
-print(f"- Prepared {len(TRAIN_DATA)} training and {len(VALIDATION_DATA)} validation dialogues")
+print("Step 4: Data Preparation")
 
 ####################################
-# STEP 2: DATA FORMAT PREPARATION #
+# STEP 5: FINE-TUNING CONFIGURATION #
 ####################################
 
-print("\nStep 2: Data Format Preparation")
-
-# Prepare training file in OpenAI's format
-def prepare_dialogue_data(data, output_file):
-    """
-    Convert dialogue data to OpenAI's fine-tuning format
-    Format follows the OpenAI Chat Completions format with messages
-    """
-    # Save to JSONL file (already in correct format)
-    with open(output_file, "w") as f:
-        for item in data:
-            f.write(json.dumps(item) + "\n")
-    
-    print(f"- Formatted dialogue data saved to {output_file}")
-    return output_file
-
-# Generate the formatted data files
-training_file_path = os.path.join(os.path.dirname(__file__), "openai_teacher_dialogue_training.jsonl")
-validation_file_path = os.path.join(os.path.dirname(__file__), "openai_teacher_dialogue_validation.jsonl")
-
-prepare_dialogue_data(TRAIN_DATA, training_file_path)
-prepare_dialogue_data(VALIDATION_DATA, validation_file_path)
-
-#######################################
-# STEP 3: FINE-TUNING CONFIGURATION  #
-#######################################
-
-print("\nStep 3: Fine-Tuning Configuration")
+print("\nStep 5: Fine-Tuning Configuration")
 print("- Base model: gpt-3.5-turbo (OpenAI)")
 print("- Training method: Full model fine-tuning with dialogue data")
 print("- Format: Multi-turn conversations with system, user, and assistant roles")
@@ -196,10 +204,10 @@ print("- Pedagogical focus: Socratic questioning, scaffolding, and knowledge ass
 print("- Hyperparameters: Default OpenAI settings with n_epochs=3")
 
 #######################################
-# STEP 4: FINE-TUNING IMPLEMENTATION #
+# STEP 6: FINE-TUNING IMPLEMENTATION #
 #######################################
 
-print("\nStep 4: Fine-Tuning Implementation")
+print("\nStep 6: Fine-Tuning Implementation")
 print("- Note: This would upload dialogue data and start a fine-tuning job")
 
 # Function to upload the file to OpenAI
@@ -333,10 +341,10 @@ print("- To run actual fine-tuning, call execute_fine_tuning()")
 simulated_fine_tuned_model_id = "ft:gpt-3.5-turbo:teaching-assistant:2023-01-01"
 
 ###########################################
-# STEP 5: EVALUATION OF FINE-TUNING      #
+# STEP 7: EVALUATION OF FINE-TUNING      #
 ###########################################
 
-print("\nStep 5: Evaluation of Fine-Tuning")
+print("\nStep 7: Evaluation of Fine-Tuning")
 
 def evaluate_teacher_responses(responses: List[str]) -> Dict[str, float]:
     """Evaluate the quality of teacher responses using multiple metrics"""
@@ -509,10 +517,10 @@ for metric in base_model_results["OVERALL"]:
     print(f"{metric:<25} {base_value:<15.2f} {ft_value:<15.2f} {improvement_str:<15}")
 
 ########################################
-# STEP 6: INTERACTIVE DEMONSTRATION   #
+# STEP 8: INTERACTIVE DEMONSTRATION   #
 ########################################
 
-print("\nStep 6: Interactive Teacher-Student Dialogue Demo")
+print("\nStep 8: Interactive Teacher-Student Dialogue Demo")
 
 def interactive_dialogue(model_type="base", fine_tuned_model_id=None):
     """Interactive dialogue with chosen model"""
@@ -545,10 +553,10 @@ def interactive_dialogue(model_type="base", fine_tuned_model_id=None):
 interactive_dialogue(model_type="fine-tuned", fine_tuned_model_id=simulated_fine_tuned_model_id)
 
 ##########################
-# STEP 7: COMPARISON    #
+# STEP 9: COMPARISON    #
 ##########################
 
-print("\nStep 7: Comparison with other methods")
+print("\nStep 9: Comparison with other methods")
 print("- OpenAI dialogue fine-tuning vs. DSPy:")
 print("  * OpenAI: Updates model weights, DSPy: Only optimizes prompts")
 print("  * OpenAI: Better understanding of educational dialogue flow")
@@ -563,4 +571,20 @@ print("  * OpenAI: Simpler implementation, HuggingFace: More control over dialog
 print("\nNote about costs:")
 print("1. Fine-tuning gpt-3.5-turbo typically costs around $0.008 per 1K training tokens")
 print("2. Using a fine-tuned model costs about 1.5-2x the base model price")
-print("3. For this example with ~8 dialogues, expect to pay ~$2-5 for training") 
+print("3. For this example with ~8 dialogues, expect to pay ~$2-5 for training")
+
+if __name__ == "__main__":
+    # Initialize dataset
+    dataset = initialize_dataset()
+    
+    # Split into train/val sets
+    train_dialogues, val_dialogues = dataset.split_train_val()
+    
+    # Save to files
+    dataset.save_to_file("train.jsonl")
+    dataset.save_to_file("val.jsonl")
+    
+    print(f"Prepared {len(train_dialogues)} training and {len(val_dialogues)} validation dialogues")
+    
+    # Continue with fine-tuning process...
+    # (rest of the main execution code) 

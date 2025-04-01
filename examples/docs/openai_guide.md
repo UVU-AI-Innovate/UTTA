@@ -101,88 +101,180 @@ def assess_student_response(student_answer, correct_answer, subject, grade_level
 
 ## Fine-tuning for Education
 
-### 1. Prepare Training Data
+### Understanding the Fine-tuning Script
+
+Our `openai_finetune.py` script provides a complete workflow for fine-tuning OpenAI models for educational purposes. Here's how it works:
+
+#### 1. Data Management Structure
 ```python
-def create_educational_dataset(subject_area):
-    """Create JSONL dataset for fine-tuning."""
-    
-    training_data = [
+@dataclass
+class Message:
+    role: str      # system, user, or assistant
+    content: str   # the actual message content
+
+@dataclass
+class Dialogue:
+    messages: List[Message]
+    subject: str       # e.g., "physics", "biology"
+    difficulty: str    # e.g., "beginner", "intermediate"
+    tags: List[str]    # e.g., ["mechanics", "forces"]
+```
+
+#### 2. Dataset Organization
+```
+datasets/
+├── train.jsonl              # Training dataset
+├── val.jsonl               # Validation dataset
+└── subjects/               # Subject-specific dialogues
+    ├── biology/
+    │   ├── genetics.jsonl
+    │   └── photosynthesis.jsonl
+    ├── physics/
+    │   ├── mechanics.jsonl
+    │   └── thermodynamics.jsonl
+    └── math/
+        ├── algebra.jsonl
+        └── calculus.jsonl
+```
+
+#### 3. Example Dialogue Format
+```json
+{
+    "messages": [
         {
-            "messages": [
-                {"role": "system", "content": "You are a helpful teaching assistant."},
-                {"role": "user", "content": "What is photosynthesis?"},
-                {"role": "assistant", "content": "Photosynthesis is like a plant's kitchen..."}
-            ]
+            "role": "system",
+            "content": "You are a helpful teacher assisting a student."
         },
-        # Add more examples...
-    ]
-    
-    # Save to JSONL file
-    with open(f"{subject_area}_training.jsonl", "w") as f:
-        for example in training_data:
-            json.dump(example, f)
-            f.write("\n")
-    
-    return f"{subject_area}_training.jsonl"
-
-# Create and upload training file
-training_file = client.files.create(
-    file=open("biology_training.jsonl", "rb"),
-    purpose="fine-tune"
-)
-
-# Start fine-tuning
-job = client.fine_tuning.jobs.create(
-    training_file=training_file.id,
-    model="gpt-3.5-turbo",
-    hyperparameters={
-        "n_epochs": 3,
-        "learning_rate_multiplier": 1.6,
-        "batch_size": 4
+        {
+            "role": "user",
+            "content": "I'm confused about photosynthesis."
+        },
+        {
+            "role": "assistant",
+            "content": "What specific part is confusing you?"
+        }
+    ],
+    "metadata": {
+        "subject": "biology",
+        "difficulty": "beginner",
+        "tags": ["photosynthesis", "plants", "energy"]
     }
-)
+}
 ```
 
-### 2. Educational Content Generation
+### Adding New Training Data
+
+1. **Using the DatasetManager**:
 ```python
-def generate_lesson_materials(topic, grade_level, material_type):
-    """Generate various educational materials."""
-    
-    prompts = {
-        "lesson_plan": """Create a detailed lesson plan for {topic} at {grade_level} level:
-        1. Learning objectives
-        2. Key concepts
-        3. Activities
-        4. Assessment methods
-        5. Materials needed""",
-        
-        "worksheet": """Design a worksheet for {topic} at {grade_level} level:
-        1. Practice problems
-        2. Application questions
-        3. Critical thinking exercises
-        4. Self-assessment section""",
-        
-        "quiz": """Create a quiz for {topic} at {grade_level} level:
-        1. Multiple choice questions
-        2. Short answer questions
-        3. Problem-solving tasks
-        4. Answer key with explanations"""
-    }
-    
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are an experienced curriculum designer."},
-            {"role": "user", "content": prompts[material_type].format(
-                topic=topic, 
-                grade_level=grade_level
-            )}
-        ],
-        temperature=0.7
-    )
-    
-    return response.choices[0].message.content
+from openai_finetune import DatasetManager, Dialogue, Message
+
+# Initialize dataset manager
+dataset = DatasetManager()
+
+# Add a single dialogue
+new_dialogue = Dialogue(
+    messages=[
+        Message("system", "You are a helpful teacher assisting a student."),
+        Message("user", "How do I solve quadratic equations?"),
+        Message("assistant", "Let's break this down step by step...")
+    ],
+    subject="math",
+    difficulty="intermediate",
+    tags=["algebra", "quadratic-equations"]
+)
+dataset.add_dialogue(new_dialogue)
+
+# Save to file
+dataset.save_to_file("math_training.jsonl")
 ```
+
+2. **Adding from JSONL Files**:
+```python
+# Add dialogues from existing files
+dataset.add_dialogues_from_file("datasets/subjects/physics/mechanics.jsonl")
+```
+
+### Fine-tuning Process
+
+The script handles the complete fine-tuning workflow:
+
+1. **Data Preparation**:
+   ```python
+   # Initialize and load data
+   dataset = initialize_dataset()
+   train_dialogues, val_dialogues = dataset.split_train_val()
+   ```
+
+2. **File Upload**:
+   ```python
+   # Upload training files to OpenAI
+   training_file_id = upload_training_file("train.jsonl")
+   validation_file_id = upload_training_file("val.jsonl")
+   ```
+
+3. **Fine-tuning Job**:
+   ```python
+   # Create and monitor fine-tuning job
+   job_id = create_fine_tuning_job(
+       training_file_id=training_file_id,
+       validation_file_id=validation_file_id,
+       model="gpt-3.5-turbo",
+       n_epochs=3
+   )
+   ```
+
+### Included Datasets
+
+The script comes with several pre-built datasets:
+
+1. **Basic Science Concepts**:
+   - Photosynthesis
+   - Newton's Laws
+   - Weather and Climate
+   - Earthquakes
+
+2. **Mathematics**:
+   - Derivatives
+   - Pythagorean Theorem
+   - Quadratic Equations
+
+3. **Test Scenarios**:
+   - Biology (DNA replication)
+   - Physics (Buoyancy)
+
+Each dialogue demonstrates key teaching techniques:
+- Socratic questioning
+- Building on prior knowledge
+- Real-world examples
+- Misconception correction
+
+### Evaluation Metrics
+
+The script includes comprehensive evaluation:
+
+```python
+def evaluate_teacher_responses(responses):
+    """Evaluate teaching quality metrics"""
+    metrics = {
+        "pedagogical_techniques": 0,  # Use of teaching strategies
+        "follow_up_questions": 0,     # Engagement through questions
+        "response_length": 0,         # Appropriate detail level
+        "adaptability": 0             # Response to student level
+    }
+    # ... evaluation logic ...
+```
+
+### Cost Considerations
+
+1. **Training Costs**:
+   - Base rate: $0.008 per 1K training tokens
+   - Typical dataset (8 dialogues): ~$2-5 total
+   - Fine-tuned model usage: 1.5-2x base rate
+
+2. **Optimization Tips**:
+   - Start with small dataset for testing
+   - Use validation set to prevent overfitting
+   - Monitor token usage during training
 
 ## Best Practices
 
